@@ -1,0 +1,8 @@
+;; DO NOT EDIT. RUN GENERATE TO REGENERATE
+
+(in-package :cl-amqp)
+
+(defconstant +amqp-port+ ${spec.port})
+% for (name, value, klass) in spec.constants:
+(defconstant +amqp-${name.lower()}+ ${value})
+% endfor
