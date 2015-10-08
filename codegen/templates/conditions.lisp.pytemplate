@@ -1,0 +1,46 @@
+;; DO NOT EDIT. RUN GENERATE TO REGENERATE
+<% import re, os, codegen %>
+(in-package :cl-amqp)
+
+(define-condition amqp-base-error (error)
+  ())
+
+(define-condition amqp-protocol-error (amqp-base-error)
+  ((reply-code :reader amqp-error-reply-code) ;auto-generated
+   (reply-text :initarg :reply-text
+               :reader amqp-error-reply-text)
+   (connection :initarg :connection
+               :reader amqp-error-connection)
+   (channel :initarg :channel
+            :reader amqp-error-channel)
+   (class :initarg :class
+          :reader amqp-error-class)
+   (method :initarg :method
+           :reader amqp-error-method)))
+
+(define-condition amqp-channel-error (amqp-protocol-error)
+  ((channel :initarg :channel
+            :reader amqp-error-channel)))
+
+(define-condition amqp-connection-error (amqp-protocol-error)
+  ())
+% for (name, value, klass) in spec.constants:
+  % if klass:
+
+(define-condition amqp-error-${name.lower()} (${codegen.to_cl_condition_class(klass)})
+  ((reply-code :initform ${value})))
+  % endif
+% endfor
+
+(define-condition amqp-unknown-reply-code-error (amqp-base-error)
+  ((reply-code :initarg :reply-code
+               :reader amqp-error-reply-code)))
+
+(defun error-type-from-reply-code (reply-code)
+  (case reply-code
+% for (name, value, klass) in spec.constants:
+  % if klass:
+    (${value} 'amqp-error-${name.lower()})
+  % endif
+% endfor
+    (t (error 'amqp-unknown-reply-code-error :reply-code reply-code))))
