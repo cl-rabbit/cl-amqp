@@ -14,4 +14,12 @@
   :depends-on ("alexandria"
                "log4cl")
   :serial t
-  :components ((:file "src/package")))
+  :components ((:module "src"
+                :serial t
+                :components
+                ((:file "package")
+                 (:module "protocol"
+                  :serial t
+                  :components
+                  ((:file "constants")
+                   (:file "conditions")))))))
