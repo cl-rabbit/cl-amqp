@@ -9,4 +9,4 @@ fi
 
 EXTENSIONS=()
 
-./codegen/codegen.py ${ARRAY[*]}
+./codegen/codegen.py $SPEC ${EXTENSIONS[*]}
