@@ -1,0 +1,12 @@
+#!/bin/bash
+
+SPEC="codegen/rabbitmq-codegen/amqp-rabbitmq-0.9.1.json"
+
+if [ ! -f $SPEC ]; then
+    echo "rabbitmq-codegen submodule not found. downloading"
+    git submodule update --init
+fi
+
+EXTENSIONS=()
+
+./codegen/codegen.py ${ARRAY[*]}
