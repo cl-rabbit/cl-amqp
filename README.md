@@ -27,6 +27,8 @@ By contributing to the project, you agree to the license and copyright terms the
 
 ## Copyright
 
+Copyright (c) 2015 Ilya Khaprov <ilya.khaprov@publitechs.com> and [CONTRIBUTORS](CONTRIBUTORS.md)
+
 CL-AMQP uses a shared copyright model: each contributor holds copyright over their contributions to CL-AMQP. The project versioning records all such contribution and copyright details.
 
 If a contributor wants to further mark their specific copyright on a particular contribution, they should indicate their copyright solely in the commit message of the change when it is committed. Do not include copyright notices in files for this purpose.
