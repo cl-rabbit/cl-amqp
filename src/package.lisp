@@ -2,4 +2,6 @@
 
 (defpackage :cl-amqp
   (:use :cl :alexandria)
-  (:nicknames :amqp))
+  (:nicknames :amqp)
+  (:export :error-type-from-reply-code ;; conditions, maybe auto-generate?
+           :amqp-unknown-reply-code-error))
