@@ -1,4 +1,4 @@
-# cl-amqp
+# CL-AMQP [![Build Status](https://travis-ci.org/cl-rabbit/cl-amqp.svg)](https://travis-ci.org/cl-rabbit/cl-amqp)
 AMQP 0.9.1 with RabbitMQ extensions in Common Lisp
 
 ## License
