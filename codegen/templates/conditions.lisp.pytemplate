@@ -28,7 +28,7 @@
   % if klass:
 
 (define-condition amqp-error-${name.lower()} (${codegen.to_cl_condition_class(klass)})
-  ((reply-code :initform ${value})))
+  ((reply-code :initform +amqp-${name.lower()}+)))
   % endif
 % endfor
 
@@ -40,7 +40,7 @@
   (case reply-code
 % for (name, value, klass) in spec.constants:
   % if klass:
-    (${value} 'amqp-error-${name.lower()})
+    (${value} #|+amqp-${name.lower()}+|# 'amqp-error-${name.lower()})
   % endif
 % endfor
     (t (error 'amqp-unknown-reply-code-error :reply-code reply-code))))
