@@ -13,12 +13,14 @@
   :licence "MIT"
   :depends-on ("cl-amqp"
                "prove"
-               "log4cl")
+               "log4cl"
+               "cl-interpol")
   :serial t
   :components ((:module "t"
                 :serial t
                 :components
                 ((:file "package")
+                 (:test-file "util/binary-string")
                  (:test-file "dummy")
                  (:test-file "conditions"))))
   :defsystem-depends-on (:prove-asdf)
