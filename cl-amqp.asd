@@ -25,5 +25,6 @@
                   :serial t
                   :components
                   ((:file "constants")
-                   (:file "conditions"))))))
+                   (:file "conditions")
+                   (:file "frame"))))))
   :in-order-to ((test-op (test-op cl-amqp.test))))
