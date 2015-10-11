@@ -1,4 +1,4 @@
 (in-package :cl-user)
 
 (defpackage :cl-amqp.test
-  (:use :cl-amqp :prove))
+  (:use :cl :cl-amqp :prove))
