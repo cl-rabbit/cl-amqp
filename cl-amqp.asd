@@ -12,6 +12,7 @@
   :author "Ilya Khaprov <ilya.khaprov@publitechs.com> and CONTRIBUTORS"
   :licence "MIT"
   :depends-on ("alexandria"
+               "nibbles"
                "log4cl")
   :serial t
   :components ((:module "src"
