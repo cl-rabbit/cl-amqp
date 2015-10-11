@@ -20,8 +20,8 @@
                 :serial t
                 :components
                 ((:file "package")
-                 (:test-file "util/binary-string")
                  (:test-file "dummy")
+                 (:test-file "util/binary-string")
                  (:test-file "conditions"))))
   :defsystem-depends-on (:prove-asdf)
   :perform (test-op :after (op c)

@@ -13,12 +13,14 @@
   :licence "MIT"
   :depends-on ("alexandria"
                "nibbles"
+               "cl-interpol"
                "log4cl")
   :serial t
   :components ((:module "src"
                 :serial t
                 :components
                 ((:file "package")
+                 (:file "util/binary-string")
                  (:module "protocol"
                   :serial t
                   :components
