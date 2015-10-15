@@ -10,6 +10,7 @@
   :description "AMQP 0.9.1 with RabbitMQ extensions in Common Lisp"  
   :maintainer "Ilya Khaprov <ilya.khaprov@publitechs.com>"
   :author "Ilya Khaprov <ilya.khaprov@publitechs.com> and CONTRIBUTORS"
+  :homepage "https://github.com/cl-rabbit/cl-amqp"
   :licence "MIT"
   :depends-on ("alexandria"
                "nibbles"
