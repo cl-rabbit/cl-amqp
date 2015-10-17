@@ -15,6 +15,8 @@
   :depends-on ("alexandria"
                "nibbles"
                "cl-interpol"
+               "wu-decimal"
+               "local-time"
                "log4cl")
   :serial t
   :components ((:module "src"
