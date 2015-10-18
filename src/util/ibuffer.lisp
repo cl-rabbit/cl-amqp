@@ -9,13 +9,23 @@
   (end 0 :type fixnum)
   (cursor 0 :type fixnum))
 
+(defmacro assert-ibuffer-can-advance (ibuffer count)
+  `(unless (<= (+ (ibuffer-cursor ,ibuffer) ,count)
+               (ibuffer-end ,ibuffer))
+     (error "iBuffer overflow"))) ;; TODO: specialize error
+
 (defun new-ibuffer-from-octets (octets length)
+  (declare (type nibbles:simple-octet-vector octets))
+  (unless (<= length
+              (length octets))
+    (error "iBuffer overflow")) ;; TODO: specialize error
   (make-ibuffer :buffer octets
                 :start 0
                 :end length
                 :cursor 0))
 
 (defun new-ibuffer-from-ibuffer (ibuffer length)
+  (assert-ibuffer-can-advance ibuffer length)
   (make-ibuffer :buffer (ibuffer-buffer ibuffer)
                 :source-buffer ibuffer
                 :start (ibuffer-cursor ibuffer)
@@ -23,7 +33,7 @@
                 :cursor (ibuffer-cursor ibuffer)))
 
 (defun new-ibuffer (source &optional length)
-  (typecase source 
+  (typecase source
     (nibbles:simple-octet-vector (new-ibuffer-from-octets source (or length
                                                                      (length source))))
     (ibuffer (new-ibuffer-from-ibuffer source (or length
@@ -50,11 +60,6 @@
       (dpb byte (byte 8 0) -1)
       byte))
 
-(defmacro assert-ibuffer-can-advance (ibuffer count)
-  `(unless (<= (+ (ibuffer-cursor ,ibuffer) ,count)
-               (ibuffer-end ,ibuffer))
-     (error "iBuffer overflow"))) ;; TODO: specialize error
-
 (defmacro define-ibuffer-decoder (name advance-count &body body)
   (let ((lambda-list (if (integerp advance-count)
                     '(ibuffer)
@@ -69,8 +74,8 @@
 
 (define-ibuffer-decoder ibuffer-get-bytes length
   (subseq (ibuffer-buffer ibuffer)
-                 (ibuffer-cursor ibuffer)
-                 (+ (ibuffer-cursor ibuffer) length)))
+          (ibuffer-cursor ibuffer)
+          (+ (ibuffer-cursor ibuffer) length)))
 
 (define-ibuffer-decoder ibuffer-decode-utf8 length
   (trivial-utf-8:utf-8-bytes-to-string (ibuffer-buffer ibuffer) :start (ibuffer-cursor ibuffer)
