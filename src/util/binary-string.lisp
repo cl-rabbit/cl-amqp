@@ -16,7 +16,11 @@ here by ENABLE-BINARY-STRING-SYNTAX.")
   (push *readtable*
         *previous-readtables*)
   (setq *readtable* (copy-readtable))
-  (set-dispatch-macro-character #\# #\b #'binary-string-reader)
+  (let ((bits-reader (get-dispatch-macro-character #\# #\b)))
+    (set-dispatch-macro-character #\# #\b (lambda (stream char arg)
+                                            (if (char= #\" (peek-char nil stream))
+                                                (binary-string-reader stream char arg)
+                                                (funcall bits-reader stream char arg)))))
   (values))
 
 (defmacro enable-binary-string-syntax ()
