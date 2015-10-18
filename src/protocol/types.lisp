@@ -96,7 +96,7 @@
   ;; I'm lost here
   ;; (octets-to-string #b"he\x1llo") -> "hello"
   (let* ((string-length (ibuffer-decode-ub32 buffer)))
-    (trivial-utf-8:utf-8-bytes-to-string (ibuffer-get-bytes buffer string-length))))
+    (ibuffer-decode-utf8 buffer string-length)))
 
 (defun amqp-array-decoder (buffer)
   (let* ((array-body-length (ibuffer-decode-ub32 buffer))
@@ -113,7 +113,7 @@
 
 (defun amqp-decode-short-string (buffer)
   (let* ((string-length (ibuffer-decode-ub8 buffer)))
-    (trivial-utf-8:utf-8-bytes-to-string (ibuffer-get-bytes buffer string-length))))
+    (ibuffer-decode-utf8 buffer string-length)))
 
 (defun amqp-decode-field-name (buffer)
   (amqp-decode-short-string buffer))
