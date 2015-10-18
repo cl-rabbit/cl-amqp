@@ -31,16 +31,18 @@
     (t (error "Invalid source for ibuffer")))) ;; TODO: specialize error
 
 (defun advance-cursor (ibuffer count)
-  (declare (type ibuffer ibuffer))
+  (declare (type ibuffer ibuffer)
+           (type fixnum count)
+           (optimize (speed 3) (debug 0) (safety 0)))
   (incf (ibuffer-cursor ibuffer) count)
   (when-let ((source-buffer (ibuffer-source-buffer ibuffer)))
     (advance-cursor source-buffer count)))
 
-(defun ibuffer-get-bytes (ibuffer)
+(defun ibuffer-get-bytes (ibuffer length)
   (declare (type ibuffer ibuffer))
   (prog1 (subseq (ibuffer-buffer ibuffer)
                  (ibuffer-cursor ibuffer)
-                 (ibuffer-end ibuffer))
+                 (+ (ibuffer-cursor ibuffer) length))
     (advance-cursor ibuffer (- (ibuffer-end ibuffer) (ibuffer-cursor ibuffer)))))
 
 (defun ibuffer-consumed-p (ibuffer)
@@ -50,53 +52,61 @@
 
 (defun ub8-to-sb8 (byte)
   (declare (optimize (speed 3) (debug 0) (safety 0))
-           (type (unsigned-byte 8)byte))
+           (type (unsigned-byte 8) byte))
   (if (logbitp 7 byte)
       (dpb byte (byte 8 0) -1)
       byte))
 
 (defun ibuffer-decode-ub8 (ibuffer)
-  (declare (type ibuffer ibuffer))
+  (declare (type ibuffer ibuffer)
+           (optimize (speed 3) (debug 0) (safety 0)))
   (prog1 (aref (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))
     (advance-cursor ibuffer 1)))
 
 (defun ibuffer-decode-sb8 (ibuffer)
-  (declare (type ibuffer ibuffer))
+  (declare (type ibuffer ibuffer)
+           (optimize (speed 3) (debug 0) (safety 0)))
   (prog1 (ub8-to-sb8 (aref (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
     (advance-cursor ibuffer 1)))
 
-(defun ibuffer-decode-sb16 (ibuffer)  
-  (declare (type ibuffer ibuffer))
+(defun ibuffer-decode-sb16 (ibuffer)
+  (declare (type ibuffer ibuffer)
+           (optimize (speed 3) (debug 0) (safety 0)))
   (prog1
       (nibbles:sb16ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))
     (advance-cursor ibuffer 2)))
 
-(defun ibuffer-decode-sb32 (ibuffer)  
-  (declare (type ibuffer ibuffer))
+(defun ibuffer-decode-sb32 (ibuffer)
+  (declare (type ibuffer ibuffer)
+           (optimize (speed 3) (debug 0) (safety 0)))
   (prog1
       (nibbles:sb32ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))
     (advance-cursor ibuffer 4)))
 
-(defun ibuffer-decode-ub32 (ibuffer)  
-  (declare (type ibuffer ibuffer))
+(defun ibuffer-decode-ub32 (ibuffer)
+  (declare (type ibuffer ibuffer)
+           (optimize (speed 3) (debug 0) (safety 0)))
   (prog1
       (nibbles:ub32ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))
     (advance-cursor ibuffer 4)))
 
-(defun ibuffer-decode-sb64 (ibuffer)  
-  (declare (type ibuffer ibuffer))
+(defun ibuffer-decode-sb64 (ibuffer)
+  (declare (type ibuffer ibuffer)
+           (optimize (speed 3) (debug 0) (safety 0)))
   (prog1
       (nibbles:sb64ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))
     (advance-cursor ibuffer 8)))
 
-(defun ibuffer-decode-float (ibuffer)  
-  (declare (type ibuffer ibuffer))
+(defun ibuffer-decode-float (ibuffer)
+  (declare (type ibuffer ibuffer)
+           (optimize (speed 3) (debug 0) (safety 0)))
   (prog1
       (nibbles:ieee-single-ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))
     (advance-cursor ibuffer 4)))
 
-(defun ibuffer-decode-double (ibuffer)  
-  (declare (type ibuffer ibuffer))
+(defun ibuffer-decode-double (ibuffer)
+  (declare (type ibuffer ibuffer)
+           (optimize (speed 3) (debug 0) (safety 0)))
   (prog1
       (nibbles:ieee-double-ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))
     (advance-cursor ibuffer 8)))
