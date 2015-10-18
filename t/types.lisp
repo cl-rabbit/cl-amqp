@@ -36,7 +36,7 @@
                  ("longval" . 912598613)
                  ("null" . :void)
                  ("strval" . "Test")
-                 ("single" . 314)
+                 ("single" . 3.14)
                  ("double" . 3.666666666666d0)
                  ("timestampval" . @2006-11-21T16:30:10)
                  ("unicode" . "utf8=✓"))))
