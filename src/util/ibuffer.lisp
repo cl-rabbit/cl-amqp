@@ -38,17 +38,6 @@
   (when-let ((source-buffer (ibuffer-source-buffer ibuffer)))
     (advance-cursor source-buffer count)))
 
-(defun ibuffer-get-bytes (ibuffer length)
-  (declare (type ibuffer ibuffer)
-           (type fixnum length)
-           (optimize (speed 3) (debug 0) (safety 0)))
-  (assert (<= (+ (ibuffer-cursor ibuffer) length)
-              (ibuffer-end ibuffer)))
-  (prog1 (subseq (ibuffer-buffer ibuffer)
-                 (ibuffer-cursor ibuffer)
-                 (+ (ibuffer-cursor ibuffer) length))
-    (advance-cursor ibuffer length)))
-
 (defun ibuffer-consumed-p (ibuffer)
   (declare (type ibuffer ibuffer))
   (>= (ibuffer-cursor ibuffer)
@@ -61,56 +50,51 @@
       (dpb byte (byte 8 0) -1)
       byte))
 
-(defun ibuffer-decode-ub8 (ibuffer)
-  (declare (type ibuffer ibuffer)
-           (optimize (speed 3) (debug 0) (safety 0)))
-  (prog1 (aref (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))
-    (advance-cursor ibuffer 1)))
+(defmacro assert-ibuffer-can-advance (ibuffer count)
+  `(unless (<= (+ (ibuffer-cursor ,ibuffer) ,count)
+               (ibuffer-end ,ibuffer))
+     (error "iBuffer overflow"))) ;; TODO: specialize error
 
-(defun ibuffer-decode-sb8 (ibuffer)
-  (declare (type ibuffer ibuffer)
-           (optimize (speed 3) (debug 0) (safety 0)))
-  (prog1 (ub8-to-sb8 (aref (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
-    (advance-cursor ibuffer 1)))
+(defmacro define-ibuffer-decoder (name advance-count &body body)
+  (let ((lambda-list (if (integerp advance-count)
+                    '(ibuffer)
+                    (list 'ibuffer advance-count))))
+    `(defun ,name ,lambda-list
+       (declare (type ibuffer ibuffer)
+                (optimize (speed 3) (debug 0) (safety 0)))
+       (assert-ibuffer-can-advance ibuffer ,advance-count)
+       (prog1 (progn
+                ,@body)
+         (advance-cursor ibuffer ,advance-count)))))
 
-(defun ibuffer-decode-sb16 (ibuffer)
-  (declare (type ibuffer ibuffer)
-           (optimize (speed 3) (debug 0) (safety 0)))
-  (prog1
-      (nibbles:sb16ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))
-    (advance-cursor ibuffer 2)))
+(define-ibuffer-decoder ibuffer-get-bytes length
+  (subseq (ibuffer-buffer ibuffer)
+                 (ibuffer-cursor ibuffer)
+                 (+ (ibuffer-cursor ibuffer) length)))
 
-(defun ibuffer-decode-sb32 (ibuffer)
-  (declare (type ibuffer ibuffer)
-           (optimize (speed 3) (debug 0) (safety 0)))
-  (prog1
-      (nibbles:sb32ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))
-    (advance-cursor ibuffer 4)))
+(define-ibuffer-decoder ibuffer-decode-utf8 length
+  (trivial-utf-8:utf-8-bytes-to-string (ibuffer-buffer ibuffer) :start (ibuffer-cursor ibuffer)
+                                                                :end (+ (ibuffer-cursor ibuffer) length)))
 
-(defun ibuffer-decode-ub32 (ibuffer)
-  (declare (type ibuffer ibuffer)
-           (optimize (speed 3) (debug 0) (safety 0)))
-  (prog1
-      (nibbles:ub32ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))
-    (advance-cursor ibuffer 4)))
+(define-ibuffer-decoder ibuffer-decode-ub8 1
+  (aref (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
 
-(defun ibuffer-decode-sb64 (ibuffer)
-  (declare (type ibuffer ibuffer)
-           (optimize (speed 3) (debug 0) (safety 0)))
-  (prog1
-      (nibbles:sb64ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))
-    (advance-cursor ibuffer 8)))
+(define-ibuffer-decoder ibuffer-decode-sb8 1
+  (ub8-to-sb8 (aref (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))))
 
-(defun ibuffer-decode-float (ibuffer)
-  (declare (type ibuffer ibuffer)
-           (optimize (speed 3) (debug 0) (safety 0)))
-  (prog1
-      (nibbles:ieee-single-ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))
-    (advance-cursor ibuffer 4)))
+(define-ibuffer-decoder ibuffer-decode-sb16 2  (nibbles:sb16ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
 
-(defun ibuffer-decode-double (ibuffer)
-  (declare (type ibuffer ibuffer)
-           (optimize (speed 3) (debug 0) (safety 0)))
-  (prog1
-      (nibbles:ieee-double-ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))
-    (advance-cursor ibuffer 8)))
+(define-ibuffer-decoder ibuffer-decode-sb32 4
+  (nibbles:sb32ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
+
+(define-ibuffer-decoder ibuffer-decode-ub32 4
+  (nibbles:ub32ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
+
+(define-ibuffer-decoder ibuffer-decode-sb64 8
+  (nibbles:sb64ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
+
+(define-ibuffer-decoder ibuffer-decode-float 4
+  (nibbles:ieee-single-ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
+
+(define-ibuffer-decoder ibuffer-decode-double 8
+  (nibbles:ieee-double-ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
