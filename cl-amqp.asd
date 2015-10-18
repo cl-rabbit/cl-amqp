@@ -18,7 +18,7 @@
                "wu-decimal"
                "local-time"
                "collectors"
-               "babel"
+               "trivial-utf-8"
                "log4cl")
   :serial t
   :components ((:module "src"
