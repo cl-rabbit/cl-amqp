@@ -39,11 +39,15 @@
     (advance-cursor source-buffer count)))
 
 (defun ibuffer-get-bytes (ibuffer length)
-  (declare (type ibuffer ibuffer))
+  (declare (type ibuffer ibuffer)
+           (type fixnum length)
+           (optimize (speed 3) (debug 0) (safety 0)))
+  (assert (<= (+ (ibuffer-cursor ibuffer) length)
+              (ibuffer-end ibuffer)))
   (prog1 (subseq (ibuffer-buffer ibuffer)
                  (ibuffer-cursor ibuffer)
                  (+ (ibuffer-cursor ibuffer) length))
-    (advance-cursor ibuffer (- (ibuffer-end ibuffer) (ibuffer-cursor ibuffer)))))
+    (advance-cursor ibuffer length)))
 
 (defun ibuffer-consumed-p (ibuffer)
   (declare (type ibuffer ibuffer))
