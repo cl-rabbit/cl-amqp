@@ -95,9 +95,8 @@
   ;; and pika fpr example converts lstring to utf8 string
   ;; I'm lost here
   ;; (octets-to-string #b"he\x1llo") -> "hello"
-  (let* ((string-length (ibuffer-decode-ub32 buffer))
-         (string-buffer (new-ibuffer buffer string-length)))
-    (babel:octets-to-string (ibuffer-get-bytes string-buffer) :encoding :utf-8)))
+  (let* ((string-length (ibuffer-decode-ub32 buffer)))
+    (trivial-utf-8:utf-8-bytes-to-string (ibuffer-get-bytes buffer string-length))))
 
 (defun amqp-array-decoder (buffer)
   (let* ((array-body-length (ibuffer-decode-ub32 buffer))
@@ -108,13 +107,13 @@
              collect (amqp-decode-field-value array-body-buffer)))))
 
 (defun amqp-timestamp-decoder (buffer)
+  
   (let ((time_t (ibuffer-decode-sb64 buffer))) ;; or ub64??
     (local-time:unix-to-timestamp time_t)))
 
 (defun amqp-decode-short-string (buffer)
-  (let* ((string-length (ibuffer-decode-ub8 buffer))
-         (string-buffer (new-ibuffer buffer string-length)))
-    (babel:octets-to-string (ibuffer-get-bytes string-buffer) :encoding :utf-8)))
+  (let* ((string-length (ibuffer-decode-ub8 buffer)))
+    (trivial-utf-8:utf-8-bytes-to-string (ibuffer-get-bytes buffer string-length))))
 
 (defun amqp-decode-field-name (buffer)
   (amqp-decode-short-string buffer))
@@ -134,9 +133,8 @@
   *amqp-void*)
 
 (defun amqp-barray-decoder (buffer)  
-  (let* ((string-length (ibuffer-decode-ub32 buffer))
-         (string-buffer (new-ibuffer buffer string-length)))
-    (ibuffer-get-bytes string-buffer)))
+  (let* ((string-length (ibuffer-decode-ub32 buffer)))
+    (ibuffer-get-bytes buffer string-length)))
 
 (define-amqp-types
   (#\t "boolean")
