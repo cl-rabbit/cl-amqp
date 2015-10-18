@@ -12,4 +12,6 @@
            :invalid-frame-parser-state-error
 
            :enable-binary-string-syntax
-           :disable-binary-string-syntax))
+           :disable-binary-string-syntax
+           :enable-binary-string-printing
+           :disable-binary-string-printing))
