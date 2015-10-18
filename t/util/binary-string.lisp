@@ -14,6 +14,8 @@
   (is (princ-to-string #b"\x06barrayx\x00\x00\x00\x08utf8=\xe2\x9c\x93")
       "\\x06barrayx\\x00\\x00\\x00\\x08utf8=\\xe2\\x9c\\x93")
   (is (prin1-to-string #b"\x06barrayx\x00\x00\x00\x08utf8=\xe2\x9c\x93")
-      "#b\"\\x06barrayx\\x00\\x00\\x00\\x08utf8=\\xe2\\x9c\\x93\""))
+      "#b\"\\x06barrayx\\x00\\x00\\x00\\x08utf8=\\xe2\\x9c\\x93\"")
+  (amqp:disable-binary-string-syntax)
+  (is-error (read-from-string "#b\"\\x06barrayx\\x00\\x00\\x00\\x08utf8=\\xe2\\x9c\\x93\"") 'reader-error))
 
 (finalize)
