@@ -269,8 +269,8 @@ x            Byte array         (D)
 
 (defun amqp-encode-field-value (buffer value)
   (typecase value
-    ;; ((signed-byte 8) (amqp-sb8-table-field-encoder buffer value))
-    ;; ((signed-byte 16) (amqp-sb16-table-field-encoder buffer value))
+    ((signed-byte 8) (amqp-sb8-table-field-encoder buffer value))
+    ((signed-byte 16) (amqp-sb16-table-field-encoder buffer value))
     ((signed-byte 32) (amqp-sb32-table-field-encoder buffer value))
     ((signed-byte 64) (amqp-sb64-table-field-encoder buffer value))
     (double-float (amqp-double-table-field-encoder buffer value))
