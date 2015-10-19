@@ -11,7 +11,7 @@
 
 (subtest "AMQP Table encode/decode test"
   (let ((amqp-table-bytes (concatenate '(simple-array  (unsigned-byte 8) 1)
-                                       #b"\x00\x00\x01\x09"
+                                       #b"\x00\x00\x01\x1a"
                                        #b"\x05arrayA\x00\x00\x00\x0fI\x00\x00\x00\x01I\x00\x00\x00\x02I\x00\x00\x00\x03"
                                        #b"\x07boolvalt\x01"
                                        #b"\x0dboolval_falset\x00"
@@ -19,7 +19,8 @@
                                        #b"\x0bdecimal_tooD\x00\x00\x00\x00d"
                                        #b"\x07dictvalF\x00\x00\x00\x0c\x03fooS\x00\x00\x00\x03bar"
                                        #b"\x06intvalI\x00\x00\x00\x01"
-                                       #b"\x07longvall\x00\x00\x00\x006e&U"
+                                       #b"\x07longvalI6e&U"
+                                       #b"\x0blonglongvall\x00\x00\x00\x1cu\x03\x1b\x8e"
                                        #b"\x04nullV"
                                        #b"\x06strvalS\x00\x00\x00\x04Test"
                                        #b"\x06singlef\x40\x48\xf5\xc3"
@@ -37,6 +38,7 @@
                  ("dictval" . (("foo" . "bar")))
                  ("intval" . 1)
                  ("longval" . 912598613)
+                 ("longlongval" . 122222222222)
                  ("null" . :void)
                  ("strval" . "Test")
                  ("single" . 3.14)
