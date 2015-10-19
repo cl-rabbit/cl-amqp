@@ -53,7 +53,17 @@
     (let ((amqp::*amqp-boolean-false* :false)
           (amqp::*amqp-void* :void))
       (is table (amqp::amqp-table-decoder (amqp::new-ibuffer amqp-table-bytes)) :test (lambda (x y)
-                                                                                        (mw-equiv:object= x y t))))
+                                                                                         (mw-equiv:object= x y t))))
+
+    (let ((buffer (amqp::new-obuffer))
+          (amqp::*amqp-boolean-false* :false)
+          (amqp::*amqp-void* :void))
+      (amqp::amqp-table-encoder buffer table)
+      (is
+       table
+       (amqp::amqp-table-decoder (amqp::new-ibuffer (amqp::obuffer-get-bytes buffer)))
+       :test (lambda (x y)
+                (mw-equiv:object= x y t))))
     ;; TODO: add error cases
     ))
 
