@@ -1,30 +1,28 @@
 (in-package :cl-amqp)
 
 ;; cool story -> https://www.rabbitmq.com/amqp-0-9-1-errata.html#section_3
-#|
-0-9   0-9-1   Qpid/Rabbit  Type               Remarks
----------------------------------------------------------------------------
-t       t            Boolean
-b       b            Signed 8-bit
-B                    Unsigned 8-bit
-U       s            Signed 16-bit      (A1)
-u                    Unsigned 16-bit
-I     I       I            Signed 32-bit
-i                    Unsigned 32-bit
-L       l            Signed 64-bit      (B)
-l                    Unsigned 64-bit
-f       f            32-bit float
-d       d            64-bit float
-D     D       D            Decimal            [this one is signed too]
-s                    Short string       (A2)
-S     S       S            Long string
-A       A            Array              (C)
-T     T       T            Timestamp (u64)
-F     F       F            Nested Table
-V     V       V            Void
-x            Byte array         (D)
-|#
 
+;;   0-9   0-9-1   Qpid/Rabbit  Type               Remarks
+;; ---------------------------------------------------------------------------
+;;         t       t            Boolean
+;;         b       b            Signed 8-bit
+;;         B                    Unsigned 8-bit
+;;         U       s            Signed 16-bit      (A1)
+;;         u                    Unsigned 16-bit
+;;   I     I       I            Signed 32-bit
+;;         i                    Unsigned 32-bit
+;;         L       l            Signed 64-bit      (B)
+;;         l                    Unsigned 64-bit
+;;         f       f            32-bit float
+;;         d       d            64-bit float
+;;   D     D       D            Decimal            [this one is signed too]
+;;         s                    Short string       (A2)
+;;   S     S       S            Long string
+;;         A       A            Array              (C)
+;;   T     T       T            Timestamp (u64)
+;;   F     F       F            Nested Table
+;;   V     V       V            Void
+;;                 x            Byte array         (D)
 
 ;;; table fields
 
@@ -185,7 +183,7 @@ x            Byte array         (D)
 
 (defun amqp-decimal-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-decimal+)
-  (multiple-value-bind (c pow) 
+  (multiple-value-bind (c pow)
       (wu-decimal::find-multiplier (denominator value))
     (obuffer-encode-ub8 buffer pow)
     (obuffer-encode-sb32 buffer (* (numerator value) c))))
@@ -225,7 +223,7 @@ x            Byte array         (D)
 
 (defun amqp-barray-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-barray+)
-    ;; TODO: check (length bytes) actually fits ub32
+  ;; TODO: check (length bytes) actually fits ub32
   (obuffer-encode-ub32 buffer (length value))
   (obuffer-add-bytes buffer value))
 
