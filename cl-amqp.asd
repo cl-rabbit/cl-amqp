@@ -19,6 +19,7 @@
                "local-time"
                "collectors"
                "trivial-utf-8"
+               "fast-io"
                "log4cl")
   :serial t
   :components ((:module "src"
@@ -27,6 +28,7 @@
                 ((:file "package")
                  (:file "util/binary-string")
                  (:file "util/ibuffer")
+                 (:file "util/obuffer")
                  (:module "protocol"
                   :serial t
                   :components
