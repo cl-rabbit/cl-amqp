@@ -21,6 +21,14 @@
 (defclass heartbeat-frame (frame)
   ((type :initform +amqp-frame-heartbeat+)))
 
+(defun frame-class-from-frame-type (frame-type)
+  (case frame-type
+    (1 #|+amqp-frame-method+|# 'method-frame)
+    (2 #|+amqp-frame-header+|# 'header-frame)
+    (3 #|+amqp-frame-body+|# 'body-frame)
+    (4 #|+amqp-frame-heartbeat+|# 'heartbeat-frame)
+    (t (error 'amqp-unknown-frame-type-error :frame-type frame-type))))
+
 (define-condition malformed-frame-error (amqp-base-error)
   ())
 
