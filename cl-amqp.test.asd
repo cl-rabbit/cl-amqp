@@ -14,6 +14,7 @@
   :depends-on ("cl-amqp"
                "prove"
                "log4cl"
+               "mw-equiv"
                "cl-interpol")
   :serial t
   :components ((:module "t"
@@ -23,7 +24,8 @@
                  (:test-file "dummy")
                  (:test-file "util/binary-string")
                  (:test-file "conditions")
-                 (:test-file "frame"))))
+                 (:test-file "frame")
+                 (:test-file "types"))))
   :defsystem-depends-on (:prove-asdf)
   :perform (test-op :after (op c)
                     (funcall (intern #.(string :run-test-system) :prove-asdf) c)

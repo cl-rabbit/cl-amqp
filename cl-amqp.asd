@@ -17,6 +17,9 @@
                "cl-interpol"
                "wu-decimal"
                "local-time"
+               "collectors"
+               "trivial-utf-8"
+               "fast-io"
                "log4cl")
   :serial t
   :components ((:module "src"
@@ -24,10 +27,13 @@
                 :components
                 ((:file "package")
                  (:file "util/binary-string")
+                 (:file "util/ibuffer")
+                 (:file "util/obuffer")
                  (:module "protocol"
                   :serial t
                   :components
                   ((:file "constants")
                    (:file "conditions")
-                   (:file "frame"))))))
+                   (:file "frame")
+                   (:file "types"))))))
   :in-order-to ((test-op (test-op cl-amqp.test))))
