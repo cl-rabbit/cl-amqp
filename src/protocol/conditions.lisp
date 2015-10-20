@@ -83,6 +83,10 @@
   ((reply-code :initarg :reply-code
                :reader amqp-error-reply-code)))
 
+(define-condition amqp-unknown-frame-type-error (amqp-connection-error)  ;; TODO: can it be connection or channel error?
+  ((frame-type :initarg :frame-type
+               :reader amqp-error-frame-type)))
+
 (defun error-type-from-reply-code (reply-code)
   (case reply-code
     (311 #|+amqp-content-too-large+|# 'amqp-error-content-too-large)
