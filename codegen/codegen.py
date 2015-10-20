@@ -35,6 +35,19 @@ class AmqpSpecObject(AmqpSpec):
     def generate_conditions_file(self):
         self.render_template_to_file("codegen/templates/conditions.lisp.pytemplate", "src/protocol/conditions.lisp")
 
+    def generate_classes_file(self):
+        self.render_template_to_file("codegen/templates/classes.lisp.pytemplate", "src/protocol/classes.lisp")
+
+def method_signature(self):
+    return '#x{0:0<8x}'.format(self.klass.index << 16 | self.index)
+
+AmqpMethod.method_signature = method_signature
+
+def method_lisp_class_name(self):
+    return '{0}-{1}'.format(self.klass.name, self.name)
+
+AmqpMethod.method_lisp_class_name = method_lisp_class_name
+
 # helpers
 def to_cl_condition_class(klass):
     if klass=='soft-error':
@@ -52,3 +65,4 @@ if __name__ == "__main__":
     spec.type = 'client'
     spec.generate_constants_file()
     spec.generate_conditions_file()
+    spec.generate_classes_file()

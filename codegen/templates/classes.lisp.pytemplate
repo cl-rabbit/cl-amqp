@@ -1,0 +1,11 @@
+;; DO NOT EDIT. RUN GENERATE TO REGENERATE
+<% import re, os, codegen %>
+(in-package :cl-amqp)
+
+
+(defun method-class-from-signature(signature)
+  (case signature
+% for m in spec.allMethods():
+    (${m.method_signature()} '${m.method_lisp_class_name()})
+% endfor
+    (t (error 'amqp-unknown-method-error :method-signature signature))))
