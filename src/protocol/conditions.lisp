@@ -79,7 +79,7 @@
 (define-condition amqp-error-internal-error (amqp-connection-error)
   ((reply-code :initform +amqp-internal-error+)))
 
-(define-condition amqp-unknown-reply-code-error (amqp-base-error)
+(define-condition amqp-unknown-reply-code-error (amqp-base-error)  ;; TODO: can it be connection or channel error?
   ((reply-code :initarg :reply-code
                :reader amqp-error-reply-code)))
 

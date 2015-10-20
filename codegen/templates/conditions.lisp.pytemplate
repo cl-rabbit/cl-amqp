@@ -32,7 +32,7 @@
   % endif
 % endfor
 
-(define-condition amqp-unknown-reply-code-error (amqp-base-error)
+(define-condition amqp-unknown-reply-code-error (amqp-base-error)  ;; TODO: can it be connection or channel error?
   ((reply-code :initarg :reply-code
                :reader amqp-error-reply-code)))
 
