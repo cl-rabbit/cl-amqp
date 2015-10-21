@@ -44,7 +44,7 @@ def method_signature(self):
 AmqpMethod.method_signature = method_signature
 
 def method_lisp_class_name(self):
-    return '{0}-{1}'.format(self.klass.name, self.name)
+    return 'amqp-method-{0}-{1}'.format(self.klass.name, self.name)
 
 AmqpMethod.method_lisp_class_name = method_lisp_class_name
 
