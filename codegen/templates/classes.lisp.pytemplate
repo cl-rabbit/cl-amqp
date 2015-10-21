@@ -2,6 +2,69 @@
 <% import re, os, codegen %>
 (in-package :cl-amqp)
 
+(defclass amqp-class-base ()
+  ())
+
+(defclass amqp-method-base ()
+  ())
+
+
+% for m in spec.allMethods():
+(defclass ${m.method_lisp_class_name()} (amqp-method-base)
+(\
+  % for arg in m.arguments:
+(${arg.name} :initarg :${arg.name})
+  % endfor
+))
+
+(defun decode-${m.method_lisp_class_name()} (ibuffer)
+  (error "decode-${m.method_lisp_class_name()} not implemented"))
+
+(defun encode-${m.method_lisp_class_name()} (method obuffer)
+  (error "encode-${m.method_lisp_class_name()} not implemented"))
+
+(defmethod synchronous-method-p ((method ${m.method_lisp_class_name()}))
+  ${"t" if m.isSynchronous  else "nil"})
+
+(defmethod method-has-content-p ((method ${m.method_lisp_class_name()}))
+  ${"t" if m.hasContent  else "nil"})
+
+(defmethod method-class-id ((method ${m.method_lisp_class_name()}))
+  ${m.klass.index})
+
+(defmethod method-method-id ((method ${m.method_lisp_class_name()}))
+  ${m.index})
+
+% endfor
+
+(defun decode-method (method-class ibuffer)
+  (case method-class
+  % for m in spec.allMethods():
+    (${m.method_lisp_class_name()} (decode-${m.method_lisp_class_name()} ibuffer))
+  % endfor
+    (t (error 'amqp-unknown-method-class-error :method-class method-class))))
+
+(defun encode-method (method obuffer)
+  (case (class-of method-class)
+  % for m in spec.allMethods():
+    (${m.method_lisp_class_name()} (encode-${m.method_lisp_class_name()} method obuffer))
+  % endfor
+    (t (error 'amqp-unknown-method-class-error :method-class (class-of method-class)))))
+
+
+(defmethod synchronous-method-p ((method-class symbol))
+  (case method-class
+% for m in spec.allMethods():
+    (${m.method_lisp_class_name()} ${"t" if m.isSynchronous  else "nil"})
+% endfor
+    (t (error 'amqp-unknown-method-class-error :method-class method-class))))
+
+(defmethod method-has-content-p ((method-class symbol))
+  (case method-class
+% for m in spec.allMethods():
+    (${m.method_lisp_class_name()} ${"t" if m.hasContent  else "nil"})
+% endfor
+    (t (error 'amqp-unknown-method-class-error :method-class method-class))))
 
 (defun method-class-from-signature(signature)
   (case signature
