@@ -111,6 +111,7 @@
 
 (defun amqp-sstring-decoder (buffer)
   (let* ((string-length (ibuffer-decode-ub8 buffer)))
+    ;; TODO: check string-length actually fits ub8
     (ibuffer-decode-utf8 buffer string-length)))
 
 (defun amqp-field-name-decoder (buffer)
@@ -153,13 +154,19 @@
 (defun amqp-encode-field-value-type (buffer type)
   (obuffer-encode-ub8 buffer type))
 
+(defun amqp-boolean-encoder (buffer value)
+  (obuffer-encode-ub8 buffer (if value 1 0)))
+
 (defun amqp-boolean-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-boolean+)
-  (obuffer-encode-ub8 buffer (if value 1 0)))
+  (amqp-boolean-encoder buffer value))
+
+(defun amqp-sb8-encoder (buffer value)
+  (obuffer-encode-sb8 buffer value))
 
 (defun amqp-sb8-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-sb8+)
-  (obuffer-encode-sb8 buffer value))
+  (amqp-sb8-encoder buffer value))
 
 (defun amqp-sb16-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-sb16+)
@@ -188,11 +195,14 @@
     (obuffer-encode-ub8 buffer pow)
     (obuffer-encode-sb32 buffer (* (numerator value) c))))
 
-(defun amqp-lstring-table-field-encoder (buffer value)
-  (amqp-encode-field-value-type buffer +amqp-type-lstring+)
+(defun amqp-lstring-encoder (buffer value)
   (let ((utf-8-bytes (trivial-utf-8:string-to-utf-8-bytes value)))
     (obuffer-encode-ub32 buffer (length utf-8-bytes))
     (obuffer-add-bytes buffer utf-8-bytes)))
+
+(defun amqp-lstring-table-field-encoder (buffer value)
+  (amqp-encode-field-value-type buffer +amqp-type-lstring+)
+  (amqp-lstring-encoder buffer value))
 
 (defun amqp-array-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-array+)
