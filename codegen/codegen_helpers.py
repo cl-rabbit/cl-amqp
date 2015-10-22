@@ -4,17 +4,17 @@ def genSingleEncode(spec, cValue, unresolved_domain):
     buffer = []
     type = spec.resolveDomain(unresolved_domain)
     if type == 'shortstr':
-        buffer.append("(amqp-sstring-encoder obuffer %s)" % (cValue,))
+        buffer.append("(amqp-shortstr-encoder obuffer %s)" % (cValue,))
     elif type == 'longstr':
-        buffer.append("(amqp-lstring-encoder obuffer %s)" % (cValue,))
+        buffer.append("(amqp-longstr-encoder obuffer %s)" % (cValue,))
     elif type == 'octet':
-        buffer.append("(amqp-sb8-encoder obuffer %s)" % (cValue,))
+        buffer.append("(amqp-octet-encoder obuffer %s)" % (cValue,))
     elif type == 'short':
-        buffer.append("(amqp-sb16-encoder obuffer %s)" % (cValue,))
+        buffer.append("(amqp-short-encoder obuffer %s)" % (cValue,))
     elif type == 'long':
-        buffer.append("(amqp-sb32-encoder obuffer %s)" % (cValue,))
+        buffer.append("(amqp-long-encoder obuffer %s)" % (cValue,))
     elif type == 'longlong':
-        buffer.append("(amqp-sb64-encoder obuffer %s)" % (cValue,))
+        buffer.append("(amqp-longlong-encoder obuffer %s)" % (cValue,))
     elif type == 'timestamp':
         buffer.append("(amqp-timestamp-encoder obuffer %s)" % (cValue,))
     elif type == 'bit':
@@ -37,17 +37,17 @@ def genSingleDecode(spec, field):
     type = spec.resolveDomain(unresolved_domain)
     buffer = []
     if type == 'shortstr':
-        buffer.append("(setf %s (amqp-sstring-decoder ibuffer))" % (cLvalue,))
+        buffer.append("(setf %s (amqp-shortstr-decoder ibuffer))" % (cLvalue,))
     elif type == 'longstr':
-        buffer.append("(setf %s (amqp-lstring-decoder ibuffer))" % (cLvalue,))
+        buffer.append("(setf %s (amqp-longstr-decoder ibuffer))" % (cLvalue,))
     elif type == 'octet':
-        buffer.append("(setf %s (amqp-sb8-decoder ibuffer))" % (cLvalue,))
+        buffer.append("(setf %s (amqp-octet-decoder ibuffer))" % (cLvalue,))
     elif type == 'short':
-        buffer.append("(setf %s (amqp-sb16-decoder ibuffer))" % (cLvalue,))
+        buffer.append("(setf %s (amqp-short-decoder ibuffer))" % (cLvalue,))
     elif type == 'long':
-        buffer.append("(setf %s (amqp-sb32-decoder ibuffer))" % (cLvalue,))
+        buffer.append("(setf %s (amqp-long-decoder ibuffer))" % (cLvalue,))
     elif type == 'longlong':
-        buffer.append("(setf %s (amqp-sb64-decoder ibuffer))" % (cLvalue,))
+        buffer.append("(setf %s (amqp-longlong-decoder ibuffer))" % (cLvalue,))
     elif type == 'timestamp':
         buffer.append("(setf %s (amqp-timestamp-decoder ibuffer))" % (cLvalue,))
     elif type == 'bit':

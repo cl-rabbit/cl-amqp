@@ -64,16 +64,16 @@
       (0 *amqp-boolean-false*)
       (t (error "Invalid amqp boolean value ~a" value))))) ;;TODO: specialize error
 
-(defun amqp-sb8-decoder (buffer)
+(defun amqp-octet-decoder (buffer)
   (ibuffer-decode-sb8 buffer))
 
-(defun amqp-sb16-decoder (buffer)
+(defun amqp-short-decoder (buffer)
   (ibuffer-decode-sb16 buffer))
 
-(defun amqp-sb32-decoder (buffer)
+(defun amqp-long-decoder (buffer)
   (ibuffer-decode-sb32 buffer))
 
-(defun amqp-sb64-decoder (buffer)
+(defun amqp-longlong-decoder (buffer)
   (ibuffer-decode-sb64 buffer))
 
 (defun amqp-single-decoder (buffer)
@@ -87,7 +87,7 @@
         (value (ibuffer-decode-sb32 buffer)))
     (/ value (expt 10 scale))))
 
-(defun amqp-lstring-decoder (buffer)
+(defun amqp-longstr-decoder (buffer)
   ;; long strings are just (simple-array (unsinged-byte 8) 1)
   ;; but rabbitmq also has 'x' - pure byte array fields.
   ;; and pika fpr example converts lstring to utf8 string
@@ -109,13 +109,13 @@
   (let ((time_t (ibuffer-decode-sb64 buffer))) ;; or ub64??
     (local-time:unix-to-timestamp time_t)))
 
-(defun amqp-sstring-decoder (buffer)
+(defun amqp-shortstr-decoder (buffer)
   (let* ((string-length (ibuffer-decode-ub8 buffer)))
     ;; TODO: check string-length actually fits ub8
     (ibuffer-decode-utf8 buffer string-length)))
 
 (defun amqp-field-name-decoder (buffer)
-  (amqp-sstring-decoder buffer))
+  (amqp-shortstr-decoder buffer))
 
 (defun amqp-table-decoder (buffer)
   (let* ((table-body-length (ibuffer-decode-ub32 buffer))
@@ -137,14 +137,14 @@
 
 (define-amqp-types
     (#\t "boolean")
-    (#\b "sb8")
-  (#\s "sb16")
-  (#\I "sb32")
-  (#\l "sb64")
+    (#\b "octet")
+  (#\s "short")
+  (#\I "long")
+  (#\l "longlong")
   (#\f "single")
   (#\d "double")
   (#\D "decimal")
-  (#\S "lstring")
+  (#\S "longstr")
   (#\A "array")
   (#\T "timestamp")
   (#\F "table")
@@ -161,32 +161,47 @@
   (amqp-encode-field-value-type buffer +amqp-type-boolean+)
   (amqp-boolean-encoder buffer value))
 
-(defun amqp-sb8-encoder (buffer value)
+(defun amqp-octet-encoder (buffer value)
   (obuffer-encode-sb8 buffer value))
 
-(defun amqp-sb8-table-field-encoder (buffer value)
-  (amqp-encode-field-value-type buffer +amqp-type-sb8+)
-  (amqp-sb8-encoder buffer value))
+(defun amqp-octet-table-field-encoder (buffer value)
+  (amqp-encode-field-value-type buffer +amqp-type-octet+)
+  (amqp-octet-encoder buffer value))
 
-(defun amqp-sb16-table-field-encoder (buffer value)
-  (amqp-encode-field-value-type buffer +amqp-type-sb16+)
+(defun amqp-short-encoder (buffer value)
   (obuffer-encode-sb16 buffer value))
 
-(defun amqp-sb32-table-field-encoder (buffer value)
-  (amqp-encode-field-value-type buffer +amqp-type-sb32+)
-  (obuffer-encode-ub32 buffer value))
+(defun amqp-short-table-field-encoder (buffer value)
+  (amqp-encode-field-value-type buffer +amqp-type-short+)
+  (amqp-short-encoder buffer value))
 
-(defun amqp-sb64-table-field-encoder (buffer value)
-  (amqp-encode-field-value-type buffer +amqp-type-sb64+)
+(defun amqp-long-encoder (buffer value)
+  (obuffer-encode-sb32 buffer value))
+
+(defun amqp-long-table-field-encoder (buffer value)
+  (amqp-encode-field-value-type buffer +amqp-type-long+)
+  (amqp-long-encoder buffer value))
+
+(defun amqp-longlong-encoder (buffer value)
   (obuffer-encode-sb64 buffer value))
+
+(defun amqp-longlong-table-field-encoder (buffer value)
+  (amqp-encode-field-value-type buffer +amqp-type-longlong+)
+  (amqp-longlong-encoder buffer value))
+
+(defun amqp-single-encoder (buffer value)
+  (obuffer-encode-single buffer value))
 
 (defun amqp-single-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-single+)
-  (obuffer-encode-single buffer value))
+  (amqp-single-encoder buffer value))
+
+(defun amqp-double-encoder (buffer value)
+  (obuffer-encode-double buffer value))
 
 (defun amqp-double-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-double+)
-  (obuffer-encode-double buffer value))
+  (amqp-double-encoder buffer value))
 
 (defun amqp-decimal-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-decimal+)
@@ -195,14 +210,14 @@
     (obuffer-encode-ub8 buffer pow)
     (obuffer-encode-sb32 buffer (* (numerator value) c))))
 
-(defun amqp-lstring-encoder (buffer value)
+(defun amqp-longstr-encoder (buffer value)
   (let ((utf-8-bytes (trivial-utf-8:string-to-utf-8-bytes value)))
     (obuffer-encode-ub32 buffer (length utf-8-bytes))
     (obuffer-add-bytes buffer utf-8-bytes)))
 
-(defun amqp-lstring-table-field-encoder (buffer value)
+(defun amqp-longstr-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-lstring+)
-  (amqp-lstring-encoder buffer value))
+  (amqp-longstr-encoder buffer value))
 
 (defun amqp-array-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-array+)
@@ -216,12 +231,15 @@
     (obuffer-encode-ub32 buffer (length array-bytes))
     (obuffer-add-bytes buffer array-bytes)))
 
-(defun amqp-timestamp-table-field-encoder (buffer value)
-  (amqp-encode-field-value-type buffer +amqp-type-timestamp+)
+(defun amqp-timestamp-encoder (buffer value)
   (obuffer-encode-sb64 buffer value))
 
+(defun amqp-timestamp-table-field-encoder (buffer value)
+  (amqp-encode-field-value-type buffer +amqp-type-timestamp+)
+  (amqp-timestamp-encoder buffer value))
+
 (defun amqp-field-name-encoder (buffer value)
-  (amqp-sstring-encoder buffer value))
+  (amqp-shortstr-encoder buffer value))
 
 (defun amqp-table-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-table+)
@@ -237,7 +255,7 @@
   (obuffer-encode-ub32 buffer (length value))
   (obuffer-add-bytes buffer value))
 
-(defun amqp-sstring-encoder (buffer value)
+(defun amqp-shortstr-encoder (buffer value)
   (let ((utf-8-bytes (trivial-utf-8:string-to-utf-8-bytes value)))
     ;; TODO: check (length utf-8-byte) actually fits ub8
     (obuffer-encode-ub8 buffer (length utf-8-bytes))
@@ -277,14 +295,14 @@
 
 (defun amqp-encode-field-value (buffer value)
   (typecase value
-    ((signed-byte 8) (amqp-sb8-table-field-encoder buffer value))
-    ((signed-byte 16) (amqp-sb16-table-field-encoder buffer value))
-    ((signed-byte 32) (amqp-sb32-table-field-encoder buffer value))
-    ((signed-byte 64) (amqp-sb64-table-field-encoder buffer value))
+    ((signed-byte 8) (amqp-octet-table-field-encoder buffer value))
+    ((signed-byte 16) (amqp-short-table-field-encoder buffer value))
+    ((signed-byte 32) (amqp-long-table-field-encoder buffer value))
+    ((signed-byte 64) (amqp-longlong-table-field-encoder buffer value))
     (double-float (amqp-double-table-field-encoder buffer value))
     (float (amqp-single-table-field-encoder buffer value))
     (wu-decimal:decimal (amqp-decimal-table-field-encoder buffer value))
-    (string (amqp-lstring-table-field-encoder buffer value))
+    (string (amqp-longstr-table-field-encoder buffer value))
     (nibbles:simple-octet-vector (amqp-barray-table-field-encoder buffer value))
     (vector (amqp-array-table-field-encoder buffer value))
     (local-time:timestamp (amqp-timestamp-table-field-encoder buffer (local-time:timestamp-to-unix value)))
