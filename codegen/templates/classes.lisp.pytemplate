@@ -1,5 +1,6 @@
 ;; DO NOT EDIT. RUN GENERATE TO REGENERATE
 <% import re, os, codegen %>
+<% import codegen_helpers as helpers %>
 (in-package :cl-amqp)
 
 (defclass amqp-class-base ()
@@ -18,10 +19,20 @@
 ))
 
 (defun decode-${m.method_lisp_class_name()} (ibuffer)
-  (error "decode-${m.method_lisp_class_name()} not implemented"))
+  (error "decode-${m.method_lisp_class_name()} not implemented")
+  #|
+  % for line in helpers.genDecodeMethodDefinition(spec, m):
+    ${line}
+  % endfor
+  |#)
 
 (defun encode-${m.method_lisp_class_name()} (method obuffer)
-  (error "encode-${m.method_lisp_class_name()} not implemented"))
+  (error "encode-${m.method_lisp_class_name()} not implemented")
+  #|
+  % for line in helpers.genEncodeMethodDefinition(spec, m):
+    ${line}
+  % endfor
+  |#)
 
 (defmethod synchronous-method-p ((method ${m.method_lisp_class_name()}))
   ${"t" if m.isSynchronous  else "nil"})
