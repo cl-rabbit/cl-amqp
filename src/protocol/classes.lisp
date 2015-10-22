@@ -1,5 +1,6 @@
 ;; DO NOT EDIT. RUN GENERATE TO REGENERATE
 
+
 (in-package :cl-amqp)
 
 (defclass amqp-class-base ()
@@ -10,18 +11,34 @@
 
 
 (defclass amqp-method-connection-start (amqp-method-base)
-((version-major :initarg :version-major)
-(version-minor :initarg :version-minor)
-(server-properties :initarg :server-properties)
-(mechanisms :initarg :mechanisms)
-(locales :initarg :locales)
+(
+  (version-major :initarg :version-major)
+  (version-minor :initarg :version-minor)
+  (server-properties :initarg :server-properties)
+  (mechanisms :initarg :mechanisms)
+  (locales :initarg :locales)
 ))
 
 (defun decode-amqp-method-connection-start (ibuffer)
-  (error "decode-amqp-method-connection-start not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-connection-start
+      :version-major (amqp-octet-decoder ibuffer)
+      :version-minor (amqp-octet-decoder ibuffer)
+      :server-properties (amqp-table-decoder ibuffer)
+      :mechanisms (amqp-longstr-decoder ibuffer)
+      :locales (amqp-longstr-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-connection-start (method obuffer)
-  (error "encode-amqp-method-connection-start not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-octet-encoder obuffer (slot-value method 'version-major))
+      (amqp-octet-encoder obuffer (slot-value method 'version-minor))
+      (amqp-table-encoder obuffer (slot-value method 'server-properties))
+      (amqp-longstr-encoder obuffer (slot-value method 'mechanisms))
+      (amqp-longstr-encoder obuffer (slot-value method 'locales))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-connection-start))
   t)
@@ -36,17 +53,31 @@
   10)
 
 (defclass amqp-method-connection-start-ok (amqp-method-base)
-((client-properties :initarg :client-properties)
-(mechanism :initarg :mechanism)
-(response :initarg :response)
-(locale :initarg :locale)
+(
+  (client-properties :initarg :client-properties)
+  (mechanism :initarg :mechanism)
+  (response :initarg :response)
+  (locale :initarg :locale)
 ))
 
 (defun decode-amqp-method-connection-start-ok (ibuffer)
-  (error "decode-amqp-method-connection-start-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-connection-start-ok
+      :client-properties (amqp-table-decoder ibuffer)
+      :mechanism (amqp-shortstr-decoder ibuffer)
+      :response (amqp-longstr-decoder ibuffer)
+      :locale (amqp-shortstr-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-connection-start-ok (method obuffer)
-  (error "encode-amqp-method-connection-start-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-table-encoder obuffer (slot-value method 'client-properties))
+      (amqp-shortstr-encoder obuffer (slot-value method 'mechanism))
+      (amqp-longstr-encoder obuffer (slot-value method 'response))
+      (amqp-shortstr-encoder obuffer (slot-value method 'locale))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-connection-start-ok))
   nil)
@@ -61,14 +92,22 @@
   11)
 
 (defclass amqp-method-connection-secure (amqp-method-base)
-((challenge :initarg :challenge)
+(
+  (challenge :initarg :challenge)
 ))
 
 (defun decode-amqp-method-connection-secure (ibuffer)
-  (error "decode-amqp-method-connection-secure not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-connection-secure
+      :challenge (amqp-longstr-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-connection-secure (method obuffer)
-  (error "encode-amqp-method-connection-secure not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-longstr-encoder obuffer (slot-value method 'challenge))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-connection-secure))
   t)
@@ -83,14 +122,22 @@
   20)
 
 (defclass amqp-method-connection-secure-ok (amqp-method-base)
-((response :initarg :response)
+(
+  (response :initarg :response)
 ))
 
 (defun decode-amqp-method-connection-secure-ok (ibuffer)
-  (error "decode-amqp-method-connection-secure-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-connection-secure-ok
+      :response (amqp-longstr-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-connection-secure-ok (method obuffer)
-  (error "encode-amqp-method-connection-secure-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-longstr-encoder obuffer (slot-value method 'response))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-connection-secure-ok))
   nil)
@@ -105,16 +152,28 @@
   21)
 
 (defclass amqp-method-connection-tune (amqp-method-base)
-((channel-max :initarg :channel-max)
-(frame-max :initarg :frame-max)
-(heartbeat :initarg :heartbeat)
+(
+  (channel-max :initarg :channel-max)
+  (frame-max :initarg :frame-max)
+  (heartbeat :initarg :heartbeat)
 ))
 
 (defun decode-amqp-method-connection-tune (ibuffer)
-  (error "decode-amqp-method-connection-tune not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-connection-tune
+      :channel-max (amqp-short-decoder ibuffer)
+      :frame-max (amqp-long-decoder ibuffer)
+      :heartbeat (amqp-short-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-connection-tune (method obuffer)
-  (error "encode-amqp-method-connection-tune not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'channel-max))
+      (amqp-long-encoder obuffer (slot-value method 'frame-max))
+      (amqp-short-encoder obuffer (slot-value method 'heartbeat))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-connection-tune))
   t)
@@ -129,16 +188,28 @@
   30)
 
 (defclass amqp-method-connection-tune-ok (amqp-method-base)
-((channel-max :initarg :channel-max)
-(frame-max :initarg :frame-max)
-(heartbeat :initarg :heartbeat)
+(
+  (channel-max :initarg :channel-max)
+  (frame-max :initarg :frame-max)
+  (heartbeat :initarg :heartbeat)
 ))
 
 (defun decode-amqp-method-connection-tune-ok (ibuffer)
-  (error "decode-amqp-method-connection-tune-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-connection-tune-ok
+      :channel-max (amqp-short-decoder ibuffer)
+      :frame-max (amqp-long-decoder ibuffer)
+      :heartbeat (amqp-short-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-connection-tune-ok (method obuffer)
-  (error "encode-amqp-method-connection-tune-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'channel-max))
+      (amqp-long-encoder obuffer (slot-value method 'frame-max))
+      (amqp-short-encoder obuffer (slot-value method 'heartbeat))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-connection-tune-ok))
   nil)
@@ -153,16 +224,32 @@
   31)
 
 (defclass amqp-method-connection-open (amqp-method-base)
-((virtual-host :initarg :virtual-host)
-(capabilities :initarg :capabilities)
-(insist :initarg :insist)
+(
+  (virtual-host :initarg :virtual-host)
+  (capabilities :initarg :capabilities)
+  (insist :initarg :insist)
 ))
 
 (defun decode-amqp-method-connection-open (ibuffer)
-  (error "decode-amqp-method-connection-open not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-connection-open
+      :virtual-host (amqp-shortstr-decoder ibuffer)
+      :capabilities (amqp-shortstr-decoder ibuffer)
+      :insist (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+  )))
 
 (defun encode-amqp-method-connection-open (method obuffer)
-  (error "encode-amqp-method-connection-open not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-shortstr-encoder obuffer (slot-value method 'virtual-host))
+      (amqp-shortstr-encoder obuffer (slot-value method 'capabilities))
+      (setf bit-buffer 0)
+      (when insist (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-connection-open))
   t)
@@ -177,14 +264,22 @@
   40)
 
 (defclass amqp-method-connection-open-ok (amqp-method-base)
-((known-hosts :initarg :known-hosts)
+(
+  (known-hosts :initarg :known-hosts)
 ))
 
 (defun decode-amqp-method-connection-open-ok (ibuffer)
-  (error "decode-amqp-method-connection-open-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-connection-open-ok
+      :known-hosts (amqp-shortstr-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-connection-open-ok (method obuffer)
-  (error "encode-amqp-method-connection-open-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-shortstr-encoder obuffer (slot-value method 'known-hosts))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-connection-open-ok))
   nil)
@@ -199,17 +294,31 @@
   41)
 
 (defclass amqp-method-connection-close (amqp-method-base)
-((reply-code :initarg :reply-code)
-(reply-text :initarg :reply-text)
-(class-id :initarg :class-id)
-(method-id :initarg :method-id)
+(
+  (reply-code :initarg :reply-code)
+  (reply-text :initarg :reply-text)
+  (class-id :initarg :class-id)
+  (method-id :initarg :method-id)
 ))
 
 (defun decode-amqp-method-connection-close (ibuffer)
-  (error "decode-amqp-method-connection-close not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-connection-close
+      :reply-code (amqp-short-decoder ibuffer)
+      :reply-text (amqp-shortstr-decoder ibuffer)
+      :class-id (amqp-short-decoder ibuffer)
+      :method-id (amqp-short-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-connection-close (method obuffer)
-  (error "encode-amqp-method-connection-close not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'reply-code))
+      (amqp-shortstr-encoder obuffer (slot-value method 'reply-text))
+      (amqp-short-encoder obuffer (slot-value method 'class-id))
+      (amqp-short-encoder obuffer (slot-value method 'method-id))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-connection-close))
   t)
@@ -224,13 +333,19 @@
   50)
 
 (defclass amqp-method-connection-close-ok (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-connection-close-ok (ibuffer)
-  (error "decode-amqp-method-connection-close-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-connection-close-ok
+  )))
 
 (defun encode-amqp-method-connection-close-ok (method obuffer)
-  (error "encode-amqp-method-connection-close-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-connection-close-ok))
   nil)
@@ -245,14 +360,22 @@
   51)
 
 (defclass amqp-method-connection-blocked (amqp-method-base)
-((reason :initarg :reason)
+(
+  (reason :initarg :reason)
 ))
 
 (defun decode-amqp-method-connection-blocked (ibuffer)
-  (error "decode-amqp-method-connection-blocked not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-connection-blocked
+      :reason (amqp-shortstr-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-connection-blocked (method obuffer)
-  (error "encode-amqp-method-connection-blocked not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-shortstr-encoder obuffer (slot-value method 'reason))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-connection-blocked))
   nil)
@@ -267,13 +390,19 @@
   60)
 
 (defclass amqp-method-connection-unblocked (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-connection-unblocked (ibuffer)
-  (error "decode-amqp-method-connection-unblocked not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-connection-unblocked
+  )))
 
 (defun encode-amqp-method-connection-unblocked (method obuffer)
-  (error "encode-amqp-method-connection-unblocked not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-connection-unblocked))
   nil)
@@ -288,14 +417,22 @@
   61)
 
 (defclass amqp-method-channel-open (amqp-method-base)
-((out-of-band :initarg :out-of-band)
+(
+  (out-of-band :initarg :out-of-band)
 ))
 
 (defun decode-amqp-method-channel-open (ibuffer)
-  (error "decode-amqp-method-channel-open not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-channel-open
+      :out-of-band (amqp-shortstr-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-channel-open (method obuffer)
-  (error "encode-amqp-method-channel-open not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-shortstr-encoder obuffer (slot-value method 'out-of-band))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-channel-open))
   t)
@@ -310,14 +447,22 @@
   10)
 
 (defclass amqp-method-channel-open-ok (amqp-method-base)
-((channel-id :initarg :channel-id)
+(
+  (channel-id :initarg :channel-id)
 ))
 
 (defun decode-amqp-method-channel-open-ok (ibuffer)
-  (error "decode-amqp-method-channel-open-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-channel-open-ok
+      :channel-id (amqp-longstr-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-channel-open-ok (method obuffer)
-  (error "encode-amqp-method-channel-open-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-longstr-encoder obuffer (slot-value method 'channel-id))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-channel-open-ok))
   nil)
@@ -332,14 +477,26 @@
   11)
 
 (defclass amqp-method-channel-flow (amqp-method-base)
-((active :initarg :active)
+(
+  (active :initarg :active)
 ))
 
 (defun decode-amqp-method-channel-flow (ibuffer)
-  (error "decode-amqp-method-channel-flow not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-channel-flow
+      :active (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+  )))
 
 (defun encode-amqp-method-channel-flow (method obuffer)
-  (error "encode-amqp-method-channel-flow not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (setf bit-buffer 0)
+      (when active (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-channel-flow))
   t)
@@ -354,14 +511,26 @@
   20)
 
 (defclass amqp-method-channel-flow-ok (amqp-method-base)
-((active :initarg :active)
+(
+  (active :initarg :active)
 ))
 
 (defun decode-amqp-method-channel-flow-ok (ibuffer)
-  (error "decode-amqp-method-channel-flow-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-channel-flow-ok
+      :active (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+  )))
 
 (defun encode-amqp-method-channel-flow-ok (method obuffer)
-  (error "encode-amqp-method-channel-flow-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (setf bit-buffer 0)
+      (when active (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-channel-flow-ok))
   nil)
@@ -376,17 +545,31 @@
   21)
 
 (defclass amqp-method-channel-close (amqp-method-base)
-((reply-code :initarg :reply-code)
-(reply-text :initarg :reply-text)
-(class-id :initarg :class-id)
-(method-id :initarg :method-id)
+(
+  (reply-code :initarg :reply-code)
+  (reply-text :initarg :reply-text)
+  (class-id :initarg :class-id)
+  (method-id :initarg :method-id)
 ))
 
 (defun decode-amqp-method-channel-close (ibuffer)
-  (error "decode-amqp-method-channel-close not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-channel-close
+      :reply-code (amqp-short-decoder ibuffer)
+      :reply-text (amqp-shortstr-decoder ibuffer)
+      :class-id (amqp-short-decoder ibuffer)
+      :method-id (amqp-short-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-channel-close (method obuffer)
-  (error "encode-amqp-method-channel-close not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'reply-code))
+      (amqp-shortstr-encoder obuffer (slot-value method 'reply-text))
+      (amqp-short-encoder obuffer (slot-value method 'class-id))
+      (amqp-short-encoder obuffer (slot-value method 'method-id))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-channel-close))
   t)
@@ -401,13 +584,19 @@
   40)
 
 (defclass amqp-method-channel-close-ok (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-channel-close-ok (ibuffer)
-  (error "decode-amqp-method-channel-close-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-channel-close-ok
+  )))
 
 (defun encode-amqp-method-channel-close-ok (method obuffer)
-  (error "encode-amqp-method-channel-close-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-channel-close-ok))
   nil)
@@ -422,19 +611,41 @@
   41)
 
 (defclass amqp-method-access-request (amqp-method-base)
-((realm :initarg :realm)
-(exclusive :initarg :exclusive)
-(passive :initarg :passive)
-(active :initarg :active)
-(write :initarg :write)
-(read :initarg :read)
+(
+  (realm :initarg :realm)
+  (exclusive :initarg :exclusive)
+  (passive :initarg :passive)
+  (active :initarg :active)
+  (write :initarg :write)
+  (read :initarg :read)
 ))
 
 (defun decode-amqp-method-access-request (ibuffer)
-  (error "decode-amqp-method-access-request not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-access-request
+      :realm (amqp-shortstr-decoder ibuffer)
+      :exclusive (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+      :passive (not (zerop (ldb (byte 8 1) bit-buffer)))
+      :active (not (zerop (ldb (byte 8 2) bit-buffer)))
+      :write (not (zerop (ldb (byte 8 3) bit-buffer)))
+      :read (not (zerop (ldb (byte 8 4) bit-buffer)))
+  )))
 
 (defun encode-amqp-method-access-request (method obuffer)
-  (error "encode-amqp-method-access-request not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-shortstr-encoder obuffer (slot-value method 'realm))
+      (setf bit-buffer 0)
+      (when exclusive (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when passive (setf (ldb (byte 8 1) bit-buffer) 1))
+      (when active (setf (ldb (byte 8 2) bit-buffer) 1))
+      (when write (setf (ldb (byte 8 3) bit-buffer) 1))
+      (when read (setf (ldb (byte 8 4) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-access-request))
   t)
@@ -449,14 +660,22 @@
   10)
 
 (defclass amqp-method-access-request-ok (amqp-method-base)
-((ticket :initarg :ticket)
+(
+  (ticket :initarg :ticket)
 ))
 
 (defun decode-amqp-method-access-request-ok (ibuffer)
-  (error "decode-amqp-method-access-request-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-access-request-ok
+      :ticket (amqp-short-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-access-request-ok (method obuffer)
-  (error "encode-amqp-method-access-request-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'ticket))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-access-request-ok))
   nil)
@@ -471,22 +690,50 @@
   11)
 
 (defclass amqp-method-exchange-declare (amqp-method-base)
-((ticket :initarg :ticket)
-(exchange :initarg :exchange)
-(type :initarg :type)
-(passive :initarg :passive)
-(durable :initarg :durable)
-(auto-delete :initarg :auto-delete)
-(internal :initarg :internal)
-(nowait :initarg :nowait)
-(arguments :initarg :arguments)
+(
+  (ticket :initarg :ticket)
+  (exchange :initarg :exchange)
+  (type :initarg :type)
+  (passive :initarg :passive)
+  (durable :initarg :durable)
+  (auto-delete :initarg :auto-delete)
+  (internal :initarg :internal)
+  (nowait :initarg :nowait)
+  (arguments :initarg :arguments)
 ))
 
 (defun decode-amqp-method-exchange-declare (ibuffer)
-  (error "decode-amqp-method-exchange-declare not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-exchange-declare
+      :ticket (amqp-short-decoder ibuffer)
+      :exchange (amqp-shortstr-decoder ibuffer)
+      :type (amqp-shortstr-decoder ibuffer)
+      :passive (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+      :durable (not (zerop (ldb (byte 8 1) bit-buffer)))
+      :auto-delete (not (zerop (ldb (byte 8 2) bit-buffer)))
+      :internal (not (zerop (ldb (byte 8 3) bit-buffer)))
+      :nowait (not (zerop (ldb (byte 8 4) bit-buffer)))
+      :arguments (amqp-table-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-exchange-declare (method obuffer)
-  (error "encode-amqp-method-exchange-declare not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'ticket))
+      (amqp-shortstr-encoder obuffer (slot-value method 'exchange))
+      (amqp-shortstr-encoder obuffer (slot-value method 'type))
+      (setf bit-buffer 0)
+      (when passive (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when durable (setf (ldb (byte 8 1) bit-buffer) 1))
+      (when auto-delete (setf (ldb (byte 8 2) bit-buffer) 1))
+      (when internal (setf (ldb (byte 8 3) bit-buffer) 1))
+      (when nowait (setf (ldb (byte 8 4) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+      (amqp-table-encoder obuffer (slot-value method 'arguments))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-exchange-declare))
   t)
@@ -501,13 +748,19 @@
   10)
 
 (defclass amqp-method-exchange-declare-ok (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-exchange-declare-ok (ibuffer)
-  (error "decode-amqp-method-exchange-declare-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-exchange-declare-ok
+  )))
 
 (defun encode-amqp-method-exchange-declare-ok (method obuffer)
-  (error "encode-amqp-method-exchange-declare-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-exchange-declare-ok))
   nil)
@@ -522,17 +775,35 @@
   11)
 
 (defclass amqp-method-exchange-delete (amqp-method-base)
-((ticket :initarg :ticket)
-(exchange :initarg :exchange)
-(if-unused :initarg :if-unused)
-(nowait :initarg :nowait)
+(
+  (ticket :initarg :ticket)
+  (exchange :initarg :exchange)
+  (if-unused :initarg :if-unused)
+  (nowait :initarg :nowait)
 ))
 
 (defun decode-amqp-method-exchange-delete (ibuffer)
-  (error "decode-amqp-method-exchange-delete not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-exchange-delete
+      :ticket (amqp-short-decoder ibuffer)
+      :exchange (amqp-shortstr-decoder ibuffer)
+      :if-unused (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+      :nowait (not (zerop (ldb (byte 8 1) bit-buffer)))
+  )))
 
 (defun encode-amqp-method-exchange-delete (method obuffer)
-  (error "encode-amqp-method-exchange-delete not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'ticket))
+      (amqp-shortstr-encoder obuffer (slot-value method 'exchange))
+      (setf bit-buffer 0)
+      (when if-unused (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when nowait (setf (ldb (byte 8 1) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-exchange-delete))
   t)
@@ -547,13 +818,19 @@
   20)
 
 (defclass amqp-method-exchange-delete-ok (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-exchange-delete-ok (ibuffer)
-  (error "decode-amqp-method-exchange-delete-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-exchange-delete-ok
+  )))
 
 (defun encode-amqp-method-exchange-delete-ok (method obuffer)
-  (error "encode-amqp-method-exchange-delete-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-exchange-delete-ok))
   nil)
@@ -568,19 +845,41 @@
   21)
 
 (defclass amqp-method-exchange-bind (amqp-method-base)
-((ticket :initarg :ticket)
-(destination :initarg :destination)
-(source :initarg :source)
-(routing-key :initarg :routing-key)
-(nowait :initarg :nowait)
-(arguments :initarg :arguments)
+(
+  (ticket :initarg :ticket)
+  (destination :initarg :destination)
+  (source :initarg :source)
+  (routing-key :initarg :routing-key)
+  (nowait :initarg :nowait)
+  (arguments :initarg :arguments)
 ))
 
 (defun decode-amqp-method-exchange-bind (ibuffer)
-  (error "decode-amqp-method-exchange-bind not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-exchange-bind
+      :ticket (amqp-short-decoder ibuffer)
+      :destination (amqp-shortstr-decoder ibuffer)
+      :source (amqp-shortstr-decoder ibuffer)
+      :routing-key (amqp-shortstr-decoder ibuffer)
+      :nowait (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+      :arguments (amqp-table-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-exchange-bind (method obuffer)
-  (error "encode-amqp-method-exchange-bind not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'ticket))
+      (amqp-shortstr-encoder obuffer (slot-value method 'destination))
+      (amqp-shortstr-encoder obuffer (slot-value method 'source))
+      (amqp-shortstr-encoder obuffer (slot-value method 'routing-key))
+      (setf bit-buffer 0)
+      (when nowait (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+      (amqp-table-encoder obuffer (slot-value method 'arguments))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-exchange-bind))
   t)
@@ -595,13 +894,19 @@
   30)
 
 (defclass amqp-method-exchange-bind-ok (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-exchange-bind-ok (ibuffer)
-  (error "decode-amqp-method-exchange-bind-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-exchange-bind-ok
+  )))
 
 (defun encode-amqp-method-exchange-bind-ok (method obuffer)
-  (error "encode-amqp-method-exchange-bind-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-exchange-bind-ok))
   nil)
@@ -616,19 +921,41 @@
   31)
 
 (defclass amqp-method-exchange-unbind (amqp-method-base)
-((ticket :initarg :ticket)
-(destination :initarg :destination)
-(source :initarg :source)
-(routing-key :initarg :routing-key)
-(nowait :initarg :nowait)
-(arguments :initarg :arguments)
+(
+  (ticket :initarg :ticket)
+  (destination :initarg :destination)
+  (source :initarg :source)
+  (routing-key :initarg :routing-key)
+  (nowait :initarg :nowait)
+  (arguments :initarg :arguments)
 ))
 
 (defun decode-amqp-method-exchange-unbind (ibuffer)
-  (error "decode-amqp-method-exchange-unbind not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-exchange-unbind
+      :ticket (amqp-short-decoder ibuffer)
+      :destination (amqp-shortstr-decoder ibuffer)
+      :source (amqp-shortstr-decoder ibuffer)
+      :routing-key (amqp-shortstr-decoder ibuffer)
+      :nowait (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+      :arguments (amqp-table-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-exchange-unbind (method obuffer)
-  (error "encode-amqp-method-exchange-unbind not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'ticket))
+      (amqp-shortstr-encoder obuffer (slot-value method 'destination))
+      (amqp-shortstr-encoder obuffer (slot-value method 'source))
+      (amqp-shortstr-encoder obuffer (slot-value method 'routing-key))
+      (setf bit-buffer 0)
+      (when nowait (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+      (amqp-table-encoder obuffer (slot-value method 'arguments))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-exchange-unbind))
   t)
@@ -643,13 +970,19 @@
   40)
 
 (defclass amqp-method-exchange-unbind-ok (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-exchange-unbind-ok (ibuffer)
-  (error "decode-amqp-method-exchange-unbind-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-exchange-unbind-ok
+  )))
 
 (defun encode-amqp-method-exchange-unbind-ok (method obuffer)
-  (error "encode-amqp-method-exchange-unbind-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-exchange-unbind-ok))
   nil)
@@ -664,21 +997,47 @@
   51)
 
 (defclass amqp-method-queue-declare (amqp-method-base)
-((ticket :initarg :ticket)
-(queue :initarg :queue)
-(passive :initarg :passive)
-(durable :initarg :durable)
-(exclusive :initarg :exclusive)
-(auto-delete :initarg :auto-delete)
-(nowait :initarg :nowait)
-(arguments :initarg :arguments)
+(
+  (ticket :initarg :ticket)
+  (queue :initarg :queue)
+  (passive :initarg :passive)
+  (durable :initarg :durable)
+  (exclusive :initarg :exclusive)
+  (auto-delete :initarg :auto-delete)
+  (nowait :initarg :nowait)
+  (arguments :initarg :arguments)
 ))
 
 (defun decode-amqp-method-queue-declare (ibuffer)
-  (error "decode-amqp-method-queue-declare not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-queue-declare
+      :ticket (amqp-short-decoder ibuffer)
+      :queue (amqp-shortstr-decoder ibuffer)
+      :passive (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+      :durable (not (zerop (ldb (byte 8 1) bit-buffer)))
+      :exclusive (not (zerop (ldb (byte 8 2) bit-buffer)))
+      :auto-delete (not (zerop (ldb (byte 8 3) bit-buffer)))
+      :nowait (not (zerop (ldb (byte 8 4) bit-buffer)))
+      :arguments (amqp-table-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-queue-declare (method obuffer)
-  (error "encode-amqp-method-queue-declare not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'ticket))
+      (amqp-shortstr-encoder obuffer (slot-value method 'queue))
+      (setf bit-buffer 0)
+      (when passive (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when durable (setf (ldb (byte 8 1) bit-buffer) 1))
+      (when exclusive (setf (ldb (byte 8 2) bit-buffer) 1))
+      (when auto-delete (setf (ldb (byte 8 3) bit-buffer) 1))
+      (when nowait (setf (ldb (byte 8 4) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+      (amqp-table-encoder obuffer (slot-value method 'arguments))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-queue-declare))
   t)
@@ -693,16 +1052,28 @@
   10)
 
 (defclass amqp-method-queue-declare-ok (amqp-method-base)
-((queue :initarg :queue)
-(message-count :initarg :message-count)
-(consumer-count :initarg :consumer-count)
+(
+  (queue :initarg :queue)
+  (message-count :initarg :message-count)
+  (consumer-count :initarg :consumer-count)
 ))
 
 (defun decode-amqp-method-queue-declare-ok (ibuffer)
-  (error "decode-amqp-method-queue-declare-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-queue-declare-ok
+      :queue (amqp-shortstr-decoder ibuffer)
+      :message-count (amqp-long-decoder ibuffer)
+      :consumer-count (amqp-long-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-queue-declare-ok (method obuffer)
-  (error "encode-amqp-method-queue-declare-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-shortstr-encoder obuffer (slot-value method 'queue))
+      (amqp-long-encoder obuffer (slot-value method 'message-count))
+      (amqp-long-encoder obuffer (slot-value method 'consumer-count))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-queue-declare-ok))
   nil)
@@ -717,19 +1088,41 @@
   11)
 
 (defclass amqp-method-queue-bind (amqp-method-base)
-((ticket :initarg :ticket)
-(queue :initarg :queue)
-(exchange :initarg :exchange)
-(routing-key :initarg :routing-key)
-(nowait :initarg :nowait)
-(arguments :initarg :arguments)
+(
+  (ticket :initarg :ticket)
+  (queue :initarg :queue)
+  (exchange :initarg :exchange)
+  (routing-key :initarg :routing-key)
+  (nowait :initarg :nowait)
+  (arguments :initarg :arguments)
 ))
 
 (defun decode-amqp-method-queue-bind (ibuffer)
-  (error "decode-amqp-method-queue-bind not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-queue-bind
+      :ticket (amqp-short-decoder ibuffer)
+      :queue (amqp-shortstr-decoder ibuffer)
+      :exchange (amqp-shortstr-decoder ibuffer)
+      :routing-key (amqp-shortstr-decoder ibuffer)
+      :nowait (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+      :arguments (amqp-table-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-queue-bind (method obuffer)
-  (error "encode-amqp-method-queue-bind not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'ticket))
+      (amqp-shortstr-encoder obuffer (slot-value method 'queue))
+      (amqp-shortstr-encoder obuffer (slot-value method 'exchange))
+      (amqp-shortstr-encoder obuffer (slot-value method 'routing-key))
+      (setf bit-buffer 0)
+      (when nowait (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+      (amqp-table-encoder obuffer (slot-value method 'arguments))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-queue-bind))
   t)
@@ -744,13 +1137,19 @@
   20)
 
 (defclass amqp-method-queue-bind-ok (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-queue-bind-ok (ibuffer)
-  (error "decode-amqp-method-queue-bind-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-queue-bind-ok
+  )))
 
 (defun encode-amqp-method-queue-bind-ok (method obuffer)
-  (error "encode-amqp-method-queue-bind-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-queue-bind-ok))
   nil)
@@ -765,16 +1164,32 @@
   21)
 
 (defclass amqp-method-queue-purge (amqp-method-base)
-((ticket :initarg :ticket)
-(queue :initarg :queue)
-(nowait :initarg :nowait)
+(
+  (ticket :initarg :ticket)
+  (queue :initarg :queue)
+  (nowait :initarg :nowait)
 ))
 
 (defun decode-amqp-method-queue-purge (ibuffer)
-  (error "decode-amqp-method-queue-purge not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-queue-purge
+      :ticket (amqp-short-decoder ibuffer)
+      :queue (amqp-shortstr-decoder ibuffer)
+      :nowait (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+  )))
 
 (defun encode-amqp-method-queue-purge (method obuffer)
-  (error "encode-amqp-method-queue-purge not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'ticket))
+      (amqp-shortstr-encoder obuffer (slot-value method 'queue))
+      (setf bit-buffer 0)
+      (when nowait (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-queue-purge))
   t)
@@ -789,14 +1204,22 @@
   30)
 
 (defclass amqp-method-queue-purge-ok (amqp-method-base)
-((message-count :initarg :message-count)
+(
+  (message-count :initarg :message-count)
 ))
 
 (defun decode-amqp-method-queue-purge-ok (ibuffer)
-  (error "decode-amqp-method-queue-purge-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-queue-purge-ok
+      :message-count (amqp-long-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-queue-purge-ok (method obuffer)
-  (error "encode-amqp-method-queue-purge-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-long-encoder obuffer (slot-value method 'message-count))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-queue-purge-ok))
   nil)
@@ -811,18 +1234,38 @@
   31)
 
 (defclass amqp-method-queue-delete (amqp-method-base)
-((ticket :initarg :ticket)
-(queue :initarg :queue)
-(if-unused :initarg :if-unused)
-(if-empty :initarg :if-empty)
-(nowait :initarg :nowait)
+(
+  (ticket :initarg :ticket)
+  (queue :initarg :queue)
+  (if-unused :initarg :if-unused)
+  (if-empty :initarg :if-empty)
+  (nowait :initarg :nowait)
 ))
 
 (defun decode-amqp-method-queue-delete (ibuffer)
-  (error "decode-amqp-method-queue-delete not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-queue-delete
+      :ticket (amqp-short-decoder ibuffer)
+      :queue (amqp-shortstr-decoder ibuffer)
+      :if-unused (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+      :if-empty (not (zerop (ldb (byte 8 1) bit-buffer)))
+      :nowait (not (zerop (ldb (byte 8 2) bit-buffer)))
+  )))
 
 (defun encode-amqp-method-queue-delete (method obuffer)
-  (error "encode-amqp-method-queue-delete not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'ticket))
+      (amqp-shortstr-encoder obuffer (slot-value method 'queue))
+      (setf bit-buffer 0)
+      (when if-unused (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when if-empty (setf (ldb (byte 8 1) bit-buffer) 1))
+      (when nowait (setf (ldb (byte 8 2) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-queue-delete))
   t)
@@ -837,14 +1280,22 @@
   40)
 
 (defclass amqp-method-queue-delete-ok (amqp-method-base)
-((message-count :initarg :message-count)
+(
+  (message-count :initarg :message-count)
 ))
 
 (defun decode-amqp-method-queue-delete-ok (ibuffer)
-  (error "decode-amqp-method-queue-delete-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-queue-delete-ok
+      :message-count (amqp-long-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-queue-delete-ok (method obuffer)
-  (error "encode-amqp-method-queue-delete-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-long-encoder obuffer (slot-value method 'message-count))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-queue-delete-ok))
   nil)
@@ -859,18 +1310,34 @@
   41)
 
 (defclass amqp-method-queue-unbind (amqp-method-base)
-((ticket :initarg :ticket)
-(queue :initarg :queue)
-(exchange :initarg :exchange)
-(routing-key :initarg :routing-key)
-(arguments :initarg :arguments)
+(
+  (ticket :initarg :ticket)
+  (queue :initarg :queue)
+  (exchange :initarg :exchange)
+  (routing-key :initarg :routing-key)
+  (arguments :initarg :arguments)
 ))
 
 (defun decode-amqp-method-queue-unbind (ibuffer)
-  (error "decode-amqp-method-queue-unbind not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-queue-unbind
+      :ticket (amqp-short-decoder ibuffer)
+      :queue (amqp-shortstr-decoder ibuffer)
+      :exchange (amqp-shortstr-decoder ibuffer)
+      :routing-key (amqp-shortstr-decoder ibuffer)
+      :arguments (amqp-table-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-queue-unbind (method obuffer)
-  (error "encode-amqp-method-queue-unbind not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'ticket))
+      (amqp-shortstr-encoder obuffer (slot-value method 'queue))
+      (amqp-shortstr-encoder obuffer (slot-value method 'exchange))
+      (amqp-shortstr-encoder obuffer (slot-value method 'routing-key))
+      (amqp-table-encoder obuffer (slot-value method 'arguments))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-queue-unbind))
   t)
@@ -885,13 +1352,19 @@
   50)
 
 (defclass amqp-method-queue-unbind-ok (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-queue-unbind-ok (ibuffer)
-  (error "decode-amqp-method-queue-unbind-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-queue-unbind-ok
+  )))
 
 (defun encode-amqp-method-queue-unbind-ok (method obuffer)
-  (error "encode-amqp-method-queue-unbind-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-queue-unbind-ok))
   nil)
@@ -906,16 +1379,32 @@
   51)
 
 (defclass amqp-method-basic-qos (amqp-method-base)
-((prefetch-size :initarg :prefetch-size)
-(prefetch-count :initarg :prefetch-count)
-(global :initarg :global)
+(
+  (prefetch-size :initarg :prefetch-size)
+  (prefetch-count :initarg :prefetch-count)
+  (global :initarg :global)
 ))
 
 (defun decode-amqp-method-basic-qos (ibuffer)
-  (error "decode-amqp-method-basic-qos not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-qos
+      :prefetch-size (amqp-long-decoder ibuffer)
+      :prefetch-count (amqp-short-decoder ibuffer)
+      :global (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+  )))
 
 (defun encode-amqp-method-basic-qos (method obuffer)
-  (error "encode-amqp-method-basic-qos not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-long-encoder obuffer (slot-value method 'prefetch-size))
+      (amqp-short-encoder obuffer (slot-value method 'prefetch-count))
+      (setf bit-buffer 0)
+      (when global (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-qos))
   t)
@@ -930,13 +1419,19 @@
   10)
 
 (defclass amqp-method-basic-qos-ok (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-basic-qos-ok (ibuffer)
-  (error "decode-amqp-method-basic-qos-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-qos-ok
+  )))
 
 (defun encode-amqp-method-basic-qos-ok (method obuffer)
-  (error "encode-amqp-method-basic-qos-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-qos-ok))
   nil)
@@ -951,21 +1446,47 @@
   11)
 
 (defclass amqp-method-basic-consume (amqp-method-base)
-((ticket :initarg :ticket)
-(queue :initarg :queue)
-(consumer-tag :initarg :consumer-tag)
-(no-local :initarg :no-local)
-(no-ack :initarg :no-ack)
-(exclusive :initarg :exclusive)
-(nowait :initarg :nowait)
-(arguments :initarg :arguments)
+(
+  (ticket :initarg :ticket)
+  (queue :initarg :queue)
+  (consumer-tag :initarg :consumer-tag)
+  (no-local :initarg :no-local)
+  (no-ack :initarg :no-ack)
+  (exclusive :initarg :exclusive)
+  (nowait :initarg :nowait)
+  (arguments :initarg :arguments)
 ))
 
 (defun decode-amqp-method-basic-consume (ibuffer)
-  (error "decode-amqp-method-basic-consume not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-consume
+      :ticket (amqp-short-decoder ibuffer)
+      :queue (amqp-shortstr-decoder ibuffer)
+      :consumer-tag (amqp-shortstr-decoder ibuffer)
+      :no-local (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+      :no-ack (not (zerop (ldb (byte 8 1) bit-buffer)))
+      :exclusive (not (zerop (ldb (byte 8 2) bit-buffer)))
+      :nowait (not (zerop (ldb (byte 8 3) bit-buffer)))
+      :arguments (amqp-table-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-basic-consume (method obuffer)
-  (error "encode-amqp-method-basic-consume not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'ticket))
+      (amqp-shortstr-encoder obuffer (slot-value method 'queue))
+      (amqp-shortstr-encoder obuffer (slot-value method 'consumer-tag))
+      (setf bit-buffer 0)
+      (when no-local (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when no-ack (setf (ldb (byte 8 1) bit-buffer) 1))
+      (when exclusive (setf (ldb (byte 8 2) bit-buffer) 1))
+      (when nowait (setf (ldb (byte 8 3) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+      (amqp-table-encoder obuffer (slot-value method 'arguments))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-consume))
   t)
@@ -980,14 +1501,22 @@
   20)
 
 (defclass amqp-method-basic-consume-ok (amqp-method-base)
-((consumer-tag :initarg :consumer-tag)
+(
+  (consumer-tag :initarg :consumer-tag)
 ))
 
 (defun decode-amqp-method-basic-consume-ok (ibuffer)
-  (error "decode-amqp-method-basic-consume-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-consume-ok
+      :consumer-tag (amqp-shortstr-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-basic-consume-ok (method obuffer)
-  (error "encode-amqp-method-basic-consume-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-shortstr-encoder obuffer (slot-value method 'consumer-tag))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-consume-ok))
   nil)
@@ -1002,15 +1531,29 @@
   21)
 
 (defclass amqp-method-basic-cancel (amqp-method-base)
-((consumer-tag :initarg :consumer-tag)
-(nowait :initarg :nowait)
+(
+  (consumer-tag :initarg :consumer-tag)
+  (nowait :initarg :nowait)
 ))
 
 (defun decode-amqp-method-basic-cancel (ibuffer)
-  (error "decode-amqp-method-basic-cancel not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-cancel
+      :consumer-tag (amqp-shortstr-decoder ibuffer)
+      :nowait (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+  )))
 
 (defun encode-amqp-method-basic-cancel (method obuffer)
-  (error "encode-amqp-method-basic-cancel not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-shortstr-encoder obuffer (slot-value method 'consumer-tag))
+      (setf bit-buffer 0)
+      (when nowait (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-cancel))
   t)
@@ -1025,14 +1568,22 @@
   30)
 
 (defclass amqp-method-basic-cancel-ok (amqp-method-base)
-((consumer-tag :initarg :consumer-tag)
+(
+  (consumer-tag :initarg :consumer-tag)
 ))
 
 (defun decode-amqp-method-basic-cancel-ok (ibuffer)
-  (error "decode-amqp-method-basic-cancel-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-cancel-ok
+      :consumer-tag (amqp-shortstr-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-basic-cancel-ok (method obuffer)
-  (error "encode-amqp-method-basic-cancel-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-shortstr-encoder obuffer (slot-value method 'consumer-tag))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-cancel-ok))
   nil)
@@ -1047,18 +1598,38 @@
   31)
 
 (defclass amqp-method-basic-publish (amqp-method-base)
-((ticket :initarg :ticket)
-(exchange :initarg :exchange)
-(routing-key :initarg :routing-key)
-(mandatory :initarg :mandatory)
-(immediate :initarg :immediate)
+(
+  (ticket :initarg :ticket)
+  (exchange :initarg :exchange)
+  (routing-key :initarg :routing-key)
+  (mandatory :initarg :mandatory)
+  (immediate :initarg :immediate)
 ))
 
 (defun decode-amqp-method-basic-publish (ibuffer)
-  (error "decode-amqp-method-basic-publish not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-publish
+      :ticket (amqp-short-decoder ibuffer)
+      :exchange (amqp-shortstr-decoder ibuffer)
+      :routing-key (amqp-shortstr-decoder ibuffer)
+      :mandatory (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+      :immediate (not (zerop (ldb (byte 8 1) bit-buffer)))
+  )))
 
 (defun encode-amqp-method-basic-publish (method obuffer)
-  (error "encode-amqp-method-basic-publish not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'ticket))
+      (amqp-shortstr-encoder obuffer (slot-value method 'exchange))
+      (amqp-shortstr-encoder obuffer (slot-value method 'routing-key))
+      (setf bit-buffer 0)
+      (when mandatory (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when immediate (setf (ldb (byte 8 1) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-publish))
   nil)
@@ -1073,17 +1644,31 @@
   40)
 
 (defclass amqp-method-basic-return (amqp-method-base)
-((reply-code :initarg :reply-code)
-(reply-text :initarg :reply-text)
-(exchange :initarg :exchange)
-(routing-key :initarg :routing-key)
+(
+  (reply-code :initarg :reply-code)
+  (reply-text :initarg :reply-text)
+  (exchange :initarg :exchange)
+  (routing-key :initarg :routing-key)
 ))
 
 (defun decode-amqp-method-basic-return (ibuffer)
-  (error "decode-amqp-method-basic-return not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-return
+      :reply-code (amqp-short-decoder ibuffer)
+      :reply-text (amqp-shortstr-decoder ibuffer)
+      :exchange (amqp-shortstr-decoder ibuffer)
+      :routing-key (amqp-shortstr-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-basic-return (method obuffer)
-  (error "encode-amqp-method-basic-return not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'reply-code))
+      (amqp-shortstr-encoder obuffer (slot-value method 'reply-text))
+      (amqp-shortstr-encoder obuffer (slot-value method 'exchange))
+      (amqp-shortstr-encoder obuffer (slot-value method 'routing-key))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-return))
   nil)
@@ -1098,18 +1683,38 @@
   50)
 
 (defclass amqp-method-basic-deliver (amqp-method-base)
-((consumer-tag :initarg :consumer-tag)
-(delivery-tag :initarg :delivery-tag)
-(redelivered :initarg :redelivered)
-(exchange :initarg :exchange)
-(routing-key :initarg :routing-key)
+(
+  (consumer-tag :initarg :consumer-tag)
+  (delivery-tag :initarg :delivery-tag)
+  (redelivered :initarg :redelivered)
+  (exchange :initarg :exchange)
+  (routing-key :initarg :routing-key)
 ))
 
 (defun decode-amqp-method-basic-deliver (ibuffer)
-  (error "decode-amqp-method-basic-deliver not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-deliver
+      :consumer-tag (amqp-shortstr-decoder ibuffer)
+      :delivery-tag (amqp-longlong-decoder ibuffer)
+      :redelivered (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+      :exchange (amqp-shortstr-decoder ibuffer)
+      :routing-key (amqp-shortstr-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-basic-deliver (method obuffer)
-  (error "encode-amqp-method-basic-deliver not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-shortstr-encoder obuffer (slot-value method 'consumer-tag))
+      (amqp-longlong-encoder obuffer (slot-value method 'delivery-tag))
+      (setf bit-buffer 0)
+      (when redelivered (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+      (amqp-shortstr-encoder obuffer (slot-value method 'exchange))
+      (amqp-shortstr-encoder obuffer (slot-value method 'routing-key))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-deliver))
   nil)
@@ -1124,16 +1729,32 @@
   60)
 
 (defclass amqp-method-basic-get (amqp-method-base)
-((ticket :initarg :ticket)
-(queue :initarg :queue)
-(no-ack :initarg :no-ack)
+(
+  (ticket :initarg :ticket)
+  (queue :initarg :queue)
+  (no-ack :initarg :no-ack)
 ))
 
 (defun decode-amqp-method-basic-get (ibuffer)
-  (error "decode-amqp-method-basic-get not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-get
+      :ticket (amqp-short-decoder ibuffer)
+      :queue (amqp-shortstr-decoder ibuffer)
+      :no-ack (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+  )))
 
 (defun encode-amqp-method-basic-get (method obuffer)
-  (error "encode-amqp-method-basic-get not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-short-encoder obuffer (slot-value method 'ticket))
+      (amqp-shortstr-encoder obuffer (slot-value method 'queue))
+      (setf bit-buffer 0)
+      (when no-ack (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-get))
   t)
@@ -1148,18 +1769,38 @@
   70)
 
 (defclass amqp-method-basic-get-ok (amqp-method-base)
-((delivery-tag :initarg :delivery-tag)
-(redelivered :initarg :redelivered)
-(exchange :initarg :exchange)
-(routing-key :initarg :routing-key)
-(message-count :initarg :message-count)
+(
+  (delivery-tag :initarg :delivery-tag)
+  (redelivered :initarg :redelivered)
+  (exchange :initarg :exchange)
+  (routing-key :initarg :routing-key)
+  (message-count :initarg :message-count)
 ))
 
 (defun decode-amqp-method-basic-get-ok (ibuffer)
-  (error "decode-amqp-method-basic-get-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-get-ok
+      :delivery-tag (amqp-longlong-decoder ibuffer)
+      :redelivered (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+      :exchange (amqp-shortstr-decoder ibuffer)
+      :routing-key (amqp-shortstr-decoder ibuffer)
+      :message-count (amqp-long-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-basic-get-ok (method obuffer)
-  (error "encode-amqp-method-basic-get-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-longlong-encoder obuffer (slot-value method 'delivery-tag))
+      (setf bit-buffer 0)
+      (when redelivered (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+      (amqp-shortstr-encoder obuffer (slot-value method 'exchange))
+      (amqp-shortstr-encoder obuffer (slot-value method 'routing-key))
+      (amqp-long-encoder obuffer (slot-value method 'message-count))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-get-ok))
   nil)
@@ -1174,14 +1815,22 @@
   71)
 
 (defclass amqp-method-basic-get-empty (amqp-method-base)
-((cluster-id :initarg :cluster-id)
+(
+  (cluster-id :initarg :cluster-id)
 ))
 
 (defun decode-amqp-method-basic-get-empty (ibuffer)
-  (error "decode-amqp-method-basic-get-empty not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-get-empty
+      :cluster-id (amqp-shortstr-decoder ibuffer)
+  )))
 
 (defun encode-amqp-method-basic-get-empty (method obuffer)
-  (error "encode-amqp-method-basic-get-empty not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-shortstr-encoder obuffer (slot-value method 'cluster-id))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-get-empty))
   nil)
@@ -1196,15 +1845,29 @@
   72)
 
 (defclass amqp-method-basic-ack (amqp-method-base)
-((delivery-tag :initarg :delivery-tag)
-(multiple :initarg :multiple)
+(
+  (delivery-tag :initarg :delivery-tag)
+  (multiple :initarg :multiple)
 ))
 
 (defun decode-amqp-method-basic-ack (ibuffer)
-  (error "decode-amqp-method-basic-ack not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-ack
+      :delivery-tag (amqp-longlong-decoder ibuffer)
+      :multiple (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+  )))
 
 (defun encode-amqp-method-basic-ack (method obuffer)
-  (error "encode-amqp-method-basic-ack not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-longlong-encoder obuffer (slot-value method 'delivery-tag))
+      (setf bit-buffer 0)
+      (when multiple (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-ack))
   nil)
@@ -1219,15 +1882,29 @@
   80)
 
 (defclass amqp-method-basic-reject (amqp-method-base)
-((delivery-tag :initarg :delivery-tag)
-(requeue :initarg :requeue)
+(
+  (delivery-tag :initarg :delivery-tag)
+  (requeue :initarg :requeue)
 ))
 
 (defun decode-amqp-method-basic-reject (ibuffer)
-  (error "decode-amqp-method-basic-reject not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-reject
+      :delivery-tag (amqp-longlong-decoder ibuffer)
+      :requeue (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+  )))
 
 (defun encode-amqp-method-basic-reject (method obuffer)
-  (error "encode-amqp-method-basic-reject not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-longlong-encoder obuffer (slot-value method 'delivery-tag))
+      (setf bit-buffer 0)
+      (when requeue (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-reject))
   nil)
@@ -1242,14 +1919,26 @@
   90)
 
 (defclass amqp-method-basic-recover-async (amqp-method-base)
-((requeue :initarg :requeue)
+(
+  (requeue :initarg :requeue)
 ))
 
 (defun decode-amqp-method-basic-recover-async (ibuffer)
-  (error "decode-amqp-method-basic-recover-async not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-recover-async
+      :requeue (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+  )))
 
 (defun encode-amqp-method-basic-recover-async (method obuffer)
-  (error "encode-amqp-method-basic-recover-async not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (setf bit-buffer 0)
+      (when requeue (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-recover-async))
   nil)
@@ -1264,14 +1953,26 @@
   100)
 
 (defclass amqp-method-basic-recover (amqp-method-base)
-((requeue :initarg :requeue)
+(
+  (requeue :initarg :requeue)
 ))
 
 (defun decode-amqp-method-basic-recover (ibuffer)
-  (error "decode-amqp-method-basic-recover not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-recover
+      :requeue (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+  )))
 
 (defun encode-amqp-method-basic-recover (method obuffer)
-  (error "encode-amqp-method-basic-recover not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (setf bit-buffer 0)
+      (when requeue (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-recover))
   t)
@@ -1286,13 +1987,19 @@
   110)
 
 (defclass amqp-method-basic-recover-ok (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-basic-recover-ok (ibuffer)
-  (error "decode-amqp-method-basic-recover-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-recover-ok
+  )))
 
 (defun encode-amqp-method-basic-recover-ok (method obuffer)
-  (error "encode-amqp-method-basic-recover-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-recover-ok))
   nil)
@@ -1307,16 +2014,32 @@
   111)
 
 (defclass amqp-method-basic-nack (amqp-method-base)
-((delivery-tag :initarg :delivery-tag)
-(multiple :initarg :multiple)
-(requeue :initarg :requeue)
+(
+  (delivery-tag :initarg :delivery-tag)
+  (multiple :initarg :multiple)
+  (requeue :initarg :requeue)
 ))
 
 (defun decode-amqp-method-basic-nack (ibuffer)
-  (error "decode-amqp-method-basic-nack not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-basic-nack
+      :delivery-tag (amqp-longlong-decoder ibuffer)
+      :multiple (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+      :requeue (not (zerop (ldb (byte 8 1) bit-buffer)))
+  )))
 
 (defun encode-amqp-method-basic-nack (method obuffer)
-  (error "encode-amqp-method-basic-nack not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (amqp-longlong-encoder obuffer (slot-value method 'delivery-tag))
+      (setf bit-buffer 0)
+      (when multiple (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when requeue (setf (ldb (byte 8 1) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-basic-nack))
   nil)
@@ -1331,13 +2054,19 @@
   120)
 
 (defclass amqp-method-tx-select (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-tx-select (ibuffer)
-  (error "decode-amqp-method-tx-select not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-tx-select
+  )))
 
 (defun encode-amqp-method-tx-select (method obuffer)
-  (error "encode-amqp-method-tx-select not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-tx-select))
   t)
@@ -1352,13 +2081,19 @@
   10)
 
 (defclass amqp-method-tx-select-ok (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-tx-select-ok (ibuffer)
-  (error "decode-amqp-method-tx-select-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-tx-select-ok
+  )))
 
 (defun encode-amqp-method-tx-select-ok (method obuffer)
-  (error "encode-amqp-method-tx-select-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-tx-select-ok))
   nil)
@@ -1373,13 +2108,19 @@
   11)
 
 (defclass amqp-method-tx-commit (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-tx-commit (ibuffer)
-  (error "decode-amqp-method-tx-commit not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-tx-commit
+  )))
 
 (defun encode-amqp-method-tx-commit (method obuffer)
-  (error "encode-amqp-method-tx-commit not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-tx-commit))
   t)
@@ -1394,13 +2135,19 @@
   20)
 
 (defclass amqp-method-tx-commit-ok (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-tx-commit-ok (ibuffer)
-  (error "decode-amqp-method-tx-commit-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-tx-commit-ok
+  )))
 
 (defun encode-amqp-method-tx-commit-ok (method obuffer)
-  (error "encode-amqp-method-tx-commit-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-tx-commit-ok))
   nil)
@@ -1415,13 +2162,19 @@
   21)
 
 (defclass amqp-method-tx-rollback (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-tx-rollback (ibuffer)
-  (error "decode-amqp-method-tx-rollback not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-tx-rollback
+  )))
 
 (defun encode-amqp-method-tx-rollback (method obuffer)
-  (error "encode-amqp-method-tx-rollback not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-tx-rollback))
   t)
@@ -1436,13 +2189,19 @@
   30)
 
 (defclass amqp-method-tx-rollback-ok (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-tx-rollback-ok (ibuffer)
-  (error "decode-amqp-method-tx-rollback-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-tx-rollback-ok
+  )))
 
 (defun encode-amqp-method-tx-rollback-ok (method obuffer)
-  (error "encode-amqp-method-tx-rollback-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-tx-rollback-ok))
   nil)
@@ -1457,14 +2216,26 @@
   31)
 
 (defclass amqp-method-confirm-select (amqp-method-base)
-((nowait :initarg :nowait)
+(
+  (nowait :initarg :nowait)
 ))
 
 (defun decode-amqp-method-confirm-select (ibuffer)
-  (error "decode-amqp-method-confirm-select not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-confirm-select
+      :nowait (progn
+        (setf bit-buffer (ibuffer-decode-ub8 ibuffer))
+        (not (zerop (ldb (byte 8 0) bit-buffer))))
+  )))
 
 (defun encode-amqp-method-confirm-select (method obuffer)
-  (error "encode-amqp-method-confirm-select not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+      (setf bit-buffer 0)
+      (when nowait (setf (ldb (byte 8 0) bit-buffer) 1))
+      (amqp-octet-encoder bit-buffer)
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-confirm-select))
   t)
@@ -1479,13 +2250,19 @@
   10)
 
 (defclass amqp-method-confirm-select-ok (amqp-method-base)
-())
+(
+))
 
 (defun decode-amqp-method-confirm-select-ok (ibuffer)
-  (error "decode-amqp-method-confirm-select-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance 'amqp-method-confirm-select-ok
+  )))
 
 (defun encode-amqp-method-confirm-select-ok (method obuffer)
-  (error "encode-amqp-method-confirm-select-ok not implemented"))
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+  ))
 
 (defmethod synchronous-method-p ((method amqp-method-confirm-select-ok))
   nil)

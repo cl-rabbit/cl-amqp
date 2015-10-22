@@ -12,27 +12,28 @@
 
 % for m in spec.allMethods():
 (defclass ${m.method_lisp_class_name()} (amqp-method-base)
-(\
+(
   % for arg in m.arguments:
-(${arg.name} :initarg :${arg.name})
+  (${arg.name} :initarg :${arg.name})
   % endfor
 ))
 
 (defun decode-${m.method_lisp_class_name()} (ibuffer)
-  (error "decode-${m.method_lisp_class_name()} not implemented")
-  #|
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
+    (make-instance '${m.method_lisp_class_name()}
   % for line in helpers.genDecodeMethodDefinition(spec, m):
-    ${line}
+      ${line}
   % endfor
-  |#)
+  )))
 
 (defun encode-${m.method_lisp_class_name()} (method obuffer)
-  (error "encode-${m.method_lisp_class_name()} not implemented")
-  #|
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer))
   % for line in helpers.genEncodeMethodDefinition(spec, m):
-    ${line}
+      ${line}
   % endfor
-  |#)
+  ))
 
 (defmethod synchronous-method-p ((method ${m.method_lisp_class_name()}))
   ${"t" if m.isSynchronous  else "nil"})
