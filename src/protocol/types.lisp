@@ -136,8 +136,8 @@
     (ibuffer-get-bytes buffer string-length)))
 
 (define-amqp-types
-    (#\t "boolean")
-    (#\b "octet")
+  (#\t "boolean")
+  (#\b "octet")
   (#\s "short")
   (#\I "long")
   (#\l "longlong")
@@ -216,7 +216,7 @@
     (obuffer-add-bytes buffer utf-8-bytes)))
 
 (defun amqp-longstr-table-field-encoder (buffer value)
-  (amqp-encode-field-value-type buffer +amqp-type-lstring+)
+  (amqp-encode-field-value-type buffer +amqp-type-longstr+)
   (amqp-longstr-encoder buffer value))
 
 (defun amqp-array-table-field-encoder (buffer value)

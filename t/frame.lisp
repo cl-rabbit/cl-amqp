@@ -2,7 +2,7 @@
 
 (enable-binary-string-syntax)
 
-(plan 9)
+(plan 2)
 
 (subtest "Frames Parsing"
 
