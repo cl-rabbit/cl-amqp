@@ -24,9 +24,71 @@
 ;;   V     V       V            Void
 ;;                 x            Byte array         (D)
 
-;;; table fields
+(deftype alist ()
+  `(and list (satisfies list-is-alist)))
 
-(defmacro define-amqp-types (&rest types-and-decoders)
+(defun list-is-alist (list)
+  (when (typep list 'list)
+    (every #'consp list)))
+
+(deftype amqp-void ()
+  `(and symbol (satisfies symbol-is-void)))
+
+(defun symbol-is-void (symbol)
+  (eq :void symbol))
+
+(deftype amqp-boolean ()
+  `(and symbol (satisfies symbol-is-amqp-boolean)))
+
+(defun symbol-is-amqp-boolean (symbol)
+  (or (eq t symbol)
+      (eq :false symbol)))
+
+(defun string-is-short (string)
+ (<= (length string) 255))
+
+(deftype amqp-shortstr ()
+  `(and string (satisfies string-is-short)))
+
+(deftype amqp-longstr ()
+  `string)
+
+(deftype amqp-octet ()
+  `(signed-byte 8))
+
+(deftype amqp-short ()
+  `(signed-byte 16))
+
+(deftype amqp-long ()
+  `(signed-byte 32))
+
+(deftype amqp-longlong ()
+  `(signed-byte 64))
+
+(deftype amqp-double ()
+  `double-float)
+
+(deftype amqp-single ()
+  `single-float)
+
+(deftype amqp-decimal ()
+  `wu-decimal:decimal)
+
+(deftype amqp-timestamp ()
+  `local-time:timestamp)
+
+(deftype amqp-table ()
+  `(or alist hash-table))
+
+(deftype amqp-array ()
+  `vector) ;; TODO: maybe check each vector element too?
+
+(deftype amqp-barray ()
+  `nibbles:simple-octet-vector)
+
+;; table fields
+
+(defmacro define-amqp-table-field-types (&rest types-and-decoders)
   (with-gensyms (type)
     (labels ((amqp-type-constant-name (type-name)
                (intern (string-upcase ;; TODO: really? what about read-table case?
@@ -135,7 +197,7 @@
   (let* ((string-length (ibuffer-decode-ub32 buffer)))
     (ibuffer-get-bytes buffer string-length)))
 
-(define-amqp-types
+(define-amqp-table-field-types
   (#\t "boolean")
   (#\b "octet")
   (#\s "short")
@@ -224,7 +286,7 @@
   (let* ((array-buffer (new-obuffer))
          (array-bytes (loop for item across value
                             do
-                               (amqp-encode-field-value array-buffer item)
+                               (amqp-encode-table-field-value array-buffer item)
                             finally
                                (return (obuffer-get-bytes array-buffer)))))
     ;; TODO: check (length array-bytes) actually fits ub32
@@ -243,7 +305,9 @@
 
 (defun amqp-table-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-table+)
-  (amqp-table-encoder buffer value))
+  (if (listp value)
+      (amqp-table-encoder buffer value)
+      (amqp-table-encoder buffer (hash-table-alist value))))
 
 (defun amqp-void-table-field-encoder (buffer value)
   (declare (ignore value))
@@ -266,76 +330,14 @@
          (table-bytes (loop for (field-name . field-value) in value
                             do
                                (amqp-field-name-encoder table-buffer field-name)
-                               (amqp-encode-field-value table-buffer field-value)
+                               (amqp-encode-table-field-value table-buffer field-value)
                             finally
                                (return (obuffer-get-bytes table-buffer)))))
     ;; TODO: check (length table-bytes) actually fits ub32
     (obuffer-encode-ub32 buffer (length table-bytes))
     (obuffer-add-bytes buffer table-bytes)))
 
-(deftype alist ()
-  `(and list (satisfies list-is-alist)))
-
-(defun list-is-alist (list)
-  (when (typep list 'list)
-    (every #'consp list)))
-
-(deftype amqp-void ()
-  `(and symbol (satisfies symbol-is-void)))
-
-(defun symbol-is-void (symbol)
-  (eq :void symbol))
-
-(deftype amqp-boolean ()
-  `(and symbol (satisfies symbol-is-amqp-boolean)))
-
-(defun symbol-is-amqp-boolean (symbol)
-  (or (eq t symbol)
-      (eq :false symbol)))
-
-(defun string-is-short (string)
- (<= (length string) 255))
-
-(deftype amqp-shortstr ()
-  `(and string (satisfies string-is-short)))
-
-(deftype amqp-longstr ()
-  `string)
-
-(deftype amqp-octet ()
-  `(signed-byte 8))
-
-(deftype amqp-short ()
-  `(signed-byte 16))
-
-(deftype amqp-long ()
-  `(signed-byte 32))
-
-(deftype amqp-longlong ()
-  `(signed-byte 64))
-
-(deftype amqp-double ()
-  `double-float)
-
-(deftype amqp-single ()
-  `single-float)
-
-(deftype amqp-decimal ()
-  `wu-decimal:decimal)
-
-(deftype amqp-timestamp ()
-  `local-time:timestamp)
-
-(deftype amqp-table ()
-  `(or alist hash-table))
-
-(deftype amqp-array ()
-  `vector) ;; TODO: maybe check each vector element too?
-
-(deftype amqp-barray ()
-  `nibbles:simple-octet-vector)
-
-(defun amqp-encode-field-value (buffer value)
+(defun amqp-encode-table-field-value (buffer value)
   (typecase value
     (amqp-octet (amqp-octet-table-field-encoder buffer value))
     (amqp-short (amqp-short-table-field-encoder buffer value))
@@ -348,9 +350,7 @@
     (amqp-barray (amqp-barray-table-field-encoder buffer value))
     (amqp-array (amqp-array-table-field-encoder buffer value))
     (amqp-timestamp (amqp-timestamp-table-field-encoder buffer (local-time:timestamp-to-unix value)))
-    (amqp-table (if (listp value)
-                    (amqp-table-table-field-encoder buffer value)
-                    (amqp-table-table-field-encoder buffer (hash-table-alist value))))
+    (amqp-table (amqp-table-table-field-encoder buffer value))
     (amqp-void (amqp-void-table-field-encoder buffer value))
     (amqp-boolean (amqp-boolean-table-field-encoder buffer (eq t value)))
     (t (error "Don't know how to encode ~a" value)))) ;; TODO: specialize error
