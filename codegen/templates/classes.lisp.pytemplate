@@ -62,15 +62,15 @@
 
 % endfor
 
-(defun decode-method (method-class ibuffer)
+(defun method-decode (method-class ibuffer)
   (case method-class
   % for m in spec.allMethods():
     (${m.method_lisp_class_name()} (decode-${m.method_lisp_class_name()} ibuffer))
   % endfor
     (t (error 'amqp-unknown-method-class-error :method-class method-class))))
 
-(defun encode-method (method obuffer)
-  (case (class-of method)
+(defun method-encode (method obuffer)
+  (case (class-name (class-of method))
   % for m in spec.allMethods():
     (${m.method_lisp_class_name()} (encode-${m.method_lisp_class_name()} method obuffer))
   % endfor
@@ -97,3 +97,10 @@
     (${m.method_signature()} '${m.method_lisp_class_name()})
 % endfor
     (t (error 'amqp-unknown-method-error :method-signature signature))))
+
+(defun method-signature(method)
+  (case (class-name (class-of method))
+% for m in spec.allMethods():
+    (${m.method_lisp_class_name()} ${m.method_signature()})
+% endfor
+    (t (error 'amqp-unknown-method-class-error :method-class (class-of method)))))
