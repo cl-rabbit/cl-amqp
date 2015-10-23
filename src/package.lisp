@@ -7,7 +7,12 @@
            #:amqp-unknown-reply-code-error
 
            #:make-frame-parser ;; frames stuff
+           #:make-frame-payload-parser
+           #:+amqp-frame-method+
            #:method-frame
+           #:frame-channel
+           #:frame-size
+           #:frame-payload
            #:frame-encode
            #:frame-parser-consume
            #:malformed-frame-error
@@ -24,4 +29,6 @@
            #:obuffer-get-bytes
 
            #:amqp-method-basic-ack ;; TODO: generate for this and other methods
+           #:method-decode
+           #:method-class-from-signature
    ))
