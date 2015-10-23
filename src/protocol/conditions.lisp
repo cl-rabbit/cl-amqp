@@ -87,6 +87,14 @@
   ((frame-type :initarg :frame-type
                :reader amqp-error-frame-type)))
 
+(define-condition amqp-unknown-method-error (amqp-connection-error)
+  ((method-signature :initarg :method-signature
+                     :reader :amqp-error-method-signature)))
+
+(define-condition amqp-unknown-method-class-error (amqp-connection-error)
+  ((method-class :initarg :method-class
+                 :reader :amqp-error-method-class)))
+
 (defun error-type-from-reply-code (reply-code)
   (case reply-code
     (311 #|+amqp-content-too-large+|# 'amqp-error-content-too-large)

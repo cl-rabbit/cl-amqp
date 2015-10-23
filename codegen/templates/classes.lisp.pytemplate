@@ -1,0 +1,106 @@
+;; DO NOT EDIT. RUN GENERATE TO REGENERATE
+<% import re, os, codegen %>
+<% import codegen_helpers as helpers %>
+(in-package :cl-amqp)
+
+(defclass amqp-class-base ()
+  ())
+
+(defclass amqp-method-base ()
+  ())
+
+
+% for m in spec.allMethods():
+(defclass ${m.method_lisp_class_name()} (amqp-method-base)
+(
+  % for arg in m.arguments:
+  (${arg.name} :type amqp-${spec.resolveDomain(arg.domain)} :initarg :${arg.name}${helpers.genMethodArgInitform(arg)})
+  % endfor
+))
+
+(defun decode-${m.method_lisp_class_name()} (ibuffer)
+  % if len(m.arguments) == 0:
+  (declare (ignore ibuffer))
+  (make-instance '${m.method_lisp_class_name()})
+  % else:
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer)
+             (ignorable bit-buffer))
+    (make-instance '${m.method_lisp_class_name()}
+  % for line in helpers.genDecodeMethodDefinition(spec, m):
+      ${line}
+  % endfor
+  ))
+  % endif
+)
+
+(defun encode-${m.method_lisp_class_name()} (method obuffer)
+  % if len(m.arguments) == 0:
+  (declare (ignore method obuffer))
+  % else:
+  (let ((bit-buffer 0))
+    (declare (type (unsigned-byte 8) bit-buffer)
+             (ignorable bit-buffer))
+  % for line in helpers.genEncodeMethodDefinition(spec, m):
+      ${line}
+  % endfor
+  )
+  % endif
+)
+
+(defmethod synchronous-method-p ((method ${m.method_lisp_class_name()}))
+  ${"t" if m.isSynchronous  else "nil"})
+
+(defmethod method-has-content-p ((method ${m.method_lisp_class_name()}))
+  ${"t" if m.hasContent  else "nil"})
+
+(defmethod method-class-id ((method ${m.method_lisp_class_name()}))
+  ${m.klass.index})
+
+(defmethod method-method-id ((method ${m.method_lisp_class_name()}))
+  ${m.index})
+
+% endfor
+
+(defun method-decode (method-class ibuffer)
+  (case method-class
+  % for m in spec.allMethods():
+    (${m.method_lisp_class_name()} (decode-${m.method_lisp_class_name()} ibuffer))
+  % endfor
+    (t (error 'amqp-unknown-method-class-error :method-class method-class))))
+
+(defun method-encode (method obuffer)
+  (case (class-name (class-of method))
+  % for m in spec.allMethods():
+    (${m.method_lisp_class_name()} (encode-${m.method_lisp_class_name()} method obuffer))
+  % endfor
+    (t (error 'amqp-unknown-method-class-error :method-class (class-of method)))))
+
+
+(defmethod synchronous-method-p ((method-class symbol))
+  (case method-class
+% for m in spec.allMethods():
+    (${m.method_lisp_class_name()} ${"t" if m.isSynchronous  else "nil"})
+% endfor
+    (t (error 'amqp-unknown-method-class-error :method-class method-class))))
+
+(defmethod method-has-content-p ((method-class symbol))
+  (case method-class
+% for m in spec.allMethods():
+    (${m.method_lisp_class_name()} ${"t" if m.hasContent  else "nil"})
+% endfor
+    (t (error 'amqp-unknown-method-class-error :method-class method-class))))
+
+(defun method-class-from-signature(signature)
+  (case signature
+% for m in spec.allMethods():
+    (${m.method_signature()} '${m.method_lisp_class_name()})
+% endfor
+    (t (error 'amqp-unknown-method-error :method-signature signature))))
+
+(defun method-signature(method)
+  (case (class-name (class-of method))
+% for m in spec.allMethods():
+    (${m.method_lisp_class_name()} ${m.method_signature()})
+% endfor
+    (t (error 'amqp-unknown-method-class-error :method-class (class-of method)))))

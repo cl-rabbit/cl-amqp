@@ -1,8 +1,7 @@
 (in-package :cl-amqp.test)
 
 (enable-binary-string-syntax)
-
-(plan 9)
+(plan 3)
 
 (subtest "Frames Parsing"
 
@@ -252,5 +251,57 @@
     (is-error (amqp:frame-class-from-frame-type 11) 'amqp:amqp-unknown-frame-type-error
               "Frame type 11 generates amqp-unknown-frame-type-error")))
 
+(subtest "Method frame encoding/decoding"
+  (let* ((frame-bytes (concatenate '(simple-array  (unsigned-byte 8) 1)
+                                 #b"\x01\x00\x01\x00\x00\x00\r\x00<\x00P\x00\x00\x00\x00\x00\x00"
+                                 #b"\x00d\x00\xce"))
+       (method (make-instance 'amqp:amqp-method-basic-ack :delivery-tag 100))
+       (frame (make-instance 'amqp:method-frame :channel 1 :payload method))
+       (payload-parser)
+       (dframe)
+       (parser (amqp:make-frame-parser
+                :on-frame-type (lambda (parser frame-type)
+                                 (declare (ignore parser))
+                                 ;;(is frame-type amqp:+amqp-frame-method+ "Frame type is expected to be Method Frame")
+                                 (setf dframe (make-instance (amqp:frame-class-from-frame-type frame-type))))
+                :on-frame-channel (lambda (parser frame-channel)
+                                    (declare (ignore parser))
+                                    (setf (amqp:frame-channel dframe) frame-channel))
+                :on-frame-payload-size (lambda (parser payload-size)
+                                         (declare (ignore parser))
+                                         ;; validate frame size
+                                         (setf (amqp:frame-size dframe) payload-size)
+                                         (setf payload-parser
+                                               (amqp:make-frame-payload-parser dframe
+                                                                               :on-method-signature (lambda (signature)
+                                                                                                       (is signature #x003c0050))
+                                                                               :on-method-arguments-buffer (lambda (buffer)
+                                                                                                             (is buffer #b"\x00<\x00P\x00\x00\x00\x00\x00\x00\x00d\x00"
+                                                                                                                  :test (lambda (x y)
+                                                                                                                          (mw-equiv:object= x y t)))))))
+                :on-frame-payload (lambda (parser data start end)
+                                    (declare (ignore parser))
+                                    (amqp:frame-payload-parser-consume payload-parser data  :start start :end end))
+                :on-frame-end (lambda (parser)
+                                (declare (ignore parser))
+                                (amqp:frame-payload-parser-finish payload-parser)))))
+
+
+    ;; encoding test
+    (let ((obuffer (amqp:new-obuffer)))
+      (amqp:frame-encode frame obuffer)
+      (is frame-bytes
+          (amqp:obuffer-get-bytes obuffer)
+          :test (lambda (x y)
+                  (mw-equiv:object= x y t))))
+
+    ;; decoding test
+    (amqp:frame-parser-consume parser frame-bytes)
+    (let ((obuffer (amqp:new-obuffer)))
+      (amqp:frame-encode dframe obuffer)
+      (is frame-bytes
+          (amqp:obuffer-get-bytes obuffer)
+          :test (lambda (x y)
+                  (mw-equiv:object= x y t))))))
+
 (finalize)
-  

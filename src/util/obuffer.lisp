@@ -15,6 +15,9 @@
 (defun obuffer-encode-sb16 (buffer value)
   (fast-io:write16-be value buffer))
 
+(defun obuffer-encode-ub16 (buffer value)
+  (fast-io:writeu16-be value buffer))
+
 (defun obuffer-encode-sb32 (buffer value)
   (fast-io:write32-be value buffer))
 

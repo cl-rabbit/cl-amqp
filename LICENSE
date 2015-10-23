@@ -39,7 +39,8 @@ license and copyright terms herein.
 
 ================================================================================
 
-For codegen/amqp_0.9.1_changes.json, portions of codegen/codegen.py [taken from https://github.com/ruby-amqp/amq-protocol]:
+For codegen/amqp_0.9.1_changes.json, portions of codegen/codegen.py, codegen/codegen_helpers.py
+[taken from https://github.com/ruby-amqp/amq-protocol]:
 
 Copyright (c) 2010 – 2011 Jakub Šťastný aka Botanicus
 Copyright (c) 2011 – 2015 Michael S. Klishin <michael@defprotocol.org>
@@ -65,7 +66,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ================================================================================
 
-Some tests inspired or ported from Pika [https://github.com/pika/pika]
+Some tests inspired by or ported from Pika [https://github.com/pika/pika]
 
 Copyright (c) 2009-2015, Tony Garnock-Jones, Gavin M. Roy, Pivotal and others.
 All rights reserved.

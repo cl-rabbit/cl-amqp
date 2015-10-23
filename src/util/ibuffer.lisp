@@ -14,15 +14,15 @@
                (ibuffer-end ,ibuffer))
      (error "iBuffer overflow"))) ;; TODO: specialize error
 
-(defun new-ibuffer-from-octets (octets length)
+(defun new-ibuffer-from-octets (octets start length)
   (declare (type nibbles:simple-octet-vector octets))
   (unless (<= length
               (length octets))
     (error "iBuffer overflow")) ;; TODO: specialize error
   (make-ibuffer :buffer octets
-                :start 0
-                :end length
-                :cursor 0))
+                :start start
+                :end (+ start length)
+                :cursor start))
 
 (defun new-ibuffer-from-ibuffer (ibuffer length)
   (assert-ibuffer-can-advance ibuffer length)
@@ -32,11 +32,15 @@
                 :end (+ (ibuffer-cursor ibuffer) length)
                 :cursor (ibuffer-cursor ibuffer)))
 
-(defun new-ibuffer (source &optional length)
+(defun new-ibuffer (source &key start length)
   (typecase source
-    (nibbles:simple-octet-vector (new-ibuffer-from-octets source (or length
-                                                                     (length source))))
-    (ibuffer (new-ibuffer-from-ibuffer source (or length
+    (nibbles:simple-octet-vector (new-ibuffer-from-octets source
+                                                          (or start 0)
+                                                          (or length
+                                                              (- (length source) (or start 0)))))
+    (ibuffer
+     (assert (null start))
+     (new-ibuffer-from-ibuffer source (or length
                                                   (- (ibuffer-end source) (ibuffer-cursor source)))))
     (t (error "Invalid source for ibuffer")))) ;; TODO: specialize error
 

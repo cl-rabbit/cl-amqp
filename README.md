@@ -1,6 +1,21 @@
 # CL-AMQP [![Build Status](https://travis-ci.org/cl-rabbit/cl-amqp.svg)](https://travis-ci.org/cl-rabbit/cl-amqp) [![Coverage Status](https://coveralls.io/repos/cl-rabbit/cl-amqp/badge.svg?branch=master&service=github)](https://coveralls.io/github/cl-rabbit/cl-amqp?branch=master)
 AMQP 0.9.1 with RabbitMQ extensions in Common Lisp
 
+## Example
+``` lisp
+
+(let* ((method (make-instance 'amqp:amqp-method-basic-ack :delivery-tag 100))
+       (frame (make-instance 'amqp:method-frame :channel 1
+                                                :payload method))
+       (obuffer (amqp:new-obuffer)))
+  (amqp:obuffer-get-bytes
+   (amqp:frame-encode frame obuffer)))
+
+=>
+#b"\x01\x00\x01\x00\x00\x00\x0d\x00<\x00P\x00\x00\x00\x00\x00\x00\x00d\x00\xce"
+
+```
+
 ## License
 
 ```
