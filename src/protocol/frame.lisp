@@ -3,11 +3,11 @@
 (defclass frame ()
   ((type :reader frame-type)
    (channel :initarg :channel
-            :reader frame-channel)
+            :accessor frame-channel)
    (size :initarg :size
-         :reader frame-size)
+         :accessor frame-size)
    (payload :initarg :payload
-            :reader frame-payload)))
+            :accessor frame-payload)))
 
 (defclass method-frame (frame)
   ((type :initform +amqp-frame-method+)))
@@ -189,3 +189,70 @@
                index)))
     (loop for i from start to (1- end) do
              (setf i (the fixnum (consume data i))))))
+
+
+(defun method-payload-parser (size &key class-id-callback method-id-callback method-signature-callback buffer-consumed)
+  (let ((state :start)
+        (buffer (nibbles:make-octet-vector size))
+        (consumed 0))
+    (lambda (octets &key (start 0) (end (length octets)))
+      (labels ((reset-state ()
+                 (setf state :start))
+               (consume (bytes index)
+                 (declare (type (simple-array (unsigned-byte 8)) bytes))
+                 (let ((byte (aref bytes index)))
+                   (declare (type (unsigned-byte 8) byte))
+                   (tagbody
+                      (case state
+                        (:state (go :parsing-method-signature-first-octet))
+                        (:parsing-method-signature-second-octet (go :parsing-method-signature-second-octet))
+                        (:parsing-method-signature-third-octet (go :parsing-method-signature-third-octet))
+                        (:parsing-method-signature-forth-octet (go :parsing-method-signature-forth-octet))
+                        (:consuming-method-arguments-start (go :consuming-method-arguments-start))
+                        (:consuming-method-arguments (go :consuming-method-arguments))
+                        (:method-frame-payload-parsed (go :method-frame-payload-parsed)))
+                    :parsing-method-signature-first-octet
+                      (setf (aref buffer 0) byte)
+                      (setf state :parsing-method-signature-second-octet)
+                      (go :end)
+                    :parsing-method-signature-second-octet
+                      (setf (aref buffer 1) byte)
+                      (if class-id-callback
+                          (funcall class-id-callback (nibbles:ub16ref/be buffer 0)))
+                      (setf state :parsing-method-signature-third-octet)
+                      (go :end)
+                    :parsing-method-signature-third-octet
+                      (setf (aref buffer 2) byte)
+                      (setf state :parsing-method-signature-forth-octet)
+                      (go :end)
+                    :parsing-method-signature-forth-octet
+                      (setf (aref buffer 3) byte)
+                      (if method-id-callback
+                          (funcall method-id-callback (nibbles:ub16ref/be buffer 2)))
+                      (if method-signature-callback
+                          (funcall method-signature-callback (nibbles:ub32ref/be buffer 0)))
+                      (setf state :consuming-method-arguments)
+                      (setf consumed 4)
+                      (go :consuming-method-arguments-start)
+                    :consuming-method-arguments-start
+                      (if (= size consumed)
+                          (go :method-frame-payload-parsed)
+                          (go :end))
+                    :consuming-method-arguments
+                      (let ((to-copy (if (< (- end start) (- size consumed))
+                                         (- end start)
+                                         (- size consumed))))
+                        (replace buffer octets :start1 consumed :start2 index)
+                        (incf consumed to-copy)
+                        (incf index to-copy)
+                        (if (= consumed size)
+                            (go :method-frame-payload-parsed)))
+                    :method-frame-payload-parsed
+                      (if buffer-consumed
+                         (funcall buffer-consumed buffer))
+                      (reset-state)
+                      (go :end)
+                    :end)
+                   index)))
+        (loop for i from start to (1- end) do
+                 (setf i (the fixnum (consume octets i))))))))
