@@ -190,72 +190,120 @@
     (loop for i from start to (1- end) do
              (setf i (the fixnum (consume data i))))))
 
+(defclass method-frame-payload-parser ()
+  (;; parser state
+   (state :initform :start)
+   (consumed :initform 0)
+   (buffer :initarg :buffer)
+   (frame :initarg :frame)
+   (size :initarg :size)
+   ;; method frame payload
+   (class-id)
+   (method-id)
+   (method-signature)
+   (method-class)
+   ;; callbacks
+   (on-class-id :initarg :on-class-id)
+   (on-method-id :initarg :on-method-id)
+   (on-method-signature :initarg :on-method-signature)
+   (on-method-arguments-buffer :initarg :on-method-arguments-buffer)))
 
 (defun method-frame-payload-parser (frame &key on-class-id on-method-id on-method-signature on-method-arguments-buffer &aux (size (frame-size frame)))
-  (let ((state :start)
-        (buffer (nibbles:make-octet-vector size))
-        (consumed 0))
-    (lambda (octets &key (start 0) (end (length octets)))
-      (labels ((reset-state ()
-                 (setf state :start))
-               (consume (bytes index)
-                 (declare (type (simple-array (unsigned-byte 8)) bytes))
-                 (let ((byte (aref bytes index)))
-                   (declare (type (unsigned-byte 8) byte))
-                   (tagbody
-                      (case state
-                        (:state (go :parsing-method-signature-first-octet))
-                        (:parsing-method-signature-second-octet (go :parsing-method-signature-second-octet))
-                        (:parsing-method-signature-third-octet (go :parsing-method-signature-third-octet))
-                        (:parsing-method-signature-forth-octet (go :parsing-method-signature-forth-octet))
-                        (:consuming-method-arguments-start (go :consuming-method-arguments-start))
-                        (:consuming-method-arguments (go :consuming-method-arguments))
-                        (:method-frame-payload-parsed (go :method-frame-payload-parsed)))
-                    :parsing-method-signature-first-octet
-                      (setf (aref buffer 0) byte)
-                      (setf state :parsing-method-signature-second-octet)
-                      (go :end)
-                    :parsing-method-signature-second-octet
-                      (setf (aref buffer 1) byte)
-                      (if on-class-id
-                          (funcall on-class-id (nibbles:ub16ref/be buffer 0)))
-                      (setf state :parsing-method-signature-third-octet)
-                      (go :end)
-                    :parsing-method-signature-third-octet
-                      (setf (aref buffer 2) byte)
-                      (setf state :parsing-method-signature-forth-octet)
-                      (go :end)
-                    :parsing-method-signature-forth-octet
-                      (setf (aref buffer 3) byte)
-                      (if on-method-id
-                          (funcall on-method-id (nibbles:ub16ref/be buffer 2)))
-                      (if on-method-signature
-                          (funcall on-method-signature (nibbles:ub32ref/be buffer 0)))
-                      (setf state :consuming-method-arguments)
-                      (setf consumed 4)
-                      (go :consuming-method-arguments-start)
-                    :consuming-method-arguments-start
-                      (if (= size consumed)
-                          (go :method-frame-payload-parsed)
-                          (go :end))
-                    :consuming-method-arguments
-                      (let ((to-copy (if (< (- end start) (- size consumed))
-                                         (- end start)
-                                         (- size consumed))))
-                        (replace buffer octets :start1 consumed :start2 index)
-                        (incf consumed to-copy)
-                        (incf index to-copy)
-                        (if (= consumed size)
-                            (go :method-frame-payload-parsed)))
-                    :method-frame-payload-parsed
-                      (if on-method-arguments-buffer
-                          (funcall on-method-arguments-buffer buffer))
-                      (reset-state)
-                      (go :end)
-                    :end)
-                   index)))
-        (loop for i from start to (1- end) do
-                 (setf i (the fixnum (consume octets i))))))))
+  (make-instance 'method-frame-payload-parser :frame frame
+                                              :size size
+                                              :buffer (nibbles:make-octet-vector size)
+                                              :on-class-id on-class-id
+                                              :on-method-id on-method-id
+                                              :on-method-signature on-method-signature
+                                              :on-method-arguments-buffer on-method-arguments-buffer))
+
+
+(defmethod frame-payload-parser-consume ((payload-parser method-frame-payload-parser) octets &key (start 0) (end (length octets)))
+  (with-slots (state
+               buffer
+               size
+               consumed
+               frame
+               class-id
+               method-id
+               method-signature
+               method-class
+               on-class-id
+               on-method-id
+               on-method-signature
+               on-method-arguments-buffer) payload-parser
+    (labels ((consume (bytes index)
+               (declare (type (simple-array (unsigned-byte 8)) bytes))
+               (let ((byte (aref bytes index)))
+                 (declare (type (unsigned-byte 8) byte))
+                 (tagbody
+                    (case state
+                      (:state (go :parsing-method-signature-first-octet))
+                      (:parsing-method-signature-second-octet (go :parsing-method-signature-second-octet))
+                      (:parsing-method-signature-third-octet (go :parsing-method-signature-third-octet))
+                      (:parsing-method-signature-forth-octet (go :parsing-method-signature-forth-octet))
+                      (:consuming-method-arguments-start (go :consuming-method-arguments-start))
+                      (:consuming-method-arguments (go :consuming-method-arguments))
+                      (:method-frame-payload-parsed (error "Payload parser finished"))) ;; TODO: specialize error
+                  :parsing-method-signature-first-octet
+                    (setf (aref buffer 0) byte)
+                    (setf state :parsing-method-signature-second-octet)
+                    (go :end)
+                  :parsing-method-signature-second-octet
+                    (setf (aref buffer 1) byte)
+                    (setf class-id (nibbles:ub16ref/be buffer 0))
+                    (if on-class-id
+                        (funcall on-class-id class-id))
+                    (setf state :parsing-method-signature-third-octet)
+                    (go :end)
+                  :parsing-method-signature-third-octet
+                    (setf (aref buffer 2) byte)
+                    (setf state :parsing-method-signature-forth-octet)
+                    (go :end)
+                  :parsing-method-signature-forth-octet
+                    (setf (aref buffer 3) byte)
+                    (setf method-id (nibbles:ub16ref/be buffer 2))
+                    (if on-method-id
+                        (funcall on-method-id method-id))
+                    (setf method-signature (nibbles:ub32ref/be buffer 0))
+                    (if on-method-signature
+                        (funcall on-method-signature method-signature))
+                    (setf method-class (method-class-from-signature method-signature))
+                    (setf state :consuming-method-arguments)
+                    (setf consumed 4)
+                    (go :consuming-method-arguments-start)
+                  :consuming-method-arguments-start
+                    (if (= size consumed)
+                        (go :method-frame-payload-parsed)
+                        (go :end))
+                  :consuming-method-arguments
+                    (let ((to-copy (if (< (- end start) (- size consumed))
+                                       (- end start)
+                                       (- size consumed))))
+                      (replace buffer octets :start1 consumed :start2 index)
+                      (incf consumed to-copy)
+                      (incf index to-copy)
+                      (when (= consumed size)
+                        (setf state :method-frame-payload-parsed)
+                        (go :method-frame-payload-parsed)))
+                  :method-frame-payload-parsed
+                    (if on-method-arguments-buffer
+                        (funcall on-method-arguments-buffer buffer))
+                    (return-from frame-payload-parser-consume)
+                  :end)
+                 index)))
+      (loop for i from start to (1- end) do
+               (setf i (the fixnum (consume octets i)))))))
+
+(defmethod frame-payload-parser-finish ((payload-parser method-frame-payload-parser))
+  (with-slots (state
+               buffer
+               frame
+               method-class) payload-parser
+    (unless (eq state :method-frame-payload-parsed)
+      (error "Invalid method-frame-payload-parser state: payload not parsed")) ;; TODO: specialize error
+
+    (setf (frame-payload frame) (method-decode method-class (new-ibuffer buffer :start 4)))))
 
 (defun make-frame-payload-parser (frame &rest args &key &allow-other-keys)
   (let ((parser-ctor

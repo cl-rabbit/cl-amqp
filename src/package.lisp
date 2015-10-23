@@ -8,6 +8,8 @@
 
            #:make-frame-parser ;; frames stuff
            #:make-frame-payload-parser
+           #:frame-payload-parser-consume
+           #:frame-payload-parser-finish
            #:+amqp-frame-method+
            #:method-frame
            #:frame-channel
