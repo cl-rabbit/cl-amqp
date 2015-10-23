@@ -44,6 +44,9 @@
   (or (eq t symbol)
       (eq :false symbol)))
 
+(deftype amqp-bit ()
+  `amqp-boolean)
+
 (defun string-is-short (string)
  (<= (length string) 255))
 
