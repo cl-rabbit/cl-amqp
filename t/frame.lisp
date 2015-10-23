@@ -2,7 +2,7 @@
 
 (enable-binary-string-syntax)
 
-(plan 2)
+(plan 3)
 
 (subtest "Frames Parsing"
 
@@ -252,5 +252,17 @@
     (is-error (amqp:frame-class-from-frame-type 11) 'amqp:amqp-unknown-frame-type-error
               "Frame type 11 generates amqp-unknown-frame-type-error")))
 
+(subtest "Method frame encoding/decoding"
+  (let* ((frame-bytes (concatenate '(simple-array  (unsigned-byte 8) 1)
+                                   #b"\x01\x00\x01\x00\x00\x00\r\x00<\x00P\x00\x00\x00\x00\x00\x00"
+                                   #b"\x00d\x00\xce"))
+         (method (make-instance 'amqp:amqp-method-basic-ack :delivery-tag 100))
+         (frame (make-instance 'amqp:method-frame :channel 1 :payload method))
+         (obuffer (amqp:new-obuffer)))
+    (amqp:frame-encode frame obuffer)
+    (is frame-bytes
+        (amqp:obuffer-get-bytes obuffer)
+        :test (lambda (x y)
+                (mw-equiv:object= x y t)))))
+
 (finalize)
-  
