@@ -9,7 +9,7 @@ AMQP 0.9.1 with RabbitMQ extensions in Common Lisp
                                                 :payload method))
        (obuffer (amqp:new-obuffer)))
   (amqp:obuffer-get-bytes
-  (amqp:frame-encode frame obuffer)))
+    (amqp:frame-encode frame obuffer)))
 
 =>
 #b"\x01\x00\x01\x00\x00\x00\x0d\x00<\x00P\x00\x00\x00\x00\x00\x00\x00d\x00\xce"
