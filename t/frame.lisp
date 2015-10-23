@@ -1,7 +1,6 @@
 (in-package :cl-amqp.test)
 
 (enable-binary-string-syntax)
-
 (plan 3)
 
 (subtest "Frames Parsing"
@@ -258,11 +257,52 @@
                                    #b"\x00d\x00\xce"))
          (method (make-instance 'amqp:amqp-method-basic-ack :delivery-tag 100))
          (frame (make-instance 'amqp:method-frame :channel 1 :payload method))
-         (obuffer (amqp:new-obuffer)))
-    (amqp:frame-encode frame obuffer)
-    (is frame-bytes
-        (amqp:obuffer-get-bytes obuffer)
-        :test (lambda (x y)
-                (mw-equiv:object= x y t)))))
+         (method-parser)
+         (dframe)
+         (method-bytes)
+         (method-class)
+         (parser (amqp:make-frame-parser
+                  :on-frame-type (lambda (parser frame-type)
+                                   (declare (ignore parser))
+                                   (is frame-type amqp:+amqp-frame-method+ "Frame type is expected to be Method Frame")
+                                   (setf dframe (make-instance (amqp:frame-class-from-frame-type frame-type))))
+                  :on-frame-channel (lambda (parser frame-channel)
+                                      (declare (ignore parser))
+                                      (setf (amqp:frame-channel dframe) frame-channel))
+                  :on-frame-payload-size (lambda (parser payload-size)
+                                           (declare (ignore parser))
+                                           ;; validate frame size
+                                           (setf (amqp:frame-size dframe) payload-size)
+                                           (setf method-parser
+                                                 (amqp:make-frame-payload-parser dframe
+                                                                                 :on-method-signature (lambda (signature)
+                                                                                                              (setf method-class (amqp:method-class-from-signature signature)))
+                                                                                 :on-method-arguments-buffer (lambda (buffer)
+                                                                                                    (setf method-bytes buffer)))))
+                  :on-frame-payload (lambda (parser data start end)
+                                      (declare (ignore parser))
+                                      (funcall method-parser data :start start :end end))
+                  :on-frame-end (lambda (parser)
+                                  (declare (ignore parser))
+                                  (setf (amqp:frame-payload dframe) (amqp:method-decode method-class
+                                                                                        (amqp::new-ibuffer method-bytes :start 4)))))))
+
+
+    ;; encoding test
+    (let ((obuffer (amqp:new-obuffer)))
+      (amqp:frame-encode frame obuffer)
+      (is frame-bytes
+          (amqp:obuffer-get-bytes obuffer)
+          :test (lambda (x y)
+                  (mw-equiv:object= x y t))))
+
+    ;; decoding test
+    (amqp:frame-parser-consume parser frame-bytes)
+    (let ((obuffer (amqp:new-obuffer)))
+      (amqp:frame-encode dframe obuffer)
+      (is frame-bytes
+          (amqp:obuffer-get-bytes obuffer)
+          :test (lambda (x y)
+                  (mw-equiv:object= x y t))))))
 
 (finalize)
