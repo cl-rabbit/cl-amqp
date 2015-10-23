@@ -2,6 +2,8 @@
 AMQP 0.9.1 with RabbitMQ extensions in Common Lisp
 
 ## Example
+
+### Encoding
 ``` lisp
 
 (let* ((method (make-instance 'amqp:amqp-method-basic-ack :delivery-tag 100))
@@ -14,6 +16,39 @@ AMQP 0.9.1 with RabbitMQ extensions in Common Lisp
 =>
 #b"\x01\x00\x01\x00\x00\x00\x0d\x00<\x00P\x00\x00\x00\x00\x00\x00\x00d\x00\xce"
 
+```
+
+### Decoding
+``` lisp
+(let* ((bytes #b"\x01\x00\x01\x00\x00\x00\x0d\x00<\x00P\x00\x00\x00\x00\x00\x00\x00d\x00\xce")
+       (payload-parser)
+       (frame)
+       (parser (amqp:make-frame-parser
+                :on-frame-type (lambda (parser frame-type)
+                                 (declare (ignore parser))
+                                 (setf frame (make-instance 
+                                               (amqp:frame-class-from-frame-type frame-type))))
+                :on-frame-channel (lambda (parser frame-channel)
+                                    (declare (ignore parser))
+                                    (setf (amqp:frame-channel frame) frame-channel))
+                :on-frame-payload-size (lambda (parser payload-size)
+                                         (declare (ignore parser))
+                                         (setf (amqp:frame-size frame) payload-size)
+                                         (setf payload-parser
+                                               (amqp:make-frame-payload-parser frame)))
+                :on-frame-payload (lambda (parser data start end)
+                                    (declare (ignore parser))
+                                    (amqp:frame-payload-parser-consume payload-parser 
+                                                                       data :start start :end end))
+                :on-frame-end (lambda (parser)
+                                (declare (ignore parser))
+                                (amqp:frame-payload-parser-finish payload-parser)))))
+
+  (amqp:frame-parser-consume parser bytes)
+  (amqp:frame-payload frame))
+  
+=>
+#<CL-AMQP:AMQP-METHOD-BASIC-ACK {1009C6B703}>
 ```
 
 ## License
