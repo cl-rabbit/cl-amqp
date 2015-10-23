@@ -191,7 +191,7 @@
              (setf i (the fixnum (consume data i))))))
 
 
-(defun method-payload-parser (size &key class-id-callback method-id-callback method-signature-callback buffer-consumed)
+(defun method-frame-payload-parser (frame &key on-class-id on-method-id on-method-signature on-method-arguments-buffer &aux (size (frame-size frame)))
   (let ((state :start)
         (buffer (nibbles:make-octet-vector size))
         (consumed 0))
@@ -217,8 +217,8 @@
                       (go :end)
                     :parsing-method-signature-second-octet
                       (setf (aref buffer 1) byte)
-                      (if class-id-callback
-                          (funcall class-id-callback (nibbles:ub16ref/be buffer 0)))
+                      (if on-class-id
+                          (funcall on-class-id (nibbles:ub16ref/be buffer 0)))
                       (setf state :parsing-method-signature-third-octet)
                       (go :end)
                     :parsing-method-signature-third-octet
@@ -227,10 +227,10 @@
                       (go :end)
                     :parsing-method-signature-forth-octet
                       (setf (aref buffer 3) byte)
-                      (if method-id-callback
-                          (funcall method-id-callback (nibbles:ub16ref/be buffer 2)))
-                      (if method-signature-callback
-                          (funcall method-signature-callback (nibbles:ub32ref/be buffer 0)))
+                      (if on-method-id
+                          (funcall on-method-id (nibbles:ub16ref/be buffer 2)))
+                      (if on-method-signature
+                          (funcall on-method-signature (nibbles:ub32ref/be buffer 0)))
                       (setf state :consuming-method-arguments)
                       (setf consumed 4)
                       (go :consuming-method-arguments-start)
@@ -248,11 +248,21 @@
                         (if (= consumed size)
                             (go :method-frame-payload-parsed)))
                     :method-frame-payload-parsed
-                      (if buffer-consumed
-                         (funcall buffer-consumed buffer))
+                      (if on-method-arguments-buffer
+                          (funcall on-method-arguments-buffer buffer))
                       (reset-state)
                       (go :end)
                     :end)
                    index)))
         (loop for i from start to (1- end) do
                  (setf i (the fixnum (consume octets i))))))))
+
+(defun make-frame-payload-parser (frame &rest args &key &allow-other-keys)
+  (let ((parser-ctor
+          (case (frame-type frame)
+            (1 #|+amqp-frame-method+|# 'method-frame-payload-parser)
+            (2 #|+amqp-frame-header+|# 'header-frame-payload-parser)
+            (3 #|+amqp-frame-body+|# 'body-frame-payload-parser)
+            (4 #|+amqp-frame-heartbeat+|# 'heartbeat-frame-payload-parser)
+            (t (error 'amqp-unknown-frame-type-error :frame-type (frame-type frame))))))
+    (apply parser-ctor frame args)))
