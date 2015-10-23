@@ -163,7 +163,7 @@
 
 (defun amqp-array-decoder (buffer)
   (let* ((array-body-length (ibuffer-decode-ub32 buffer))
-         (array-body-buffer (new-ibuffer buffer array-body-length)))
+         (array-body-buffer (new-ibuffer buffer :length array-body-length)))
     (apply #'vector
            (loop
              until (ibuffer-consumed-p array-body-buffer)
@@ -184,7 +184,7 @@
 
 (defun amqp-table-decoder (buffer)
   (let* ((table-body-length (ibuffer-decode-ub32 buffer))
-         (table-body-buffer (new-ibuffer buffer table-body-length)))
+         (table-body-buffer (new-ibuffer buffer :length table-body-length)))
     (with-alist-output (add-field)
       (loop
         until (ibuffer-consumed-p table-body-buffer)
