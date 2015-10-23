@@ -280,7 +280,7 @@
   (when (typep list 'list)
     (every #'consp list)))
 
-(deftype void ()
+(deftype amqp-void ()
   `(and symbol (satisfies symbol-is-void)))
 
 (defun symbol-is-void (symbol)
@@ -293,21 +293,64 @@
   (or (eq t symbol)
       (eq :false symbol)))
 
+(defun string-is-short (string)
+ (<= (length string) 255))
+
+(deftype amqp-shortstr ()
+  `(and string (satisfies string-is-short)))
+
+(deftype amqp-longstr ()
+  `string)
+
+(deftype amqp-octet ()
+  `(signed-byte 8))
+
+(deftype amqp-short ()
+  `(signed-byte 16))
+
+(deftype amqp-long ()
+  `(signed-byte 32))
+
+(deftype amqp-longlong ()
+  `(signed-byte 64))
+
+(deftype amqp-double ()
+  `double-float)
+
+(deftype amqp-single ()
+  `single-float)
+
+(deftype amqp-decimal ()
+  `wu-decimal:decimal)
+
+(deftype amqp-timestamp ()
+  `local-time:timestamp)
+
+(deftype amqp-table ()
+  `(or alist hash-table))
+
+(deftype amqp-array ()
+  `vector) ;; TODO: maybe check each vector element too?
+
+(deftype amqp-barray ()
+  `nibbles:simple-octet-vector)
+
 (defun amqp-encode-field-value (buffer value)
   (typecase value
-    ((signed-byte 8) (amqp-octet-table-field-encoder buffer value))
-    ((signed-byte 16) (amqp-short-table-field-encoder buffer value))
-    ((signed-byte 32) (amqp-long-table-field-encoder buffer value))
-    ((signed-byte 64) (amqp-longlong-table-field-encoder buffer value))
-    (double-float (amqp-double-table-field-encoder buffer value))
-    (float (amqp-single-table-field-encoder buffer value))
-    (wu-decimal:decimal (amqp-decimal-table-field-encoder buffer value))
-    (string (amqp-longstr-table-field-encoder buffer value))
-    (nibbles:simple-octet-vector (amqp-barray-table-field-encoder buffer value))
-    (vector (amqp-array-table-field-encoder buffer value))
-    (local-time:timestamp (amqp-timestamp-table-field-encoder buffer (local-time:timestamp-to-unix value)))
-    (alist (amqp-table-table-field-encoder buffer value))
-    (hash-table (amqp-table-table-field-encoder buffer (hash-table-alist value)))
-    (void (amqp-void-table-field-encoder buffer value))
+    (amqp-octet (amqp-octet-table-field-encoder buffer value))
+    (amqp-short (amqp-short-table-field-encoder buffer value))
+    (amqp-long (amqp-long-table-field-encoder buffer value))
+    (amqp-longlong (amqp-longlong-table-field-encoder buffer value))
+    (amqp-single (amqp-single-table-field-encoder buffer value))
+    (amqp-double (amqp-double-table-field-encoder buffer value))
+    (amqp-decimal (amqp-decimal-table-field-encoder buffer value))
+    (amqp-longstr (amqp-longstr-table-field-encoder buffer value))
+    (amqp-barray (amqp-barray-table-field-encoder buffer value))
+    (amqp-array (amqp-array-table-field-encoder buffer value))
+    (amqp-timestamp (amqp-timestamp-table-field-encoder buffer (local-time:timestamp-to-unix value)))
+    (amqp-table (if (listp value)
+                    (amqp-table-table-field-encoder buffer value)
+                    (amqp-table-table-field-encoder buffer (hash-table-alist value))))
+    (amqp-void (amqp-void-table-field-encoder buffer value))
     (amqp-boolean (amqp-boolean-table-field-encoder buffer (eq t value)))
     (t (error "Don't know how to encode ~a" value)))) ;; TODO: specialize error
