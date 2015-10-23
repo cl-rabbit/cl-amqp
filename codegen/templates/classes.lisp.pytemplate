@@ -14,26 +14,39 @@
 (defclass ${m.method_lisp_class_name()} (amqp-method-base)
 (
   % for arg in m.arguments:
-  (${arg.name} :initarg :${arg.name})
+  (${arg.name} :type amqp-${spec.resolveDomain(arg.domain)} :initarg :${arg.name}${helpers.genMethodArgInitform(arg)})
   % endfor
 ))
 
 (defun decode-${m.method_lisp_class_name()} (ibuffer)
+  % if len(m.arguments) == 0:
+  (declare (ignore ibuffer))
+  (make-instance '${m.method_lisp_class_name()})
+  % else:
   (let ((bit-buffer 0))
-    (declare (type (unsigned-byte 8) bit-buffer))
+    (declare (type (unsigned-byte 8) bit-buffer)
+             (ignorable bit-buffer))
     (make-instance '${m.method_lisp_class_name()}
   % for line in helpers.genDecodeMethodDefinition(spec, m):
       ${line}
   % endfor
-  )))
+  ))
+  % endif
+)
 
 (defun encode-${m.method_lisp_class_name()} (method obuffer)
+  % if len(m.arguments) == 0:
+  (declare (ignore method obuffer))
+  % else:
   (let ((bit-buffer 0))
-    (declare (type (unsigned-byte 8) bit-buffer))
+    (declare (type (unsigned-byte 8) bit-buffer)
+             (ignorable bit-buffer))
   % for line in helpers.genEncodeMethodDefinition(spec, m):
       ${line}
   % endfor
-  ))
+  )
+  % endif
+)
 
 (defmethod synchronous-method-p ((method ${m.method_lisp_class_name()}))
   ${"t" if m.isSynchronous  else "nil"})
@@ -57,11 +70,11 @@
     (t (error 'amqp-unknown-method-class-error :method-class method-class))))
 
 (defun encode-method (method obuffer)
-  (case (class-of method-class)
+  (case (class-of method)
   % for m in spec.allMethods():
     (${m.method_lisp_class_name()} (encode-${m.method_lisp_class_name()} method obuffer))
   % endfor
-    (t (error 'amqp-unknown-method-class-error :method-class (class-of method-class)))))
+    (t (error 'amqp-unknown-method-class-error :method-class (class-of method)))))
 
 
 (defmethod synchronous-method-p ((method-class symbol))

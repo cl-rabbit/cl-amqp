@@ -63,7 +63,7 @@ def genSingleDecode(spec, field):
 def genEncodeMethodDefinition(spec, m):
     def finishBits():
         if bit_index is not None:
-            buffer.append("(amqp-octet-encoder bit-buffer)")
+            buffer.append("(amqp-octet-encoder obuffer bit-buffer)")
 
     bit_index = None
     buffer = []
@@ -77,7 +77,7 @@ def genEncodeMethodDefinition(spec, m):
                 finishBits()
                 buffer.append("(setf bit-buffer 0)")
                 bit_index = 0
-            buffer.append("(when %s (setf (ldb (byte 8 %d) bit-buffer) 1))" % (f.name, bit_index))
+            buffer.append("(when (slot-value method '%s) (setf (ldb (byte 8 %d) bit-buffer) 1))" % (f.name, bit_index))
             bit_index = bit_index + 1
         else:
             finishBits()
@@ -108,3 +108,23 @@ def genDecodeMethodDefinition(spec, m):
             bitindex = None
             buffer += genSingleDecode(spec, f)
     return buffer
+
+def convert_value_to_cl(value):
+    if isinstance(value, unicode):
+        return '"%s"' % (value.encode('ascii'))
+    if isinstance(value, bool):
+        return "t" if value else ":false"
+    if isinstance(value, dict):
+        if value == {}:
+            return "nil"
+        else:            
+            raise "Can't emit code for non-empty table"
+    else:
+        return repr(value)
+
+def genMethodArgInitform(field):
+    value = field.defaultvalue
+    if value == None:
+        return ""
+    else:
+        return " :initform " + convert_value_to_cl(value)
