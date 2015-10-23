@@ -39,7 +39,7 @@ class AmqpSpecObject(AmqpSpec):
         self.render_template_to_file("codegen/templates/classes.lisp.pytemplate", "src/protocol/classes.lisp")
 
 def method_signature(self):
-    return '#x{0:0<8x}'.format(self.klass.index << 16 | self.index)
+    return '#x{0:0>8x}'.format(self.klass.index << 16 | self.index)
 
 AmqpMethod.method_signature = method_signature
 
