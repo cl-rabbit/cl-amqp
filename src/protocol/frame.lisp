@@ -41,7 +41,8 @@
                           (obuffer-get-bytes payload-buffer))))
     (obuffer-encode-ub32 obuffer (length payload-bytes))
     (obuffer-add-bytes obuffer payload-bytes)
-    (obuffer-encode-ub8 obuffer +amqp-frame-end+)))
+    (obuffer-encode-ub8 obuffer +amqp-frame-end+))
+  obuffer)
 
 (define-condition malformed-frame-error (amqp-base-error)
   ())
