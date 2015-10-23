@@ -29,6 +29,20 @@
     (4 #|+amqp-frame-heartbeat+|# 'heartbeat-frame)
     (t (error 'amqp-unknown-frame-type-error :frame-type frame-type))))
 
+(defgeneric frame-encode (frame obuffer))
+
+(defmethod frame-encode ((frame method-frame) obuffer)
+  (obuffer-encode-ub8 obuffer (frame-type frame))
+  (obuffer-encode-ub16 obuffer (frame-channel frame))
+  (let* ((payload-buffer (new-obuffer))
+         (payload-bytes (progn
+                          (obuffer-encode-ub32 payload-buffer (method-signature (frame-payload frame)))
+                          (method-encode (frame-payload frame) payload-buffer)
+                          (obuffer-get-bytes payload-buffer))))
+    (obuffer-encode-ub32 obuffer (length payload-bytes))
+    (obuffer-add-bytes obuffer payload-bytes)
+    (obuffer-encode-ub8 obuffer +amqp-frame-end+)))
+
 (define-condition malformed-frame-error (amqp-base-error)
   ())
 
