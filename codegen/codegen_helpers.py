@@ -77,7 +77,7 @@ def genEncodeMethodDefinition(spec, m):
                 finishBits()
                 buffer.append("(setf bit-buffer 0)")
                 bit_index = 0
-            buffer.append("(when (slot-value method '%s) (setf (ldb (byte 8 %d) bit-buffer) 1))" % (f.name, bit_index))
+            buffer.append("(when (eq t (slot-value method '%s)) (setf (ldb (byte 8 %d) bit-buffer) 1))" % (f.name, bit_index))
             bit_index = bit_index + 1
         else:
             finishBits()
