@@ -128,9 +128,16 @@ ${line}
   ;; TODO: also calculate how may bytes needed for flags encoding
   ;; use this with refactored obuffer
   % for prop in klass.fields:
+  % if spec.resolveDomain(prop.domain) == 'bit':
+    (when (and
+            (slot-boundp props '${prop.name})
+            (slot-value props '${prop.name}))
+      (setf flags (logior flags +flag-${prop.name}+)))
+  % else:
     (when (slot-boundp props '${prop.name})
       (setf flags (logior flags +flag-${prop.name}+))
       (amqp-${spec.resolveDomain(prop.domain)}-encoder props-buffer (slot-value props '${prop.name})))
+  % endif
   % endfor
     (loop
       as reminder = (ash flags -16)
@@ -159,8 +166,12 @@ ${line}
                (incf flagword-index))
             (collectors:with-appender-output (add-initarg)
              % for prop in klass.fields:
+              % if spec.resolveDomain(prop.domain) == 'bit':
+               (add-initarg :${prop.name} (not (zerop (logand flags +flag-${prop.name}+))))
+              % else:
              (unless (zerop (logand flags +flag-${prop.name}+))
                (add-initarg :${prop.name} (amqp-${spec.resolveDomain(prop.domain)}-decoder ibuffer)))
+              % endif
              % endfor
              ))))
     (apply #'make-instance class initargs)))
