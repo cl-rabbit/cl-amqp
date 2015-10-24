@@ -44,7 +44,7 @@
   (let* ((payload-buffer (new-obuffer))
          (payload-bytes (progn
                           (obuffer-encode-ub32 payload-buffer (method-signature (frame-payload frame)))
-                          (method-encode frame payload-buffer)
+                          (method-encode (frame-payload frame) payload-buffer)
                           (obuffer-get-bytes payload-buffer))))
     (obuffer-encode-ub32 obuffer (length payload-bytes))
     (obuffer-add-bytes obuffer payload-bytes))
