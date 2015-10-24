@@ -104,3 +104,63 @@
     (${m.method_lisp_class_name()} ${m.method_signature()})
 % endfor
     (t (error 'amqp-unknown-method-class-error :method-class (class-of method)))))
+
+% for klass in spec.allClasses():
+ % if klass.fields:
+;; ${klass.name} class properties flags
+  % for line in helpers.genPropertiesClassFlags(spec, klass):
+${line}
+  % endfor
+
+;; ${klass.name} class properties
+(defclass amqp-${klass.name}-class-properties ()
+ (
+ % for prop in klass.fields:
+ (${prop.name} :type amqp-${spec.resolveDomain(prop.domain)} :initarg :${prop.name})
+ % endfor
+))
+
+;; ${klass.name} class properties encoder/decoder
+(defmethod amqp-class-properties-encoder ((props amqp-${klass.name}-class-properties) obuffer)
+  (let ((flags 0)
+        (props-buffer (new-obuffer)))
+  ;; TODO: add flags length declaration here
+  ;; TODO: also calculate how may bytes needed for flags encoding
+  ;; use this with refactored obuffer
+  % for prop in klass.fields:
+    (when (slot-boundp props '${prop.name})
+      (setf flags (logior flags +flag-${prop.name}+))
+      (amqp-${spec.resolveDomain(prop.domain)}-encoder props-buffer (slot-value props '${prop.name})))
+  % endfor
+    (loop
+      as reminder = (ash flags -16)
+      as partial-flags = (logand flags #xfffe)
+      do
+         (when (not (= reminder 0))
+           (setf partial-flags (logior partial-flags 1)))
+
+         (obuffer-encode-ub16 obuffer partial-flags)
+         (setf flags reminder)
+         (if (zerop flags)
+             (return)))
+     (obuffer-add-bytes obuffer (obuffer-get-bytes props-buffer))))
+ % endif
+% endfor
+
+(defun amqp-class-properties-class (class-id)
+  (case class-id
+% for klass in spec.allClasses():
+ % if klass.fields:
+    (${'#x%04X' % klass.index} amqp-${klass.name}-class-properties)
+ % endif
+% endfor
+    (t (error "AMQP Class ~a has no properties" class-id)))) ;; TODO: specialize error
+
+(defun amqp-class-properties-class-id (class-properties)
+  (case (class-name (class-of class-properties))
+% for klass in spec.allClasses():
+ % if klass.fields:
+    (amqp-${klass.name}-class-properties ${'#x%04X' % klass.index})
+ % endif
+% endfor
+    (t (error "Unknown properties class ~a" (class-name (class-of class-properties)))))) ;; TODO: specialize error

@@ -128,3 +128,16 @@ def genMethodArgInitform(field):
         return ""
     else:
         return " :initform " + convert_value_to_cl(value)
+
+def genPropertiesClassFlags(spec, klass):
+    buffer = []
+    index = 0
+    for prop in klass.fields:
+        if index % 16 == 15:
+            index +=1
+        shortnum = index / 16
+        partialindex = 15 - (index % 16)
+        bitindex = shortnum * 16 + partialindex
+        buffer.append("(defconstant +flag-%s+ (ash 1 %d))" % (prop.name, bitindex))
+        index += 1
+    return buffer
