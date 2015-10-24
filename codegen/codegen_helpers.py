@@ -119,6 +119,8 @@ def convert_value_to_cl(value):
             return "nil"
         else:            
             raise "Can't emit code for non-empty table"
+    if isinstance(value, str):
+        return '"%s"' % value
     else:
         return repr(value)
 
