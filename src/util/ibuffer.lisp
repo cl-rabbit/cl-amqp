@@ -91,13 +91,17 @@
 (define-ibuffer-decoder ibuffer-decode-sb8 1
   (ub8-to-sb8 (aref (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer))))
 
-(define-ibuffer-decoder ibuffer-decode-sb16 2  (nibbles:sb16ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
+(define-ibuffer-decoder ibuffer-decode-ub16 2
+  (nibbles:ub16ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
 
-(define-ibuffer-decoder ibuffer-decode-sb32 4
-  (nibbles:sb32ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
+(define-ibuffer-decoder ibuffer-decode-sb16 2
+  (nibbles:sb16ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
 
 (define-ibuffer-decoder ibuffer-decode-ub32 4
   (nibbles:ub32ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
+
+(define-ibuffer-decoder ibuffer-decode-sb32 4
+  (nibbles:sb32ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
 
 (define-ibuffer-decoder ibuffer-decode-sb64 8
   (nibbles:sb64ref/be (ibuffer-buffer ibuffer) (ibuffer-cursor ibuffer)))
