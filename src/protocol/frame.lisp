@@ -323,6 +323,154 @@
 
     (setf (frame-payload frame) (method-decode method-class (new-ibuffer buffer :start 4)))))
 
+(defclass header-frame-payload-parser ()
+  (;; parser state
+   (state :initform :start)
+   (consumed :initform 0)
+   (buffer :initarg :buffer)
+   (frame :initarg :frame)
+   (size :initarg :size)
+   ;; header frame payload
+   (class-id)
+   (body-size)
+   (payload-class)
+   ;; callbacks
+   (on-class-id :initarg :on-class-id)
+   (on-content-body-size :initarg :on-content-body-size)
+   (on-class-properties-buffer :initarg :on-class-properties-buffer)))
+
+(defun header-frame-payload-parser (frame &key on-class-id on-content-body-size on-class-properties-buffer &aux (size (frame-size frame)))
+  (make-instance 'header-frame-payload-parser :frame frame
+                                              :size size
+                                              :buffer (nibbles:make-octet-vector size)
+                                              :on-class-id on-class-id
+                                              :on-content-body-size on-content-body-size
+                                              :on-class-properties-buffer on-class-properties-buffer))
+
+(defmethod frame-payload-parser-consume ((payload-parser header-frame-payload-parser) octets &key (start 0) (end (length octets)))
+  (with-slots (state
+               buffer
+               size
+               consumed
+               frame
+               class-id
+               body-size
+               payload-class
+               on-class-id
+               on-content-body-size
+               on-class-properties-buffer) payload-parser
+    (labels ((consume (bytes index)
+               (declare (type (simple-array (unsigned-byte 8)) bytes))
+               (let ((byte (aref bytes index)))
+                 (declare (type (unsigned-byte 8) byte))
+                 (tagbody
+                    (case state
+                      (:state (go :parsing-class-id-first-octet))
+                      (:parsing-class-id-second-octet (go :parsing-class-id-second-octet))
+                      (:parsing-weight-first-octet (go :parsing-weight-first-octet))
+                      (:parsing-weight-second-octet (go :parsing-weight-second-octet))
+                      (:parsing-body-size-1-octet (go :parsing-body-size-1-octet))
+                      (:parsing-body-size-2-octet (go :parsing-body-size-2-octet))
+                      (:parsing-body-size-3-octet (go :parsing-body-size-3-octet))
+                      (:parsing-body-size-4-octet (go :parsing-body-size-4-octet))
+                      (:parsing-body-size-5-octet (go :parsing-body-size-5-octet))
+                      (:parsing-body-size-6-octet (go :parsing-body-size-6-octet))
+                      (:parsing-body-size-7-octet (go :parsing-body-size-7-octet))
+                      (:parsing-body-size-8-octet (go :parsing-body-size-8-octet))
+                      (:consuming-class-properties-start (go :consuming-class-properties-start))
+                      (:consuming-class-properties (go :consuming-class-properties))
+                      (:header-frame-payload-parsed (error "Payload parser finished"))) ;; TODO: specialize error
+                  ::parsing-class-id-first-octet
+                    (setf (aref buffer 0) byte)
+                    (setf state :parsing-class-id-second-octet)
+                    (go :end)
+                  :parsing-class-id-second-octet
+                    (setf (aref buffer 1) byte)
+                    (setf class-id (nibbles:ub16ref/be buffer 0))
+                    (setf payload-class (amqp-class-properties-class class-id))
+                    (if on-class-id
+                        (funcall on-class-id class-id))
+                    (setf state :parsing-weight-first-octet)
+                    (go :end)
+                  :parsing-weight-first-octet
+                    (setf (aref buffer 2) byte)
+                    (setf state :parsing-weight-second-octet)
+                    (go :end)
+                  :parsing-weight-second-octet
+                    (setf (aref buffer 3) byte)
+                    (setf state :parsing-body-size-1-octet)
+                    (go :end)
+                  :parsing-body-size-1-octet
+                    (setf (aref buffer 4) byte)
+                    (setf state :parsing-body-size-2-octet)
+                    (go :end)
+                  :parsing-body-size-2-octet
+                    (setf (aref buffer 5) byte)
+                    (setf state :parsing-body-size-3-octet)
+                    (go :end)
+                  :parsing-body-size-3-octet
+                    (setf (aref buffer 6) byte)
+                    (setf state :parsing-body-size-4-octet)
+                    (go :end)
+                  :parsing-body-size-4-octet
+                    (setf (aref buffer 7) byte)
+                    (setf state :parsing-body-size-5-octet)
+                    (go :end)
+                  :parsing-body-size-5-octet
+                    (setf (aref buffer 8) byte)
+                    (setf state :parsing-body-size-6-octet)
+                    (go :end)
+                  :parsing-body-size-6-octet
+                    (setf (aref buffer 9) byte)
+                    (setf state :parsing-body-size-7-octet)
+                    (go :end)
+                  :parsing-body-size-7-octet
+                    (setf (aref buffer 10) byte)
+                    (setf state :parsing-body-size-8-octet)
+                    (go :end)
+                  :parsing-body-size-8-octet
+                    (setf (aref buffer 11) byte)
+                    (setf body-size (nibbles:sb64ref/be buffer 4))
+                    (setf (slot-value frame 'body-size) body-size)
+                    (if on-content-body-size
+                        (funcall on-content-body-size body-size))
+                    (setf consumed 12)
+                    (setf state :consuming-class-properties)
+                    (go :consuming-class-properties-start)
+                  :consuming-class-properties-start
+                    (if (= size consumed)
+                        (go :header-frame-payload-parsed)
+                        (go :end))
+                  :consuming-class-properties
+                    (let ((to-copy (if (< (- end start) (- size consumed))
+                                       (- end start)
+                                       (- size consumed))))
+                      (replace buffer octets :start1 consumed :start2 index)
+                      (incf consumed to-copy)
+                      (incf index to-copy)
+                      (when (= consumed size)
+                        (setf state :header-frame-payload-parsed)
+                        (go :header-frame-payload-parsed)))
+                  :header-frame-payload-parsed
+                    (if on-class-properties-buffer
+                        (funcall on-class-properties-buffer buffer))
+                    (return-from frame-payload-parser-consume)
+                  :end)
+                 index)))
+      (loop for i from start to (1- end) do
+               (setf i (the fixnum (consume octets i)))))))
+
+(defmethod frame-payload-parser-finish ((payload-parser header-frame-payload-parser))
+  (with-slots (state
+               buffer
+               frame
+               payload-class) payload-parser
+    (unless (eq state :header-frame-payload-parsed)
+      (error "Invalid header-frame-payload-parser state: payload not parsed")) ;; TODO: specialize error
+
+    (setf (frame-payload frame) (amqp-class-properties-decoder payload-class (new-ibuffer buffer :start 12)))))
+
+
 (defun make-frame-payload-parser (frame &rest args &key &allow-other-keys)
   (let ((parser-ctor
           (case (frame-type frame)
