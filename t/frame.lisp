@@ -326,7 +326,7 @@
                                          (setf (amqp:frame-size dframe) payload-size)
                                          (setf payload-parser
                                                (amqp:make-frame-payload-parser dframe
-                                                                               :on-content-class-id (lambda (class-id)
+                                                                               :on-class-id (lambda (class-id)
                                                                                                       (is class-id 60 "Class is Basic Class"))
                                                                                :on-content-body-size (lambda (body-size)
                                                                                                        (is body-size 100 "Body size is 100")))))
@@ -347,13 +347,13 @@
                   (mw-equiv:object= x y t))))
 
     ;; decoding test
-    ;; (amqp:frame-parser-consume parser frame-bytes)
-    ;; (let ((obuffer (amqp:new-obuffer)))
-    ;;   (amqp:frame-encoder dframe obuffer)
-    ;;   (is (amqp:obuffer-get-bytes obuffer)
-    ;;       frame-bytes
-    ;;       :test (lambda (x y)
-    ;;               (mw-equiv:object= x y t))))
-    ))
+    (amqp:frame-parser-consume parser frame-bytes)
+    (is (slot-value (frame-payload dframe) 'amqp::delivery-mode) 2 "Delivery mode is persistent")
+    (let ((obuffer (amqp:new-obuffer)))
+      (amqp:frame-encoder dframe obuffer)
+      (is (amqp:obuffer-get-bytes obuffer)
+          frame-bytes
+          :test (lambda (x y)
+                  (mw-equiv:object= x y t))))))
 
 (finalize)
