@@ -144,6 +144,26 @@ ${line}
          (if (zerop flags)
              (return)))
      (obuffer-add-bytes obuffer (obuffer-get-bytes props-buffer))))
+
+(defmethod amqp-class-properties-decoder ((class (eql 'amqp-${klass.name}-class-properties)) ibuffer)
+  (let* ((flags 0)
+         (flagword-index 0)
+         (initargs
+           (progn
+            (loop
+             as partial-flags = (ibuffer-decode-ub16 ibuffer)
+             do
+               (setf flags (logior flags (ash partial-flags (* flagword-index 16))))
+               (when (zerop (logand partial-flags 1))
+                 (return))
+               (incf flagword-index))
+            (collectors:with-appender-output (add-initarg)
+             % for prop in klass.fields:
+             (unless (zerop (logand flags +flag-${prop.name}+))
+               (add-initarg :${prop.name} (amqp-${spec.resolveDomain(prop.domain)}-decoder ibuffer)))
+             % endfor
+             ))))
+    (apply #'make-instance class initargs)))
  % endif
 % endfor
 
@@ -151,7 +171,7 @@ ${line}
   (case class-id
 % for klass in spec.allClasses():
  % if klass.fields:
-    (${'#x%04X' % klass.index} amqp-${klass.name}-class-properties)
+    (${'#x%04X' % klass.index} 'amqp-${klass.name}-class-properties)
  % endif
 % endfor
     (t (error "AMQP Class ~a has no properties" class-id)))) ;; TODO: specialize error
