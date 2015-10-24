@@ -11,11 +11,13 @@
            #:frame-payload-parser-consume
            #:frame-payload-parser-finish
            #:+amqp-frame-method+
+           #:+amqp-frame-header+
            #:method-frame
+           #:header-frame
            #:frame-channel
            #:frame-size
            #:frame-payload
-           #:frame-encode
+           #:frame-encoder
            #:frame-parser-consume
            #:malformed-frame-error
            #:invalid-frame-parser-state-error
@@ -29,6 +31,9 @@
 
            #:new-obuffer
            #:obuffer-get-bytes
+
+           #:amqp-basic-class-properties ;; TODO: are you sure about amqp- prefix?
+                                         ;; it prefixed with package name already
 
            #:amqp-method-basic-ack ;; TODO: generate for this and other methods
            #:method-decode
