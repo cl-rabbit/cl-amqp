@@ -1,5 +1,7 @@
 (in-package :cl-amqp)
 
+(enable-binary-string-syntax)
+
 (defclass frame ()
   ((type :reader frame-type)
    (channel :initarg :channel
