@@ -13,7 +13,8 @@
   ((type :initform +amqp-frame-method+)))
 
 (defclass header-frame (frame)
-  ((type :initform +amqp-frame-header+)))
+  ((type :initform +amqp-frame-header+)
+   (body-size :initarg :body-size :initform 0 :type amqp-longlong)))
 
 (defclass body-frame (frame)
   ((type :initform +amqp-frame-body+)))
@@ -29,19 +30,36 @@
     (4 #|+amqp-frame-heartbeat+|# 'heartbeat-frame)
     (t (error 'amqp-unknown-frame-type-error :frame-type frame-type))))
 
-(defgeneric frame-encode (frame obuffer))
+(defgeneric frame-encoder (frame obuffer))
+(defgeneric frame-payload-encoder (frame obuffer))
 
-(defmethod frame-encode ((frame method-frame) obuffer)
+(defmethod frame-encoder ((frame frame) obuffer)
   (obuffer-encode-ub8 obuffer (frame-type frame))
   (obuffer-encode-ub16 obuffer (frame-channel frame))
+  (frame-payload-encoder frame obuffer)
+  (obuffer-encode-ub8 obuffer +amqp-frame-end+)
+  obuffer)
+
+(defmethod frame-payload-encoder ((frame method-frame) obuffer)
   (let* ((payload-buffer (new-obuffer))
          (payload-bytes (progn
                           (obuffer-encode-ub32 payload-buffer (method-signature (frame-payload frame)))
-                          (method-encode (frame-payload frame) payload-buffer)
+                          (method-encode frame payload-buffer)
                           (obuffer-get-bytes payload-buffer))))
     (obuffer-encode-ub32 obuffer (length payload-bytes))
-    (obuffer-add-bytes obuffer payload-bytes)
-    (obuffer-encode-ub8 obuffer +amqp-frame-end+))
+    (obuffer-add-bytes obuffer payload-bytes))
+  obuffer)
+
+(defmethod frame-payload-encoder ((frame header-frame) obuffer)
+  (let* ((payload-buffer (new-obuffer))
+         (payload-bytes (progn
+                          (obuffer-encode-ub16 payload-buffer (amqp-class-properties-class-id (frame-payload frame)))
+                          (obuffer-encode-sb16 payload-buffer 0)
+                          (obuffer-encode-sb64 payload-buffer (slot-value frame 'body-size))
+                          (amqp-class-properties-encoder (frame-payload frame) payload-buffer)
+                          (obuffer-get-bytes payload-buffer))))
+    (obuffer-encode-ub32 obuffer (length payload-bytes))
+    (obuffer-add-bytes obuffer payload-bytes))
   obuffer)
 
 (define-condition malformed-frame-error (amqp-base-error)
