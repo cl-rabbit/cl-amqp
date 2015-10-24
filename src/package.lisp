@@ -12,10 +12,12 @@
            #:frame-payload-parser-finish
            #:+amqp-frame-method+
            #:+amqp-frame-header+
+           #:+amqp-frame-heartbeat+
            #:method-frame
            #:header-frame
+           #:heartbeat-frame
            #:frame-channel
-           #:frame-size
+           #:frame-payload-size
            #:frame-payload
            #:frame-encoder
            #:frame-parser-consume

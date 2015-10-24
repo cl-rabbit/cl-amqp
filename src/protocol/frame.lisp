@@ -5,7 +5,7 @@
    (channel :initarg :channel
             :accessor frame-channel)
    (size :initarg :size
-         :accessor frame-size)
+         :accessor frame-payload-size)
    (payload :initarg :payload
             :accessor frame-payload)))
 
@@ -27,7 +27,7 @@
     (1 #|+amqp-frame-method+|# 'method-frame)
     (2 #|+amqp-frame-header+|# 'header-frame)
     (3 #|+amqp-frame-body+|# 'body-frame)
-    (4 #|+amqp-frame-heartbeat+|# 'heartbeat-frame)
+    (8 #|+amqp-frame-heartbeat+|# 'heartbeat-frame)
     (t (error 'amqp-unknown-frame-type-error :frame-type frame-type))))
 
 (defgeneric frame-encoder (frame obuffer))
@@ -39,6 +39,9 @@
   (frame-payload-encoder frame obuffer)
   (obuffer-encode-ub8 obuffer +amqp-frame-end+)
   obuffer)
+
+(defmethod frame-encoder ((frame heartbeat-frame) obuffer)
+  (obuffer-add-bytes obuffer #b"\x08\x00\x00\x00\x00\x00\x00\xce"))
 
 (defmethod frame-payload-encoder ((frame method-frame) obuffer)
   (let* ((payload-buffer (new-obuffer))
@@ -226,7 +229,7 @@
    (on-method-signature :initarg :on-method-signature)
    (on-method-arguments-buffer :initarg :on-method-arguments-buffer)))
 
-(defun method-frame-payload-parser (frame &key on-class-id on-method-id on-method-signature on-method-arguments-buffer &aux (size (frame-size frame)))
+(defun method-frame-payload-parser (frame &key on-class-id on-method-id on-method-signature on-method-arguments-buffer &aux (size (frame-payload-size frame)))
   (make-instance 'method-frame-payload-parser :frame frame
                                               :size size
                                               :buffer (nibbles:make-octet-vector size)
@@ -339,7 +342,7 @@
    (on-content-body-size :initarg :on-content-body-size)
    (on-class-properties-buffer :initarg :on-class-properties-buffer)))
 
-(defun header-frame-payload-parser (frame &key on-class-id on-content-body-size on-class-properties-buffer &aux (size (frame-size frame)))
+(defun header-frame-payload-parser (frame &key on-class-id on-content-body-size on-class-properties-buffer &aux (size (frame-payload-size frame)))
   (make-instance 'header-frame-payload-parser :frame frame
                                               :size size
                                               :buffer (nibbles:make-octet-vector size)

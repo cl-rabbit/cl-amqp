@@ -1,7 +1,7 @@
 (in-package :cl-amqp.test)
 
 (enable-binary-string-syntax)
-(plan 4)
+(plan 5)
 
 (subtest "Frames Parsing"
 
@@ -253,38 +253,38 @@
 
 (subtest "Method frame encoding/decoding"
   (let* ((frame-bytes (concatenate '(simple-array  (unsigned-byte 8) 1)
-                                 #b"\x01\x00\x01\x00\x00\x00\r\x00<\x00P\x00\x00\x00\x00\x00\x00"
-                                 #b"\x00d\x00\xce"))
-       (method (make-instance 'amqp:amqp-method-basic-ack :delivery-tag 100))
-       (frame (make-instance 'amqp:method-frame :channel 1 :payload method))
-       (payload-parser)
-       (dframe)
-       (parser (amqp:make-frame-parser
-                :on-frame-type (lambda (parser frame-type)
-                                 (declare (ignore parser))
-                                 (is frame-type amqp:+amqp-frame-method+ "Frame type is expected to be Method Frame")
-                                 (setf dframe (make-instance (amqp:frame-class-from-frame-type frame-type))))
-                :on-frame-channel (lambda (parser frame-channel)
-                                    (declare (ignore parser))
-                                    (setf (amqp:frame-channel dframe) frame-channel))
-                :on-frame-payload-size (lambda (parser payload-size)
-                                         (declare (ignore parser))
-                                         ;; validate frame size
-                                         (setf (amqp:frame-size dframe) payload-size)
-                                         (setf payload-parser
-                                               (amqp:make-frame-payload-parser dframe
-                                                                               :on-method-signature (lambda (signature)
-                                                                                                       (is signature #x003c0050))
-                                                                               :on-method-arguments-buffer (lambda (buffer)
-                                                                                                             (is buffer #b"\x00<\x00P\x00\x00\x00\x00\x00\x00\x00d\x00"
-                                                                                                                  :test (lambda (x y)
-                                                                                                                          (mw-equiv:object= x y t)))))))
-                :on-frame-payload (lambda (parser data start end)
-                                    (declare (ignore parser))
-                                    (amqp:frame-payload-parser-consume payload-parser data  :start start :end end))
-                :on-frame-end (lambda (parser)
-                                (declare (ignore parser))
-                                (amqp:frame-payload-parser-finish payload-parser)))))
+                                   #b"\x01\x00\x01\x00\x00\x00\r\x00<\x00P\x00\x00\x00\x00\x00\x00"
+                                   #b"\x00d\x00\xce"))
+         (method (make-instance 'amqp:amqp-method-basic-ack :delivery-tag 100))
+         (frame (make-instance 'amqp:method-frame :channel 1 :payload method))
+         (payload-parser)
+         (dframe)
+         (parser (amqp:make-frame-parser
+                  :on-frame-type (lambda (parser frame-type)
+                                   (declare (ignore parser))
+                                   (is frame-type amqp:+amqp-frame-method+ "Frame type is expected to be Method Frame")
+                                   (setf dframe (make-instance (amqp:frame-class-from-frame-type frame-type))))
+                  :on-frame-channel (lambda (parser frame-channel)
+                                      (declare (ignore parser))
+                                      (setf (amqp:frame-channel dframe) frame-channel))
+                  :on-frame-payload-size (lambda (parser payload-size)
+                                           (declare (ignore parser))
+                                           ;; validate frame size
+                                           (setf (amqp:frame-payload-size dframe) payload-size)
+                                           (setf payload-parser
+                                                 (amqp:make-frame-payload-parser dframe
+                                                                                 :on-method-signature (lambda (signature)
+                                                                                                        (is signature #x003c0050))
+                                                                                 :on-method-arguments-buffer (lambda (buffer)
+                                                                                                               (is buffer #b"\x00<\x00P\x00\x00\x00\x00\x00\x00\x00d\x00"
+                                                                                                                   :test (lambda (x y)
+                                                                                                                           (mw-equiv:object= x y t)))))))
+                  :on-frame-payload (lambda (parser data start end)
+                                      (declare (ignore parser))
+                                      (amqp:frame-payload-parser-consume payload-parser data  :start start :end end))
+                  :on-frame-end (lambda (parser)
+                                  (declare (ignore parser))
+                                  (amqp:frame-payload-parser-finish payload-parser)))))
 
 
     ;; encoding test
@@ -300,42 +300,42 @@
     (let ((obuffer (amqp:new-obuffer)))
       (amqp:frame-encoder dframe obuffer)
       (is (amqp:obuffer-get-bytes obuffer)
-          frame-bytes          
+          frame-bytes
           :test (lambda (x y)
                   (mw-equiv:object= x y t))))))
 
 (subtest "Content header frame encoding/decoding"
   (let* ((frame-bytes (concatenate '(simple-array  (unsigned-byte 8) 1)
-                                 #b"\x02\x00\x01\x00\x00\x00\x0f\x00<\x00\x00\x00"
-                                 #b"\x00\x00\x00\x00\x00\x00d\x10\x00\x02\xce"))
-       (basic-properties (make-instance 'amqp:amqp-basic-class-properties :delivery-mode 2))
-       (frame (make-instance 'amqp:header-frame :channel 1 :body-size 100 :payload basic-properties))
-       (payload-parser)
-       (dframe)
-       (parser (amqp:make-frame-parser
-                :on-frame-type (lambda (parser frame-type)
-                                 (declare (ignore parser))
-                                 (is frame-type amqp:+amqp-frame-header+ "Frame type is expected to be Header Frame")
-                                 (setf dframe (make-instance (amqp:frame-class-from-frame-type frame-type))))
-                :on-frame-channel (lambda (parser frame-channel)
-                                    (declare (ignore parser))
-                                    (setf (amqp:frame-channel dframe) frame-channel))
-                :on-frame-payload-size (lambda (parser payload-size)
-                                         (declare (ignore parser))
-                                         ;; validate frame size
-                                         (setf (amqp:frame-size dframe) payload-size)
-                                         (setf payload-parser
-                                               (amqp:make-frame-payload-parser dframe
-                                                                               :on-class-id (lambda (class-id)
-                                                                                                      (is class-id 60 "Class is Basic Class"))
-                                                                               :on-content-body-size (lambda (body-size)
-                                                                                                       (is body-size 100 "Body size is 100")))))
-                :on-frame-payload (lambda (parser data start end)
-                                    (declare (ignore parser))
-                                    (amqp:frame-payload-parser-consume payload-parser data :start start :end end))
-                :on-frame-end (lambda (parser)
-                                (declare (ignore parser))
-                                (amqp:frame-payload-parser-finish payload-parser)))))
+                                   #b"\x02\x00\x01\x00\x00\x00\x0f\x00<\x00\x00\x00"
+                                   #b"\x00\x00\x00\x00\x00\x00d\x10\x00\x02\xce"))
+         (basic-properties (make-instance 'amqp:amqp-basic-class-properties :delivery-mode 2))
+         (frame (make-instance 'amqp:header-frame :channel 1 :body-size 100 :payload basic-properties))
+         (payload-parser)
+         (dframe)
+         (parser (amqp:make-frame-parser
+                  :on-frame-type (lambda (parser frame-type)
+                                   (declare (ignore parser))
+                                   (is frame-type amqp:+amqp-frame-header+ "Frame type is expected to be Header Frame")
+                                   (setf dframe (make-instance (amqp:frame-class-from-frame-type frame-type))))
+                  :on-frame-channel (lambda (parser frame-channel)
+                                      (declare (ignore parser))
+                                      (setf (amqp:frame-channel dframe) frame-channel))
+                  :on-frame-payload-size (lambda (parser payload-size)
+                                           (declare (ignore parser))
+                                           ;; validate frame size
+                                           (setf (amqp:frame-payload-size dframe) payload-size)
+                                           (setf payload-parser
+                                                 (amqp:make-frame-payload-parser dframe
+                                                                                 :on-class-id (lambda (class-id)
+                                                                                                (is class-id 60 "Class is Basic Class"))
+                                                                                 :on-content-body-size (lambda (body-size)
+                                                                                                         (is body-size 100 "Body size is 100")))))
+                  :on-frame-payload (lambda (parser data start end)
+                                      (declare (ignore parser))
+                                      (amqp:frame-payload-parser-consume payload-parser data :start start :end end))
+                  :on-frame-end (lambda (parser)
+                                  (declare (ignore parser))
+                                  (amqp:frame-payload-parser-finish payload-parser)))))
 
 
     ;; encoding test
@@ -355,5 +355,37 @@
           frame-bytes
           :test (lambda (x y)
                   (mw-equiv:object= x y t))))))
+
+(subtest "Heartbeat frame encoding/decoding"
+  (let* ((heartbeat-frame (make-instance 'amqp:heartbeat-frame))
+         (frame-bytes #b"\x08\x00\x00\x00\x00\x00\x00\xce")
+         (obuffer (amqp:new-obuffer))
+         (frame-parsed)
+         (parser (amqp:make-frame-parser
+                  :on-frame-type (lambda (parser frame-type)
+                                   (declare (ignore parser))
+                                   (is frame-type amqp:+amqp-frame-heartbeat+ "Frame is expected to be Heartbeat Frame")
+                                   (is (amqp:frame-class-from-frame-type frame-type) 'amqp:heartbeat-frame))
+                  :on-frame-channel (lambda (parser frame-channel)
+                                      (declare (ignore parser))
+                                      (is frame-channel 0 "Frame channel is expected to be 0"))
+                  :on-frame-payload-size (lambda (parser payload-size)
+                                           (declare (ignore parser))
+                                           (is payload-size 0 "Frame payload-size is expected to be 0"))
+                  :on-frame-payload (lambda (parser data start end)
+                                      (declare (ignore parser data))
+                                      (is start end "No payload"))
+                  :on-frame-end (lambda (parser)
+                                  (declare (ignore parser))
+                                  (setf frame-parsed t)))))
+
+    (amqp:frame-parser-consume parser frame-bytes)
+    (is frame-parsed t "Heartbeat frame successfully parsed")
+
+    (amqp:frame-encoder heartbeat-frame obuffer)
+    (is (amqp:obuffer-get-bytes obuffer)
+        #b"\x08\x00\x00\x00\x00\x00\x00\xce"
+        :test (lambda (x y)
+                (mw-equiv:object= x y t)))))
 
 (finalize)
