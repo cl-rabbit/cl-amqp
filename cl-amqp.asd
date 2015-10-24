@@ -34,7 +34,7 @@
                   :components
                   ((:file "constants")
                    (:file "conditions")
-                   (:file "frame")
                    (:file "classes")
-                   (:file "types"))))))
+                   (:file "types")
+                   (:file "frame"))))))
   :in-order-to ((test-op (test-op cl-amqp.test))))
