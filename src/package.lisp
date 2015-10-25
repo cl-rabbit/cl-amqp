@@ -12,6 +12,7 @@
            #:frame-payload-parser-finish
            #:+amqp-frame-method+
            #:+amqp-frame-header+
+           #:+amqp-frame-body+
            #:+amqp-frame-heartbeat+
            #:method-frame
            #:header-frame

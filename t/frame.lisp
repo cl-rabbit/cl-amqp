@@ -244,10 +244,10 @@
 
 (subtest "Frame types"
   (subtest "Frame class from frame type" ;; TODO: sometime later this will be redundant
-    (is 'amqp::method-frame (amqp:frame-class-from-frame-type 1) "Method Frame type: 1")
-    (is 'amqp::header-frame (amqp:frame-class-from-frame-type 2) "Header Frame type: 2")
-    (is 'amqp::body-frame (amqp:frame-class-from-frame-type 3) "Body Frame type: 3")
-    (is 'amqp::heartbeat-frame (amqp:frame-class-from-frame-type 4) "Heartbeat Frame type: 4")
+    (is 'amqp::method-frame (amqp:frame-class-from-frame-type amqp:+amqp-frame-method+) "Method Frame type: Method")
+    (is 'amqp::header-frame (amqp:frame-class-from-frame-type amqp:+amqp-frame-header+) "Header Frame type: Content Header")
+    (is 'amqp::body-frame (amqp:frame-class-from-frame-type amqp:+amqp-frame-body+) "Body Frame type: Body")
+    (is 'amqp::heartbeat-frame (amqp:frame-class-from-frame-type amqp:+amqp-frame-heartbeat+) "Heartbeat Frame type: Heartbeat")
     (is-error (amqp:frame-class-from-frame-type 11) 'amqp:amqp-unknown-frame-type-error
               "Frame type 11 generates amqp-unknown-frame-type-error")))
 
