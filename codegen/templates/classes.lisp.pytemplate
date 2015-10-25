@@ -16,6 +16,10 @@
   % for arg in m.arguments:
   (${arg.name} :type amqp-${spec.resolveDomain(arg.domain)} :initarg :${arg.name}${helpers.genMethodArgInitform(arg)})
   % endfor
+  % if m.hasContent:
+  (content :initarg :content :reader method-content)
+  (content-properties :type amqp-${m.klass.name}-class-properties :initarg :content-properties :initform (make-instance 'amqp-${m.klass.name}-class-properties) :reader method-content-properties)
+  % endif
 ))
 
 (defun decode-${m.method_lisp_class_name()} (ibuffer)

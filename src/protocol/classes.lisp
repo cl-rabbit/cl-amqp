@@ -1720,6 +1720,8 @@
   (routing-key :type amqp-shortstr :initarg :routing-key :initform "")
   (mandatory :type amqp-bit :initarg :mandatory :initform :false)
   (immediate :type amqp-bit :initarg :immediate :initform :false)
+  (content :initarg :content :reader method-content)
+  (content-properties :type amqp-basic-class-properties :initarg :content-properties :initform (make-instance 'amqp-basic-class-properties) :reader method-content-properties)
 ))
 
 (defun decode-amqp-method-basic-publish (ibuffer)
@@ -1769,6 +1771,8 @@
   (reply-text :type amqp-shortstr :initarg :reply-text :initform "")
   (exchange :type amqp-shortstr :initarg :exchange)
   (routing-key :type amqp-shortstr :initarg :routing-key)
+  (content :initarg :content :reader method-content)
+  (content-properties :type amqp-basic-class-properties :initarg :content-properties :initform (make-instance 'amqp-basic-class-properties) :reader method-content-properties)
 ))
 
 (defun decode-amqp-method-basic-return (ibuffer)
@@ -1813,6 +1817,8 @@
   (redelivered :type amqp-bit :initarg :redelivered :initform :false)
   (exchange :type amqp-shortstr :initarg :exchange)
   (routing-key :type amqp-shortstr :initarg :routing-key)
+  (content :initarg :content :reader method-content)
+  (content-properties :type amqp-basic-class-properties :initarg :content-properties :initform (make-instance 'amqp-basic-class-properties) :reader method-content-properties)
 ))
 
 (defun decode-amqp-method-basic-deliver (ibuffer)
@@ -1907,6 +1913,8 @@
   (exchange :type amqp-shortstr :initarg :exchange)
   (routing-key :type amqp-shortstr :initarg :routing-key)
   (message-count :type amqp-long :initarg :message-count)
+  (content :initarg :content :reader method-content)
+  (content-properties :type amqp-basic-class-properties :initarg :content-properties :initform (make-instance 'amqp-basic-class-properties) :reader method-content-properties)
 ))
 
 (defun decode-amqp-method-basic-get-ok (ibuffer)
