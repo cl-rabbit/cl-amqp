@@ -53,7 +53,11 @@
 )
 
 (defmethod synchronous-method-p ((method ${m.method_lisp_class_name()}))
-  ${"t" if m.isSynchronous  else "nil"})
+% if m.isSynchronous:
+  (values t '${m.method_synchronous_reply_method()}))
+% else:
+  nil)
+% endif
 
 (defmethod method-has-content-p ((method ${m.method_lisp_class_name()}))
   ${"t" if m.hasContent  else "nil"})

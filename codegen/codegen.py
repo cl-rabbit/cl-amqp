@@ -48,6 +48,48 @@ def method_lisp_class_name(self):
 
 AmqpMethod.method_lisp_class_name = method_lisp_class_name
 
+SYNC_REQ_RESP = {
+    "connection.start": "amqp-method-connection-start-ok",
+    "connection.secure": "amqp-method-connection-secure-ok",
+    "connection.tune": "amqp-method-connection-tune-ok",
+    "connection.open": "amqp-method-connection-open-ok",
+    "connection.close": "amqp-method-connection-close-ok",
+
+    "channel.open": "amqp-method-channel-open-ok",
+    "channel.flow": "amqp-method-channel-flow-ok",
+    "channel.close": "amqp-method-channel-close-ok",
+
+    "access.request": "amqp-method-access-request-ok",
+
+    "exchange.declare": "amqp-method-exchange-declare-ok",
+    "exchange.delete": "amqp-method-exchange-delete-ok",
+    "exchange.bind": "amqp-method-exchange-bind-ok",
+    "exchange.unbind": "amqp-method-exchange-unbind-ok",
+
+    "queue.declare": "amqp-method-queue-declare-ok",
+    "queue.purge": "amqp-method-queue-purge-ok",
+    "queue.delete": "amqp-method-queue-delete-ok",
+    "queue.bind": "amqp-method-queue-bind-ok",
+    "queue.unbind": "amqp-method-queue-unbind-ok",
+
+    "basic.qos": "amqp-method-basic-qos-ok",
+    "basic.consume": "amqp-method-basic-consume-ok",
+    "basic.cancel": "amqp-method-basic-cancel-ok",
+    "basic.get": "amqp-method-basic-get-ok",
+    "basic.recover": "amqp-method-basic-recover-ok",
+
+    "tx.select": "amqp-method-tx-select-ok",
+    "tx.commit": "amqp-method-tx-commit-ok",
+    "tx.rollback": "amqp-method-tx-rollback-ok",
+
+    "confirm.select": "amqp-method-confirm-select-ok"
+}
+
+def method_synchronous_reply_method(self):
+    return SYNC_REQ_RESP['{0}.{1}'.format(self.klass.name, self.name)]
+
+AmqpMethod.method_synchronous_reply_method = method_synchronous_reply_method
+
 # helpers
 def to_cl_condition_class(klass):
     if klass=='soft-error':

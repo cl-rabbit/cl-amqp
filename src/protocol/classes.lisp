@@ -45,7 +45,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-connection-start))
-  t)
+  (values t 'amqp-method-connection-start-ok))
 
 (defmethod method-has-content-p ((method amqp-method-connection-start))
   nil)
@@ -122,7 +122,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-connection-secure))
-  t)
+  (values t 'amqp-method-connection-secure-ok))
 
 (defmethod method-has-content-p ((method amqp-method-connection-secure))
   nil)
@@ -196,7 +196,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-connection-tune))
-  t)
+  (values t 'amqp-method-connection-tune-ok))
 
 (defmethod method-has-content-p ((method amqp-method-connection-tune))
   nil)
@@ -280,7 +280,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-connection-open))
-  t)
+  (values t 'amqp-method-connection-open-ok))
 
 (defmethod method-has-content-p ((method amqp-method-connection-open))
   nil)
@@ -357,7 +357,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-connection-close))
-  t)
+  (values t 'amqp-method-connection-close-ok))
 
 (defmethod method-has-content-p ((method amqp-method-connection-close))
   nil)
@@ -475,7 +475,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-channel-open))
-  t)
+  (values t 'amqp-method-channel-open-ok))
 
 (defmethod method-has-content-p ((method amqp-method-channel-open))
   nil)
@@ -547,7 +547,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-channel-flow))
-  t)
+  (values t 'amqp-method-channel-flow-ok))
 
 (defmethod method-has-content-p ((method amqp-method-channel-flow))
   nil)
@@ -628,7 +628,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-channel-close))
-  t)
+  (values t 'amqp-method-channel-close-ok))
 
 (defmethod method-has-content-p ((method amqp-method-channel-close))
   nil)
@@ -706,7 +706,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-access-request))
-  t)
+  (values t 'amqp-method-access-request-ok))
 
 (defmethod method-has-content-p ((method amqp-method-access-request))
   nil)
@@ -802,7 +802,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-exchange-declare))
-  t)
+  (values t 'amqp-method-exchange-declare-ok))
 
 (defmethod method-has-content-p ((method amqp-method-exchange-declare))
   nil)
@@ -874,7 +874,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-exchange-delete))
-  t)
+  (values t 'amqp-method-exchange-delete-ok))
 
 (defmethod method-has-content-p ((method amqp-method-exchange-delete))
   nil)
@@ -952,7 +952,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-exchange-bind))
-  t)
+  (values t 'amqp-method-exchange-bind-ok))
 
 (defmethod method-has-content-p ((method amqp-method-exchange-bind))
   nil)
@@ -1030,7 +1030,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-exchange-unbind))
-  t)
+  (values t 'amqp-method-exchange-unbind-ok))
 
 (defmethod method-has-content-p ((method amqp-method-exchange-unbind))
   nil)
@@ -1114,7 +1114,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-queue-declare))
-  t)
+  (values t 'amqp-method-queue-declare-ok))
 
 (defmethod method-has-content-p ((method amqp-method-queue-declare))
   nil)
@@ -1207,7 +1207,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-queue-bind))
-  t)
+  (values t 'amqp-method-queue-bind-ok))
 
 (defmethod method-has-content-p ((method amqp-method-queue-bind))
   nil)
@@ -1276,7 +1276,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-queue-purge))
-  t)
+  (values t 'amqp-method-queue-purge-ok))
 
 (defmethod method-has-content-p ((method amqp-method-queue-purge))
   nil)
@@ -1360,7 +1360,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-queue-delete))
-  t)
+  (values t 'amqp-method-queue-delete-ok))
 
 (defmethod method-has-content-p ((method amqp-method-queue-delete))
   nil)
@@ -1440,7 +1440,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-queue-unbind))
-  t)
+  (values t 'amqp-method-queue-unbind-ok))
 
 (defmethod method-has-content-p ((method amqp-method-queue-unbind))
   nil)
@@ -1509,7 +1509,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-basic-qos))
-  t)
+  (values t 'amqp-method-basic-qos-ok))
 
 (defmethod method-has-content-p ((method amqp-method-basic-qos))
   nil)
@@ -1593,7 +1593,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-basic-consume))
-  t)
+  (values t 'amqp-method-basic-consume-ok))
 
 (defmethod method-has-content-p ((method amqp-method-basic-consume))
   nil)
@@ -1668,7 +1668,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-basic-cancel))
-  t)
+  (values t 'amqp-method-basic-cancel-ok))
 
 (defmethod method-has-content-p ((method amqp-method-basic-cancel))
   nil)
@@ -1895,7 +1895,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-basic-get))
-  t)
+  (values t 'amqp-method-basic-get-ok))
 
 (defmethod method-has-content-p ((method amqp-method-basic-get))
   nil)
@@ -2139,7 +2139,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-basic-recover))
-  t)
+  (values t 'amqp-method-basic-recover-ok))
 
 (defmethod method-has-content-p ((method amqp-method-basic-recover))
   nil)
@@ -2233,7 +2233,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-tx-select))
-  t)
+  (values t 'amqp-method-tx-select-ok))
 
 (defmethod method-has-content-p ((method amqp-method-tx-select))
   nil)
@@ -2283,7 +2283,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-tx-commit))
-  t)
+  (values t 'amqp-method-tx-commit-ok))
 
 (defmethod method-has-content-p ((method amqp-method-tx-commit))
   nil)
@@ -2333,7 +2333,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-tx-rollback))
-  t)
+  (values t 'amqp-method-tx-rollback-ok))
 
 (defmethod method-has-content-p ((method amqp-method-tx-rollback))
   nil)
@@ -2396,7 +2396,7 @@
 )
 
 (defmethod synchronous-method-p ((method amqp-method-confirm-select))
-  t)
+  (values t 'amqp-method-confirm-select-ok))
 
 (defmethod method-has-content-p ((method amqp-method-confirm-select))
   nil)
