@@ -38,6 +38,9 @@ class AmqpSpecObject(AmqpSpec):
     def generate_classes_file(self):
         self.render_template_to_file("codegen/templates/classes.lisp.pytemplate", "src/protocol/classes.lisp")
 
+    def generate_package_file(self):
+        self.render_template_to_file("codegen/templates/package.lisp.pytemplate", "src/package.lisp")
+
 def method_signature(self):
     return '#x{0:0>8x}'.format(self.klass.index << 16 | self.index)
 
@@ -108,3 +111,4 @@ if __name__ == "__main__":
     spec.generate_constants_file()
     spec.generate_conditions_file()
     spec.generate_classes_file()
+    spec.generate_package_file()

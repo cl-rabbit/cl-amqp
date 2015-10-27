@@ -1,0 +1,64 @@
+;; DO NOT EDIT. RUN GENERATE TO REGENERATE
+
+(in-package :cl-user)
+
+(defpackage :cl-amqp
+  (:use :cl :alexandria :collectors)
+  (:nicknames :amqp)
+  (:export ;; constants
+           #:+amqp-port+
+           % for (name, value, klass) in spec.constants:
+           #:+amqp-${name.lower()}+
+           % endfor
+
+           ;; conditions
+           #:error-type-from-reply-code
+           #:amqp-unknown-reply-code-error
+           #:amqp-protocol-error
+           #:amqp-channel-error
+           #:amqp-connection-error
+           #:amqp-error-${name.lower()}
+           #:malformed-frame-error
+           #:invalid-frame-parser-state-error
+           #:frame-class-from-frame-type
+           #:amqp-unknown-frame-type-error
+           % for (name, value, klass) in spec.constants:
+              % if klass:
+           #:amqp-error-${name.lower()}
+              % endif
+           % endfor
+
+
+           ;; frames
+           #:make-frame-parser
+           #:make-frame-payload-parser
+           #:frame-payload-parser-consume
+           #:frame-payload-parser-finish
+           #:method-frame
+           #:header-frame
+           #:heartbeat-frame
+           #:frame-channel
+           #:frame-payload-size
+           #:frame-payload
+           #:frame-encoder
+           #:frame-parser-consume
+
+           ;; binary strings
+           #:enable-binary-string-syntax
+           #:disable-binary-string-syntax
+           #:enable-binary-string-printing
+           #:disable-binary-string-printing
+
+           ;; i/o buffers
+           #:new-obuffer
+           #:obuffer-get-bytes
+
+           ;; methods
+           % for m in spec.allMethods():
+           #:${m.method_lisp_class_name()}
+           % endfor
+           #:amqp-basic-class-properties ;; TODO: are you sure about amqp- prefix?
+                                         ;; it prefixed with package name already
+           #:method-decode
+           #:method-class-from-signature
+   ))
