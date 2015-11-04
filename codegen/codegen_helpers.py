@@ -77,7 +77,7 @@ def genEncodeMethodDefinition(spec, m):
                 finishBits()
                 buffer.append("(setf bit-buffer 0)")
                 bit_index = 0
-            buffer.append("(when (eq t (slot-value method '%s)) (setf (ldb (byte 8 %d) bit-buffer) 1))" % (f.name, bit_index))
+            buffer.append("(when (slot-value method '%s) (setf (ldb (byte 8 %d) bit-buffer) 1))" % (f.name, bit_index))
             bit_index = bit_index + 1
         else:
             finishBits()
@@ -113,11 +113,11 @@ def convert_value_to_cl(value):
     if isinstance(value, unicode):
         return '"%s"' % (value.encode('ascii'))
     if isinstance(value, bool):
-        return "t" if value else ":false"
+        return "t" if value else "nil"
     if isinstance(value, dict):
         if value == {}:
             return "nil"
-        else:            
+        else:
             raise "Can't emit code for non-empty table"
     if isinstance(value, str):
         return '"%s"' % value
