@@ -71,4 +71,15 @@
                                          ;; it prefixed with package name already
            #:method-decode
            #:method-class-from-signature
+
+           ## since there is only one properties class
+           ## no need to remove duplicates
+           ;; properties
+           % for klass in spec.allClasses():
+           % if klass.fields:
+           % for prop in klass.fields:
+           #:amqp-property-${prop.name}
+           % endfor
+           % endif
+           % endfor
    ))

@@ -223,4 +223,20 @@
                                          ;; it prefixed with package name already
            #:method-decode
            #:method-class-from-signature
+
+           ;; properties
+           #:amqp-property-content-type
+           #:amqp-property-content-encoding
+           #:amqp-property-headers
+           #:amqp-property-delivery-mode
+           #:amqp-property-priority
+           #:amqp-property-correlation-id
+           #:amqp-property-reply-to
+           #:amqp-property-expiration
+           #:amqp-property-message-id
+           #:amqp-property-timestamp
+           #:amqp-property-type
+           #:amqp-property-user-id
+           #:amqp-property-app-id
+           #:amqp-property-cluster-id
    ))

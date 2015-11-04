@@ -124,7 +124,7 @@ ${line}
 (defclass amqp-${klass.name}-class-properties ()
  (
  % for prop in klass.fields:
- (${prop.name} :type amqp-${spec.resolveDomain(prop.domain)} :initarg :${prop.name})
+ (${prop.name} :type amqp-${spec.resolveDomain(prop.domain)} :initarg :${prop.name} :accessor amqp-property-${prop.name})
  % endfor
 ))
 
