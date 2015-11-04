@@ -1,5 +1,6 @@
 ;; DO NOT EDIT. RUN GENERATE TO REGENERATE
-
+<% import re, os, codegen %>
+<% import codegen_helpers as helpers %>
 (in-package :cl-user)
 
 (defpackage :cl-amqp
@@ -54,8 +55,15 @@
            #:obuffer-get-bytes
 
            ;; methods
+           #:amqp-method-synchronous-p
+           #:amqp-method-has-content-p
+           #:amqp-method-class-id
+           #:amqp-method-method-id
            % for m in spec.allMethods():
            #:${m.method_lisp_class_name()}
+           % endfor
+           % for line in helpers.methodFieldsReadersExportList(spec):
+           ${line}
            % endfor
            #:amqp-basic-class-properties ;; TODO: are you sure about amqp- prefix?
                                          ;; it prefixed with package name already

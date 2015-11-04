@@ -1,5 +1,6 @@
 ;; DO NOT EDIT. RUN GENERATE TO REGENERATE
 
+
 (in-package :cl-user)
 
 (defpackage :cl-amqp
@@ -89,6 +90,10 @@
            #:obuffer-get-bytes
 
            ;; methods
+           #:amqp-method-synchronous-p
+           #:amqp-method-has-content-p
+           #:amqp-method-class-id
+           #:amqp-method-method-id
            #:amqp-method-connection-start
            #:amqp-method-connection-start-ok
            #:amqp-method-connection-secure
@@ -153,6 +158,65 @@
            #:amqp-method-tx-rollback-ok
            #:amqp-method-confirm-select
            #:amqp-method-confirm-select-ok
+           #:amqp-method-field-source
+           #:amqp-method-field-prefetch-size
+           #:amqp-method-field-nowait
+           #:amqp-method-field-requeue
+           #:amqp-method-field-queue
+           #:amqp-method-field-version-minor
+           #:amqp-method-field-internal
+           #:amqp-method-field-consumer-count
+           #:amqp-method-field-method-id
+           #:amqp-method-field-delivery-tag
+           #:amqp-method-field-reply-text
+           #:amqp-method-field-challenge
+           #:amqp-method-field-out-of-band
+           #:amqp-method-field-no-local
+           #:amqp-method-field-redelivered
+           #:amqp-method-field-channel-id
+           #:amqp-method-field-mandatory
+           #:amqp-method-field-insist
+           #:amqp-method-field-locale
+           #:amqp-method-field-exclusive
+           #:amqp-method-field-frame-max
+           #:amqp-method-field-virtual-host
+           #:amqp-method-field-type
+           #:amqp-method-field-arguments
+           #:amqp-method-field-client-properties
+           #:amqp-method-field-auto-delete
+           #:amqp-method-field-write
+           #:amqp-method-field-class-id
+           #:amqp-method-field-global
+           #:amqp-method-field-passive
+           #:amqp-method-field-locales
+           #:amqp-method-field-message-count
+           #:amqp-method-field-heartbeat
+           #:amqp-method-field-mechanisms
+           #:amqp-method-field-channel-max
+           #:amqp-method-field-no-ack
+           #:amqp-method-field-durable
+           #:amqp-method-field-realm
+           #:amqp-method-field-active
+           #:amqp-method-field-mechanism
+           #:amqp-method-field-consumer-tag
+           #:amqp-method-field-if-empty
+           #:amqp-method-field-destination
+           #:amqp-method-field-server-properties
+           #:amqp-method-field-capabilities
+           #:amqp-method-field-known-hosts
+           #:amqp-method-field-ticket
+           #:amqp-method-field-version-major
+           #:amqp-method-field-prefetch-count
+           #:amqp-method-field-reason
+           #:amqp-method-field-multiple
+           #:amqp-method-field-routing-key
+           #:amqp-method-field-exchange
+           #:amqp-method-field-read
+           #:amqp-method-field-if-unused
+           #:amqp-method-field-cluster-id
+           #:amqp-method-field-response
+           #:amqp-method-field-reply-code
+           #:amqp-method-field-immediate
            #:amqp-basic-class-properties ;; TODO: are you sure about amqp- prefix?
                                          ;; it prefixed with package name already
            #:method-decode
