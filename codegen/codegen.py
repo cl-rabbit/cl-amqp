@@ -16,8 +16,34 @@ except ImportError:
     sys.exit(1)
 
 class AmqpSpecObject(AmqpSpec):
+
+    IGNORED_CLASSES = ["access"]
+    IGNORED_FIELDS = {
+        'ticket': 0,
+        'capabilities': '',
+        'insist' : 0,
+        'out-of-band': '',
+        'known-hosts': '',
+    }
+
     def __init__(self, path):
         AmqpSpec.__init__(self, path)
+        def extend_field(field):
+            field.ruby_name = re.sub("[- ]", "_", field.name)
+            field.type = self.resolveDomain(field.domain)
+            field.ignored = bool(field.name in self.__class__.IGNORED_FIELDS) # I. e. deprecated
+
+        for klass in self.classes:
+            klass.ignored = bool(klass.name in self.__class__.IGNORED_CLASSES)
+
+            for field in klass.fields:
+                extend_field(field)
+
+            for method in klass.methods:
+                for field in method.arguments:
+                    extend_field(field)
+
+        # self.classes = filter(lambda klass: not klass.ignored, self.classes)
 
     def render_template(self, path):
         file = open(path)
@@ -41,6 +67,13 @@ class AmqpSpecObject(AmqpSpec):
     def generate_package_file(self):
         self.render_template_to_file("codegen/templates/package.lisp.pytemplate", "src/package.lisp")
 
+def findMethodByName(self, name):
+    for method in self.methods:
+        if method.name == name:
+            return method
+
+AmqpClass.findMethodByName = findMethodByName
+
 def method_signature(self):
     return '#x{0:0>8x}'.format(self.klass.index << 16 | self.index)
 
@@ -51,47 +84,75 @@ def method_lisp_class_name(self):
 
 AmqpMethod.method_lisp_class_name = method_lisp_class_name
 
+def method_interface_fun_name(self):
+    if self.klass.name == 'basic':
+        return self.name
+    else:
+        return '%s.%s' % (self.klass.name, self.name)
+
+AmqpMethod.method_interface_fun_name = method_interface_fun_name
+
 SYNC_REQ_RESP = {
-    "connection.start": "amqp-method-connection-start-ok",
-    "connection.secure": "amqp-method-connection-secure-ok",
-    "connection.tune": "amqp-method-connection-tune-ok",
-    "connection.open": "amqp-method-connection-open-ok",
-    "connection.close": "amqp-method-connection-close-ok",
+    "connection.start": "start-ok",
+    "connection.secure": "secure-ok",
+    "connection.tune": "tune-ok",
+    "connection.open": "open-ok",
+    "connection.close": "close-ok",
 
-    "channel.open": "amqp-method-channel-open-ok",
-    "channel.flow": "amqp-method-channel-flow-ok",
-    "channel.close": "amqp-method-channel-close-ok",
+    "channel.open": "open-ok",
+    "channel.flow": "flow-ok",
+    "channel.close": "close-ok",
 
-    "access.request": "amqp-method-access-request-ok",
+    "access.request": "request-ok",
 
-    "exchange.declare": "amqp-method-exchange-declare-ok",
-    "exchange.delete": "amqp-method-exchange-delete-ok",
-    "exchange.bind": "amqp-method-exchange-bind-ok",
-    "exchange.unbind": "amqp-method-exchange-unbind-ok",
+    "exchange.declare": "declare-ok",
+    "exchange.delete": "delete-ok",
+    "exchange.bind": "bind-ok",
+    "exchange.unbind": "unbind-ok",
 
-    "queue.declare": "amqp-method-queue-declare-ok",
-    "queue.purge": "amqp-method-queue-purge-ok",
-    "queue.delete": "amqp-method-queue-delete-ok",
-    "queue.bind": "amqp-method-queue-bind-ok",
-    "queue.unbind": "amqp-method-queue-unbind-ok",
+    "queue.declare": "declare-ok",
+    "queue.purge": "purge-ok",
+    "queue.delete": "delete-ok",
+    "queue.bind": "bind-ok",
+    "queue.unbind": "unbind-ok",
 
-    "basic.qos": "amqp-method-basic-qos-ok",
-    "basic.consume": "amqp-method-basic-consume-ok",
-    "basic.cancel": "amqp-method-basic-cancel-ok",
-    "basic.get": "amqp-method-basic-get-ok",
-    "basic.recover": "amqp-method-basic-recover-ok",
+    "basic.qos": "qos-ok",
+    "basic.consume": "consume-ok",
+    "basic.cancel": "cancel-ok",
+    "basic.get": "get-ok",
+    "basic.recover": "recover-ok",
 
-    "tx.select": "amqp-method-tx-select-ok",
-    "tx.commit": "amqp-method-tx-commit-ok",
-    "tx.rollback": "amqp-method-tx-rollback-ok",
+    "tx.select": "select-ok",
+    "tx.commit": "commit-ok",
+    "tx.rollback": "rollback-ok",
 
-    "confirm.select": "amqp-method-confirm-select-ok"
+    "confirm.select": "select-ok"
 }
 
 def method_synchronous_reply_method(self):
-    return SYNC_REQ_RESP['{0}.{1}'.format(self.klass.name, self.name)]
+    klass = self.klass
+    return klass.findMethodByName(SYNC_REQ_RESP['{0}.{1}'.format(self.klass.name, self.name)])
 
 AmqpMethod.method_synchronous_reply_method = method_synchronous_reply_method
+
+def method_synchronous_reply_method_lisp_name(self):
+    return 'amqp-method-%s-%s' % (self.klass.name, SYNC_REQ_RESP['{0}.{1}'.format(self.klass.name, self.name)])
+
+AmqpMethod.method_synchronous_reply_method_lisp_name = method_synchronous_reply_method_lisp_name
+
+accepted_by_update = json.loads(file("codegen/amqp_0.9.1_changes.json").read())
+
+def accepted_by(self, *receivers):
+    def get_accepted_by(self):
+        try:
+            return accepted_by_update[self.klass.name][self.name]
+        except KeyError:
+            return ["server", "client"]
+
+    actual_receivers = get_accepted_by(self)
+    return all(map(lambda receiver: receiver in actual_receivers, receivers))
+
+AmqpMethod.accepted_by = accepted_by
 
 # helpers
 def to_cl_condition_class(klass):
@@ -99,7 +160,6 @@ def to_cl_condition_class(klass):
         return 'amqp-channel-error'
     else:
         return 'amqp-connection-error'
-
 
 if __name__ == "__main__":
     parser = OptionParser()
