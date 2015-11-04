@@ -17,8 +17,8 @@
   (${arg.name} :type amqp-${spec.resolveDomain(arg.domain)} :initarg :${arg.name}${helpers.genMethodArgInitform(arg)} :reader amqp-method-field-${arg.name})
   % endfor
   % if m.hasContent:
-  (content :initarg :content :reader method-content)
-  (content-properties :type amqp-${m.klass.name}-class-properties :initarg :content-properties :initform (make-instance 'amqp-${m.klass.name}-class-properties) :reader method-content-properties)
+  (content :initarg :content :reader amqp-method-content)
+  (content-properties :type amqp-${m.klass.name}-class-properties :initarg :content-properties :initform (make-instance 'amqp-${m.klass.name}-class-properties) :reader amqp-method-content-properties)
   % endif
 ))
 

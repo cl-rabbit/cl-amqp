@@ -94,6 +94,8 @@
            #:amqp-method-has-content-p
            #:amqp-method-class-id
            #:amqp-method-method-id
+           #:amqp-method-content
+           #:amqp-method-content-properties
            #:amqp-method-connection-start
            #:amqp-method-connection-start-ok
            #:amqp-method-connection-secure

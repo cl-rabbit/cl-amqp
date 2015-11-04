@@ -131,6 +131,13 @@ def genMethodArgInitform(field):
     else:
         return " :initform " + convert_value_to_cl(value)
 
+def methodFieldsReadersExportList(spec):
+    buffer = []
+    for m in spec.allMethods():
+        for arg in m.arguments:
+            buffer.append('#:amqp-method-field-%s' % arg.name)
+    return list(set(buffer))
+
 def genPropertiesClassFlags(spec, klass):
     buffer = []
     index = 0

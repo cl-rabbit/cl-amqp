@@ -59,6 +59,8 @@
            #:amqp-method-has-content-p
            #:amqp-method-class-id
            #:amqp-method-method-id
+           #:amqp-method-content
+           #:amqp-method-content-properties
            % for m in spec.allMethods():
            #:${m.method_lisp_class_name()}
            % endfor
