@@ -14,7 +14,7 @@
 (defclass ${m.method_lisp_class_name()} (amqp-method-base)
 (
   % for arg in m.arguments:
-  (${arg.name} :type amqp-${spec.resolveDomain(arg.domain)} :initarg :${arg.name}${helpers.genMethodArgInitform(arg)})
+  (${arg.name} :type amqp-${spec.resolveDomain(arg.domain)} :initarg :${arg.name}${helpers.genMethodArgInitform(arg)} :reader amqp-method-field-${arg.name})
   % endfor
   % if m.hasContent:
   (content :initarg :content :reader method-content)
@@ -52,20 +52,20 @@
   % endif
 )
 
-(defmethod synchronous-method-p ((method ${m.method_lisp_class_name()}))
+(defmethod amqp-method-synchronous-p ((method ${m.method_lisp_class_name()}))
 % if m.isSynchronous:
-  (values t '${m.method_synchronous_reply_method()}))
+  (values t '${m.method_synchronous_reply_method_lisp_name()}))
 % else:
   nil)
 % endif
 
-(defmethod method-has-content-p ((method ${m.method_lisp_class_name()}))
+(defmethod amqp-method-has-content-p ((method ${m.method_lisp_class_name()}))
   ${"t" if m.hasContent  else "nil"})
 
-(defmethod method-class-id ((method ${m.method_lisp_class_name()}))
+(defmethod amqp-method-class-id ((method ${m.method_lisp_class_name()}))
   ${m.klass.index})
 
-(defmethod method-method-id ((method ${m.method_lisp_class_name()}))
+(defmethod amqp-method-method-id ((method ${m.method_lisp_class_name()}))
   ${m.index})
 
 % endfor

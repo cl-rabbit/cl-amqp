@@ -12,11 +12,11 @@
 
 (defclass amqp-method-connection-start (amqp-method-base)
 (
-  (version-major :type amqp-octet :initarg :version-major :initform 0)
-  (version-minor :type amqp-octet :initarg :version-minor :initform 9)
-  (server-properties :type amqp-table :initarg :server-properties)
-  (mechanisms :type amqp-longstr :initarg :mechanisms :initform "PLAIN")
-  (locales :type amqp-longstr :initarg :locales :initform "en_US")
+  (version-major :type amqp-octet :initarg :version-major :initform 0 :reader amqp-method-field-version-major)
+  (version-minor :type amqp-octet :initarg :version-minor :initform 9 :reader amqp-method-field-version-minor)
+  (server-properties :type amqp-table :initarg :server-properties :reader amqp-method-field-server-properties)
+  (mechanisms :type amqp-longstr :initarg :mechanisms :initform "PLAIN" :reader amqp-method-field-mechanisms)
+  (locales :type amqp-longstr :initarg :locales :initform "en_US" :reader amqp-method-field-locales)
 ))
 
 (defun decode-amqp-method-connection-start (ibuffer)
@@ -44,24 +44,24 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-connection-start))
+(defmethod amqp-method-synchronous-p ((method amqp-method-connection-start))
   (values t 'amqp-method-connection-start-ok))
 
-(defmethod method-has-content-p ((method amqp-method-connection-start))
+(defmethod amqp-method-has-content-p ((method amqp-method-connection-start))
   nil)
 
-(defmethod method-class-id ((method amqp-method-connection-start))
+(defmethod amqp-method-class-id ((method amqp-method-connection-start))
   10)
 
-(defmethod method-method-id ((method amqp-method-connection-start))
+(defmethod amqp-method-method-id ((method amqp-method-connection-start))
   10)
 
 (defclass amqp-method-connection-start-ok (amqp-method-base)
 (
-  (client-properties :type amqp-table :initarg :client-properties)
-  (mechanism :type amqp-shortstr :initarg :mechanism :initform "PLAIN")
-  (response :type amqp-longstr :initarg :response)
-  (locale :type amqp-shortstr :initarg :locale :initform "en_US")
+  (client-properties :type amqp-table :initarg :client-properties :reader amqp-method-field-client-properties)
+  (mechanism :type amqp-shortstr :initarg :mechanism :initform "PLAIN" :reader amqp-method-field-mechanism)
+  (response :type amqp-longstr :initarg :response :reader amqp-method-field-response)
+  (locale :type amqp-shortstr :initarg :locale :initform "en_US" :reader amqp-method-field-locale)
 ))
 
 (defun decode-amqp-method-connection-start-ok (ibuffer)
@@ -87,21 +87,21 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-connection-start-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-connection-start-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-connection-start-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-connection-start-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-connection-start-ok))
+(defmethod amqp-method-class-id ((method amqp-method-connection-start-ok))
   10)
 
-(defmethod method-method-id ((method amqp-method-connection-start-ok))
+(defmethod amqp-method-method-id ((method amqp-method-connection-start-ok))
   11)
 
 (defclass amqp-method-connection-secure (amqp-method-base)
 (
-  (challenge :type amqp-longstr :initarg :challenge)
+  (challenge :type amqp-longstr :initarg :challenge :reader amqp-method-field-challenge)
 ))
 
 (defun decode-amqp-method-connection-secure (ibuffer)
@@ -121,21 +121,21 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-connection-secure))
+(defmethod amqp-method-synchronous-p ((method amqp-method-connection-secure))
   (values t 'amqp-method-connection-secure-ok))
 
-(defmethod method-has-content-p ((method amqp-method-connection-secure))
+(defmethod amqp-method-has-content-p ((method amqp-method-connection-secure))
   nil)
 
-(defmethod method-class-id ((method amqp-method-connection-secure))
+(defmethod amqp-method-class-id ((method amqp-method-connection-secure))
   10)
 
-(defmethod method-method-id ((method amqp-method-connection-secure))
+(defmethod amqp-method-method-id ((method amqp-method-connection-secure))
   20)
 
 (defclass amqp-method-connection-secure-ok (amqp-method-base)
 (
-  (response :type amqp-longstr :initarg :response)
+  (response :type amqp-longstr :initarg :response :reader amqp-method-field-response)
 ))
 
 (defun decode-amqp-method-connection-secure-ok (ibuffer)
@@ -155,23 +155,23 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-connection-secure-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-connection-secure-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-connection-secure-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-connection-secure-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-connection-secure-ok))
+(defmethod amqp-method-class-id ((method amqp-method-connection-secure-ok))
   10)
 
-(defmethod method-method-id ((method amqp-method-connection-secure-ok))
+(defmethod amqp-method-method-id ((method amqp-method-connection-secure-ok))
   21)
 
 (defclass amqp-method-connection-tune (amqp-method-base)
 (
-  (channel-max :type amqp-short :initarg :channel-max :initform 0)
-  (frame-max :type amqp-long :initarg :frame-max :initform 0)
-  (heartbeat :type amqp-short :initarg :heartbeat :initform 0)
+  (channel-max :type amqp-short :initarg :channel-max :initform 0 :reader amqp-method-field-channel-max)
+  (frame-max :type amqp-long :initarg :frame-max :initform 0 :reader amqp-method-field-frame-max)
+  (heartbeat :type amqp-short :initarg :heartbeat :initform 0 :reader amqp-method-field-heartbeat)
 ))
 
 (defun decode-amqp-method-connection-tune (ibuffer)
@@ -195,23 +195,23 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-connection-tune))
+(defmethod amqp-method-synchronous-p ((method amqp-method-connection-tune))
   (values t 'amqp-method-connection-tune-ok))
 
-(defmethod method-has-content-p ((method amqp-method-connection-tune))
+(defmethod amqp-method-has-content-p ((method amqp-method-connection-tune))
   nil)
 
-(defmethod method-class-id ((method amqp-method-connection-tune))
+(defmethod amqp-method-class-id ((method amqp-method-connection-tune))
   10)
 
-(defmethod method-method-id ((method amqp-method-connection-tune))
+(defmethod amqp-method-method-id ((method amqp-method-connection-tune))
   30)
 
 (defclass amqp-method-connection-tune-ok (amqp-method-base)
 (
-  (channel-max :type amqp-short :initarg :channel-max :initform 0)
-  (frame-max :type amqp-long :initarg :frame-max :initform 0)
-  (heartbeat :type amqp-short :initarg :heartbeat :initform 0)
+  (channel-max :type amqp-short :initarg :channel-max :initform 0 :reader amqp-method-field-channel-max)
+  (frame-max :type amqp-long :initarg :frame-max :initform 0 :reader amqp-method-field-frame-max)
+  (heartbeat :type amqp-short :initarg :heartbeat :initform 0 :reader amqp-method-field-heartbeat)
 ))
 
 (defun decode-amqp-method-connection-tune-ok (ibuffer)
@@ -235,23 +235,23 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-connection-tune-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-connection-tune-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-connection-tune-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-connection-tune-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-connection-tune-ok))
+(defmethod amqp-method-class-id ((method amqp-method-connection-tune-ok))
   10)
 
-(defmethod method-method-id ((method amqp-method-connection-tune-ok))
+(defmethod amqp-method-method-id ((method amqp-method-connection-tune-ok))
   31)
 
 (defclass amqp-method-connection-open (amqp-method-base)
 (
-  (virtual-host :type amqp-shortstr :initarg :virtual-host :initform "/")
-  (capabilities :type amqp-shortstr :initarg :capabilities :initform "")
-  (insist :type amqp-bit :initarg :insist :initform :false)
+  (virtual-host :type amqp-shortstr :initarg :virtual-host :initform "/" :reader amqp-method-field-virtual-host)
+  (capabilities :type amqp-shortstr :initarg :capabilities :initform "" :reader amqp-method-field-capabilities)
+  (insist :type amqp-bit :initarg :insist :initform nil :reader amqp-method-field-insist)
 ))
 
 (defun decode-amqp-method-connection-open (ibuffer)
@@ -274,26 +274,26 @@
       (amqp-shortstr-encoder obuffer (slot-value method 'virtual-host))
       (amqp-shortstr-encoder obuffer (slot-value method 'capabilities))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'insist)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'insist) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-connection-open))
+(defmethod amqp-method-synchronous-p ((method amqp-method-connection-open))
   (values t 'amqp-method-connection-open-ok))
 
-(defmethod method-has-content-p ((method amqp-method-connection-open))
+(defmethod amqp-method-has-content-p ((method amqp-method-connection-open))
   nil)
 
-(defmethod method-class-id ((method amqp-method-connection-open))
+(defmethod amqp-method-class-id ((method amqp-method-connection-open))
   10)
 
-(defmethod method-method-id ((method amqp-method-connection-open))
+(defmethod amqp-method-method-id ((method amqp-method-connection-open))
   40)
 
 (defclass amqp-method-connection-open-ok (amqp-method-base)
 (
-  (known-hosts :type amqp-shortstr :initarg :known-hosts :initform "")
+  (known-hosts :type amqp-shortstr :initarg :known-hosts :initform "" :reader amqp-method-field-known-hosts)
 ))
 
 (defun decode-amqp-method-connection-open-ok (ibuffer)
@@ -313,24 +313,24 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-connection-open-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-connection-open-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-connection-open-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-connection-open-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-connection-open-ok))
+(defmethod amqp-method-class-id ((method amqp-method-connection-open-ok))
   10)
 
-(defmethod method-method-id ((method amqp-method-connection-open-ok))
+(defmethod amqp-method-method-id ((method amqp-method-connection-open-ok))
   41)
 
 (defclass amqp-method-connection-close (amqp-method-base)
 (
-  (reply-code :type amqp-short :initarg :reply-code)
-  (reply-text :type amqp-shortstr :initarg :reply-text :initform "")
-  (class-id :type amqp-short :initarg :class-id)
-  (method-id :type amqp-short :initarg :method-id)
+  (reply-code :type amqp-short :initarg :reply-code :reader amqp-method-field-reply-code)
+  (reply-text :type amqp-shortstr :initarg :reply-text :initform "" :reader amqp-method-field-reply-text)
+  (class-id :type amqp-short :initarg :class-id :reader amqp-method-field-class-id)
+  (method-id :type amqp-short :initarg :method-id :reader amqp-method-field-method-id)
 ))
 
 (defun decode-amqp-method-connection-close (ibuffer)
@@ -356,16 +356,16 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-connection-close))
+(defmethod amqp-method-synchronous-p ((method amqp-method-connection-close))
   (values t 'amqp-method-connection-close-ok))
 
-(defmethod method-has-content-p ((method amqp-method-connection-close))
+(defmethod amqp-method-has-content-p ((method amqp-method-connection-close))
   nil)
 
-(defmethod method-class-id ((method amqp-method-connection-close))
+(defmethod amqp-method-class-id ((method amqp-method-connection-close))
   10)
 
-(defmethod method-method-id ((method amqp-method-connection-close))
+(defmethod amqp-method-method-id ((method amqp-method-connection-close))
   50)
 
 (defclass amqp-method-connection-close-ok (amqp-method-base)
@@ -381,21 +381,21 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-connection-close-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-connection-close-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-connection-close-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-connection-close-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-connection-close-ok))
+(defmethod amqp-method-class-id ((method amqp-method-connection-close-ok))
   10)
 
-(defmethod method-method-id ((method amqp-method-connection-close-ok))
+(defmethod amqp-method-method-id ((method amqp-method-connection-close-ok))
   51)
 
 (defclass amqp-method-connection-blocked (amqp-method-base)
 (
-  (reason :type amqp-shortstr :initarg :reason :initform "")
+  (reason :type amqp-shortstr :initarg :reason :initform "" :reader amqp-method-field-reason)
 ))
 
 (defun decode-amqp-method-connection-blocked (ibuffer)
@@ -415,16 +415,16 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-connection-blocked))
+(defmethod amqp-method-synchronous-p ((method amqp-method-connection-blocked))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-connection-blocked))
+(defmethod amqp-method-has-content-p ((method amqp-method-connection-blocked))
   nil)
 
-(defmethod method-class-id ((method amqp-method-connection-blocked))
+(defmethod amqp-method-class-id ((method amqp-method-connection-blocked))
   10)
 
-(defmethod method-method-id ((method amqp-method-connection-blocked))
+(defmethod amqp-method-method-id ((method amqp-method-connection-blocked))
   60)
 
 (defclass amqp-method-connection-unblocked (amqp-method-base)
@@ -440,21 +440,21 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-connection-unblocked))
+(defmethod amqp-method-synchronous-p ((method amqp-method-connection-unblocked))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-connection-unblocked))
+(defmethod amqp-method-has-content-p ((method amqp-method-connection-unblocked))
   nil)
 
-(defmethod method-class-id ((method amqp-method-connection-unblocked))
+(defmethod amqp-method-class-id ((method amqp-method-connection-unblocked))
   10)
 
-(defmethod method-method-id ((method amqp-method-connection-unblocked))
+(defmethod amqp-method-method-id ((method amqp-method-connection-unblocked))
   61)
 
 (defclass amqp-method-channel-open (amqp-method-base)
 (
-  (out-of-band :type amqp-shortstr :initarg :out-of-band :initform "")
+  (out-of-band :type amqp-shortstr :initarg :out-of-band :initform "" :reader amqp-method-field-out-of-band)
 ))
 
 (defun decode-amqp-method-channel-open (ibuffer)
@@ -474,21 +474,21 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-channel-open))
+(defmethod amqp-method-synchronous-p ((method amqp-method-channel-open))
   (values t 'amqp-method-channel-open-ok))
 
-(defmethod method-has-content-p ((method amqp-method-channel-open))
+(defmethod amqp-method-has-content-p ((method amqp-method-channel-open))
   nil)
 
-(defmethod method-class-id ((method amqp-method-channel-open))
+(defmethod amqp-method-class-id ((method amqp-method-channel-open))
   20)
 
-(defmethod method-method-id ((method amqp-method-channel-open))
+(defmethod amqp-method-method-id ((method amqp-method-channel-open))
   10)
 
 (defclass amqp-method-channel-open-ok (amqp-method-base)
 (
-  (channel-id :type amqp-longstr :initarg :channel-id :initform "")
+  (channel-id :type amqp-longstr :initarg :channel-id :initform "" :reader amqp-method-field-channel-id)
 ))
 
 (defun decode-amqp-method-channel-open-ok (ibuffer)
@@ -508,21 +508,21 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-channel-open-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-channel-open-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-channel-open-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-channel-open-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-channel-open-ok))
+(defmethod amqp-method-class-id ((method amqp-method-channel-open-ok))
   20)
 
-(defmethod method-method-id ((method amqp-method-channel-open-ok))
+(defmethod amqp-method-method-id ((method amqp-method-channel-open-ok))
   11)
 
 (defclass amqp-method-channel-flow (amqp-method-base)
 (
-  (active :type amqp-bit :initarg :active)
+  (active :type amqp-bit :initarg :active :reader amqp-method-field-active)
 ))
 
 (defun decode-amqp-method-channel-flow (ibuffer)
@@ -541,26 +541,26 @@
     (declare (type (unsigned-byte 8) bit-buffer)
              (ignorable bit-buffer))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'active)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'active) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-channel-flow))
+(defmethod amqp-method-synchronous-p ((method amqp-method-channel-flow))
   (values t 'amqp-method-channel-flow-ok))
 
-(defmethod method-has-content-p ((method amqp-method-channel-flow))
+(defmethod amqp-method-has-content-p ((method amqp-method-channel-flow))
   nil)
 
-(defmethod method-class-id ((method amqp-method-channel-flow))
+(defmethod amqp-method-class-id ((method amqp-method-channel-flow))
   20)
 
-(defmethod method-method-id ((method amqp-method-channel-flow))
+(defmethod amqp-method-method-id ((method amqp-method-channel-flow))
   20)
 
 (defclass amqp-method-channel-flow-ok (amqp-method-base)
 (
-  (active :type amqp-bit :initarg :active)
+  (active :type amqp-bit :initarg :active :reader amqp-method-field-active)
 ))
 
 (defun decode-amqp-method-channel-flow-ok (ibuffer)
@@ -579,29 +579,29 @@
     (declare (type (unsigned-byte 8) bit-buffer)
              (ignorable bit-buffer))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'active)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'active) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-channel-flow-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-channel-flow-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-channel-flow-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-channel-flow-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-channel-flow-ok))
+(defmethod amqp-method-class-id ((method amqp-method-channel-flow-ok))
   20)
 
-(defmethod method-method-id ((method amqp-method-channel-flow-ok))
+(defmethod amqp-method-method-id ((method amqp-method-channel-flow-ok))
   21)
 
 (defclass amqp-method-channel-close (amqp-method-base)
 (
-  (reply-code :type amqp-short :initarg :reply-code)
-  (reply-text :type amqp-shortstr :initarg :reply-text :initform "")
-  (class-id :type amqp-short :initarg :class-id)
-  (method-id :type amqp-short :initarg :method-id)
+  (reply-code :type amqp-short :initarg :reply-code :reader amqp-method-field-reply-code)
+  (reply-text :type amqp-shortstr :initarg :reply-text :initform "" :reader amqp-method-field-reply-text)
+  (class-id :type amqp-short :initarg :class-id :reader amqp-method-field-class-id)
+  (method-id :type amqp-short :initarg :method-id :reader amqp-method-field-method-id)
 ))
 
 (defun decode-amqp-method-channel-close (ibuffer)
@@ -627,16 +627,16 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-channel-close))
+(defmethod amqp-method-synchronous-p ((method amqp-method-channel-close))
   (values t 'amqp-method-channel-close-ok))
 
-(defmethod method-has-content-p ((method amqp-method-channel-close))
+(defmethod amqp-method-has-content-p ((method amqp-method-channel-close))
   nil)
 
-(defmethod method-class-id ((method amqp-method-channel-close))
+(defmethod amqp-method-class-id ((method amqp-method-channel-close))
   20)
 
-(defmethod method-method-id ((method amqp-method-channel-close))
+(defmethod amqp-method-method-id ((method amqp-method-channel-close))
   40)
 
 (defclass amqp-method-channel-close-ok (amqp-method-base)
@@ -652,26 +652,26 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-channel-close-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-channel-close-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-channel-close-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-channel-close-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-channel-close-ok))
+(defmethod amqp-method-class-id ((method amqp-method-channel-close-ok))
   20)
 
-(defmethod method-method-id ((method amqp-method-channel-close-ok))
+(defmethod amqp-method-method-id ((method amqp-method-channel-close-ok))
   41)
 
 (defclass amqp-method-access-request (amqp-method-base)
 (
-  (realm :type amqp-shortstr :initarg :realm :initform "/data")
-  (exclusive :type amqp-bit :initarg :exclusive :initform :false)
-  (passive :type amqp-bit :initarg :passive :initform t)
-  (active :type amqp-bit :initarg :active :initform t)
-  (write :type amqp-bit :initarg :write :initform t)
-  (read :type amqp-bit :initarg :read :initform t)
+  (realm :type amqp-shortstr :initarg :realm :initform "/data" :reader amqp-method-field-realm)
+  (exclusive :type amqp-bit :initarg :exclusive :initform nil :reader amqp-method-field-exclusive)
+  (passive :type amqp-bit :initarg :passive :initform t :reader amqp-method-field-passive)
+  (active :type amqp-bit :initarg :active :initform t :reader amqp-method-field-active)
+  (write :type amqp-bit :initarg :write :initform t :reader amqp-method-field-write)
+  (read :type amqp-bit :initarg :read :initform t :reader amqp-method-field-read)
 ))
 
 (defun decode-amqp-method-access-request (ibuffer)
@@ -696,30 +696,30 @@
              (ignorable bit-buffer))
       (amqp-shortstr-encoder obuffer (slot-value method 'realm))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'exclusive)) (setf (ldb (byte 8 0) bit-buffer) 1))
-      (when (eq t (slot-value method 'passive)) (setf (ldb (byte 8 1) bit-buffer) 1))
-      (when (eq t (slot-value method 'active)) (setf (ldb (byte 8 2) bit-buffer) 1))
-      (when (eq t (slot-value method 'write)) (setf (ldb (byte 8 3) bit-buffer) 1))
-      (when (eq t (slot-value method 'read)) (setf (ldb (byte 8 4) bit-buffer) 1))
+      (when (slot-value method 'exclusive) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'passive) (setf (ldb (byte 8 1) bit-buffer) 1))
+      (when (slot-value method 'active) (setf (ldb (byte 8 2) bit-buffer) 1))
+      (when (slot-value method 'write) (setf (ldb (byte 8 3) bit-buffer) 1))
+      (when (slot-value method 'read) (setf (ldb (byte 8 4) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-access-request))
+(defmethod amqp-method-synchronous-p ((method amqp-method-access-request))
   (values t 'amqp-method-access-request-ok))
 
-(defmethod method-has-content-p ((method amqp-method-access-request))
+(defmethod amqp-method-has-content-p ((method amqp-method-access-request))
   nil)
 
-(defmethod method-class-id ((method amqp-method-access-request))
+(defmethod amqp-method-class-id ((method amqp-method-access-request))
   30)
 
-(defmethod method-method-id ((method amqp-method-access-request))
+(defmethod amqp-method-method-id ((method amqp-method-access-request))
   10)
 
 (defclass amqp-method-access-request-ok (amqp-method-base)
 (
-  (ticket :type amqp-short :initarg :ticket :initform 1)
+  (ticket :type amqp-short :initarg :ticket :initform 1 :reader amqp-method-field-ticket)
 ))
 
 (defun decode-amqp-method-access-request-ok (ibuffer)
@@ -739,29 +739,29 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-access-request-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-access-request-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-access-request-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-access-request-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-access-request-ok))
+(defmethod amqp-method-class-id ((method amqp-method-access-request-ok))
   30)
 
-(defmethod method-method-id ((method amqp-method-access-request-ok))
+(defmethod amqp-method-method-id ((method amqp-method-access-request-ok))
   11)
 
 (defclass amqp-method-exchange-declare (amqp-method-base)
 (
-  (ticket :type amqp-short :initarg :ticket :initform 0)
-  (exchange :type amqp-shortstr :initarg :exchange)
-  (type :type amqp-shortstr :initarg :type :initform "direct")
-  (passive :type amqp-bit :initarg :passive :initform :false)
-  (durable :type amqp-bit :initarg :durable :initform :false)
-  (auto-delete :type amqp-bit :initarg :auto-delete :initform :false)
-  (internal :type amqp-bit :initarg :internal :initform :false)
-  (nowait :type amqp-bit :initarg :nowait :initform :false)
-  (arguments :type amqp-table :initarg :arguments :initform nil)
+  (ticket :type amqp-short :initarg :ticket :initform 0 :reader amqp-method-field-ticket)
+  (exchange :type amqp-shortstr :initarg :exchange :reader amqp-method-field-exchange)
+  (type :type amqp-shortstr :initarg :type :initform "direct" :reader amqp-method-field-type)
+  (passive :type amqp-bit :initarg :passive :initform nil :reader amqp-method-field-passive)
+  (durable :type amqp-bit :initarg :durable :initform nil :reader amqp-method-field-durable)
+  (auto-delete :type amqp-bit :initarg :auto-delete :initform nil :reader amqp-method-field-auto-delete)
+  (internal :type amqp-bit :initarg :internal :initform nil :reader amqp-method-field-internal)
+  (nowait :type amqp-bit :initarg :nowait :initform nil :reader amqp-method-field-nowait)
+  (arguments :type amqp-table :initarg :arguments :initform nil :reader amqp-method-field-arguments)
 ))
 
 (defun decode-amqp-method-exchange-declare (ibuffer)
@@ -791,26 +791,26 @@
       (amqp-shortstr-encoder obuffer (slot-value method 'exchange))
       (amqp-shortstr-encoder obuffer (slot-value method 'type))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'passive)) (setf (ldb (byte 8 0) bit-buffer) 1))
-      (when (eq t (slot-value method 'durable)) (setf (ldb (byte 8 1) bit-buffer) 1))
-      (when (eq t (slot-value method 'auto-delete)) (setf (ldb (byte 8 2) bit-buffer) 1))
-      (when (eq t (slot-value method 'internal)) (setf (ldb (byte 8 3) bit-buffer) 1))
-      (when (eq t (slot-value method 'nowait)) (setf (ldb (byte 8 4) bit-buffer) 1))
+      (when (slot-value method 'passive) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'durable) (setf (ldb (byte 8 1) bit-buffer) 1))
+      (when (slot-value method 'auto-delete) (setf (ldb (byte 8 2) bit-buffer) 1))
+      (when (slot-value method 'internal) (setf (ldb (byte 8 3) bit-buffer) 1))
+      (when (slot-value method 'nowait) (setf (ldb (byte 8 4) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
       (amqp-table-encoder obuffer (slot-value method 'arguments))
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-exchange-declare))
+(defmethod amqp-method-synchronous-p ((method amqp-method-exchange-declare))
   (values t 'amqp-method-exchange-declare-ok))
 
-(defmethod method-has-content-p ((method amqp-method-exchange-declare))
+(defmethod amqp-method-has-content-p ((method amqp-method-exchange-declare))
   nil)
 
-(defmethod method-class-id ((method amqp-method-exchange-declare))
+(defmethod amqp-method-class-id ((method amqp-method-exchange-declare))
   40)
 
-(defmethod method-method-id ((method amqp-method-exchange-declare))
+(defmethod amqp-method-method-id ((method amqp-method-exchange-declare))
   10)
 
 (defclass amqp-method-exchange-declare-ok (amqp-method-base)
@@ -826,24 +826,24 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-exchange-declare-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-exchange-declare-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-exchange-declare-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-exchange-declare-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-exchange-declare-ok))
+(defmethod amqp-method-class-id ((method amqp-method-exchange-declare-ok))
   40)
 
-(defmethod method-method-id ((method amqp-method-exchange-declare-ok))
+(defmethod amqp-method-method-id ((method amqp-method-exchange-declare-ok))
   11)
 
 (defclass amqp-method-exchange-delete (amqp-method-base)
 (
-  (ticket :type amqp-short :initarg :ticket :initform 0)
-  (exchange :type amqp-shortstr :initarg :exchange)
-  (if-unused :type amqp-bit :initarg :if-unused :initform :false)
-  (nowait :type amqp-bit :initarg :nowait :initform :false)
+  (ticket :type amqp-short :initarg :ticket :initform 0 :reader amqp-method-field-ticket)
+  (exchange :type amqp-shortstr :initarg :exchange :reader amqp-method-field-exchange)
+  (if-unused :type amqp-bit :initarg :if-unused :initform nil :reader amqp-method-field-if-unused)
+  (nowait :type amqp-bit :initarg :nowait :initform nil :reader amqp-method-field-nowait)
 ))
 
 (defun decode-amqp-method-exchange-delete (ibuffer)
@@ -867,22 +867,22 @@
       (amqp-short-encoder obuffer (slot-value method 'ticket))
       (amqp-shortstr-encoder obuffer (slot-value method 'exchange))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'if-unused)) (setf (ldb (byte 8 0) bit-buffer) 1))
-      (when (eq t (slot-value method 'nowait)) (setf (ldb (byte 8 1) bit-buffer) 1))
+      (when (slot-value method 'if-unused) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'nowait) (setf (ldb (byte 8 1) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-exchange-delete))
+(defmethod amqp-method-synchronous-p ((method amqp-method-exchange-delete))
   (values t 'amqp-method-exchange-delete-ok))
 
-(defmethod method-has-content-p ((method amqp-method-exchange-delete))
+(defmethod amqp-method-has-content-p ((method amqp-method-exchange-delete))
   nil)
 
-(defmethod method-class-id ((method amqp-method-exchange-delete))
+(defmethod amqp-method-class-id ((method amqp-method-exchange-delete))
   40)
 
-(defmethod method-method-id ((method amqp-method-exchange-delete))
+(defmethod amqp-method-method-id ((method amqp-method-exchange-delete))
   20)
 
 (defclass amqp-method-exchange-delete-ok (amqp-method-base)
@@ -898,26 +898,26 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-exchange-delete-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-exchange-delete-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-exchange-delete-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-exchange-delete-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-exchange-delete-ok))
+(defmethod amqp-method-class-id ((method amqp-method-exchange-delete-ok))
   40)
 
-(defmethod method-method-id ((method amqp-method-exchange-delete-ok))
+(defmethod amqp-method-method-id ((method amqp-method-exchange-delete-ok))
   21)
 
 (defclass amqp-method-exchange-bind (amqp-method-base)
 (
-  (ticket :type amqp-short :initarg :ticket :initform 0)
-  (destination :type amqp-shortstr :initarg :destination)
-  (source :type amqp-shortstr :initarg :source)
-  (routing-key :type amqp-shortstr :initarg :routing-key :initform "")
-  (nowait :type amqp-bit :initarg :nowait :initform :false)
-  (arguments :type amqp-table :initarg :arguments :initform nil)
+  (ticket :type amqp-short :initarg :ticket :initform 0 :reader amqp-method-field-ticket)
+  (destination :type amqp-shortstr :initarg :destination :reader amqp-method-field-destination)
+  (source :type amqp-shortstr :initarg :source :reader amqp-method-field-source)
+  (routing-key :type amqp-shortstr :initarg :routing-key :initform "" :reader amqp-method-field-routing-key)
+  (nowait :type amqp-bit :initarg :nowait :initform nil :reader amqp-method-field-nowait)
+  (arguments :type amqp-table :initarg :arguments :initform nil :reader amqp-method-field-arguments)
 ))
 
 (defun decode-amqp-method-exchange-bind (ibuffer)
@@ -945,22 +945,22 @@
       (amqp-shortstr-encoder obuffer (slot-value method 'source))
       (amqp-shortstr-encoder obuffer (slot-value method 'routing-key))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'nowait)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'nowait) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
       (amqp-table-encoder obuffer (slot-value method 'arguments))
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-exchange-bind))
+(defmethod amqp-method-synchronous-p ((method amqp-method-exchange-bind))
   (values t 'amqp-method-exchange-bind-ok))
 
-(defmethod method-has-content-p ((method amqp-method-exchange-bind))
+(defmethod amqp-method-has-content-p ((method amqp-method-exchange-bind))
   nil)
 
-(defmethod method-class-id ((method amqp-method-exchange-bind))
+(defmethod amqp-method-class-id ((method amqp-method-exchange-bind))
   40)
 
-(defmethod method-method-id ((method amqp-method-exchange-bind))
+(defmethod amqp-method-method-id ((method amqp-method-exchange-bind))
   30)
 
 (defclass amqp-method-exchange-bind-ok (amqp-method-base)
@@ -976,26 +976,26 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-exchange-bind-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-exchange-bind-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-exchange-bind-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-exchange-bind-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-exchange-bind-ok))
+(defmethod amqp-method-class-id ((method amqp-method-exchange-bind-ok))
   40)
 
-(defmethod method-method-id ((method amqp-method-exchange-bind-ok))
+(defmethod amqp-method-method-id ((method amqp-method-exchange-bind-ok))
   31)
 
 (defclass amqp-method-exchange-unbind (amqp-method-base)
 (
-  (ticket :type amqp-short :initarg :ticket :initform 0)
-  (destination :type amqp-shortstr :initarg :destination)
-  (source :type amqp-shortstr :initarg :source)
-  (routing-key :type amqp-shortstr :initarg :routing-key :initform "")
-  (nowait :type amqp-bit :initarg :nowait :initform :false)
-  (arguments :type amqp-table :initarg :arguments :initform nil)
+  (ticket :type amqp-short :initarg :ticket :initform 0 :reader amqp-method-field-ticket)
+  (destination :type amqp-shortstr :initarg :destination :reader amqp-method-field-destination)
+  (source :type amqp-shortstr :initarg :source :reader amqp-method-field-source)
+  (routing-key :type amqp-shortstr :initarg :routing-key :initform "" :reader amqp-method-field-routing-key)
+  (nowait :type amqp-bit :initarg :nowait :initform nil :reader amqp-method-field-nowait)
+  (arguments :type amqp-table :initarg :arguments :initform nil :reader amqp-method-field-arguments)
 ))
 
 (defun decode-amqp-method-exchange-unbind (ibuffer)
@@ -1023,22 +1023,22 @@
       (amqp-shortstr-encoder obuffer (slot-value method 'source))
       (amqp-shortstr-encoder obuffer (slot-value method 'routing-key))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'nowait)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'nowait) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
       (amqp-table-encoder obuffer (slot-value method 'arguments))
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-exchange-unbind))
+(defmethod amqp-method-synchronous-p ((method amqp-method-exchange-unbind))
   (values t 'amqp-method-exchange-unbind-ok))
 
-(defmethod method-has-content-p ((method amqp-method-exchange-unbind))
+(defmethod amqp-method-has-content-p ((method amqp-method-exchange-unbind))
   nil)
 
-(defmethod method-class-id ((method amqp-method-exchange-unbind))
+(defmethod amqp-method-class-id ((method amqp-method-exchange-unbind))
   40)
 
-(defmethod method-method-id ((method amqp-method-exchange-unbind))
+(defmethod amqp-method-method-id ((method amqp-method-exchange-unbind))
   40)
 
 (defclass amqp-method-exchange-unbind-ok (amqp-method-base)
@@ -1054,28 +1054,28 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-exchange-unbind-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-exchange-unbind-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-exchange-unbind-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-exchange-unbind-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-exchange-unbind-ok))
+(defmethod amqp-method-class-id ((method amqp-method-exchange-unbind-ok))
   40)
 
-(defmethod method-method-id ((method amqp-method-exchange-unbind-ok))
+(defmethod amqp-method-method-id ((method amqp-method-exchange-unbind-ok))
   51)
 
 (defclass amqp-method-queue-declare (amqp-method-base)
 (
-  (ticket :type amqp-short :initarg :ticket :initform 0)
-  (queue :type amqp-shortstr :initarg :queue :initform "")
-  (passive :type amqp-bit :initarg :passive :initform :false)
-  (durable :type amqp-bit :initarg :durable :initform :false)
-  (exclusive :type amqp-bit :initarg :exclusive :initform :false)
-  (auto-delete :type amqp-bit :initarg :auto-delete :initform :false)
-  (nowait :type amqp-bit :initarg :nowait :initform :false)
-  (arguments :type amqp-table :initarg :arguments :initform nil)
+  (ticket :type amqp-short :initarg :ticket :initform 0 :reader amqp-method-field-ticket)
+  (queue :type amqp-shortstr :initarg :queue :initform "" :reader amqp-method-field-queue)
+  (passive :type amqp-bit :initarg :passive :initform nil :reader amqp-method-field-passive)
+  (durable :type amqp-bit :initarg :durable :initform nil :reader amqp-method-field-durable)
+  (exclusive :type amqp-bit :initarg :exclusive :initform nil :reader amqp-method-field-exclusive)
+  (auto-delete :type amqp-bit :initarg :auto-delete :initform nil :reader amqp-method-field-auto-delete)
+  (nowait :type amqp-bit :initarg :nowait :initform nil :reader amqp-method-field-nowait)
+  (arguments :type amqp-table :initarg :arguments :initform nil :reader amqp-method-field-arguments)
 ))
 
 (defun decode-amqp-method-queue-declare (ibuffer)
@@ -1103,33 +1103,33 @@
       (amqp-short-encoder obuffer (slot-value method 'ticket))
       (amqp-shortstr-encoder obuffer (slot-value method 'queue))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'passive)) (setf (ldb (byte 8 0) bit-buffer) 1))
-      (when (eq t (slot-value method 'durable)) (setf (ldb (byte 8 1) bit-buffer) 1))
-      (when (eq t (slot-value method 'exclusive)) (setf (ldb (byte 8 2) bit-buffer) 1))
-      (when (eq t (slot-value method 'auto-delete)) (setf (ldb (byte 8 3) bit-buffer) 1))
-      (when (eq t (slot-value method 'nowait)) (setf (ldb (byte 8 4) bit-buffer) 1))
+      (when (slot-value method 'passive) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'durable) (setf (ldb (byte 8 1) bit-buffer) 1))
+      (when (slot-value method 'exclusive) (setf (ldb (byte 8 2) bit-buffer) 1))
+      (when (slot-value method 'auto-delete) (setf (ldb (byte 8 3) bit-buffer) 1))
+      (when (slot-value method 'nowait) (setf (ldb (byte 8 4) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
       (amqp-table-encoder obuffer (slot-value method 'arguments))
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-queue-declare))
+(defmethod amqp-method-synchronous-p ((method amqp-method-queue-declare))
   (values t 'amqp-method-queue-declare-ok))
 
-(defmethod method-has-content-p ((method amqp-method-queue-declare))
+(defmethod amqp-method-has-content-p ((method amqp-method-queue-declare))
   nil)
 
-(defmethod method-class-id ((method amqp-method-queue-declare))
+(defmethod amqp-method-class-id ((method amqp-method-queue-declare))
   50)
 
-(defmethod method-method-id ((method amqp-method-queue-declare))
+(defmethod amqp-method-method-id ((method amqp-method-queue-declare))
   10)
 
 (defclass amqp-method-queue-declare-ok (amqp-method-base)
 (
-  (queue :type amqp-shortstr :initarg :queue)
-  (message-count :type amqp-long :initarg :message-count)
-  (consumer-count :type amqp-long :initarg :consumer-count)
+  (queue :type amqp-shortstr :initarg :queue :reader amqp-method-field-queue)
+  (message-count :type amqp-long :initarg :message-count :reader amqp-method-field-message-count)
+  (consumer-count :type amqp-long :initarg :consumer-count :reader amqp-method-field-consumer-count)
 ))
 
 (defun decode-amqp-method-queue-declare-ok (ibuffer)
@@ -1153,26 +1153,26 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-queue-declare-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-queue-declare-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-queue-declare-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-queue-declare-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-queue-declare-ok))
+(defmethod amqp-method-class-id ((method amqp-method-queue-declare-ok))
   50)
 
-(defmethod method-method-id ((method amqp-method-queue-declare-ok))
+(defmethod amqp-method-method-id ((method amqp-method-queue-declare-ok))
   11)
 
 (defclass amqp-method-queue-bind (amqp-method-base)
 (
-  (ticket :type amqp-short :initarg :ticket :initform 0)
-  (queue :type amqp-shortstr :initarg :queue :initform "")
-  (exchange :type amqp-shortstr :initarg :exchange)
-  (routing-key :type amqp-shortstr :initarg :routing-key :initform "")
-  (nowait :type amqp-bit :initarg :nowait :initform :false)
-  (arguments :type amqp-table :initarg :arguments :initform nil)
+  (ticket :type amqp-short :initarg :ticket :initform 0 :reader amqp-method-field-ticket)
+  (queue :type amqp-shortstr :initarg :queue :initform "" :reader amqp-method-field-queue)
+  (exchange :type amqp-shortstr :initarg :exchange :reader amqp-method-field-exchange)
+  (routing-key :type amqp-shortstr :initarg :routing-key :initform "" :reader amqp-method-field-routing-key)
+  (nowait :type amqp-bit :initarg :nowait :initform nil :reader amqp-method-field-nowait)
+  (arguments :type amqp-table :initarg :arguments :initform nil :reader amqp-method-field-arguments)
 ))
 
 (defun decode-amqp-method-queue-bind (ibuffer)
@@ -1200,22 +1200,22 @@
       (amqp-shortstr-encoder obuffer (slot-value method 'exchange))
       (amqp-shortstr-encoder obuffer (slot-value method 'routing-key))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'nowait)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'nowait) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
       (amqp-table-encoder obuffer (slot-value method 'arguments))
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-queue-bind))
+(defmethod amqp-method-synchronous-p ((method amqp-method-queue-bind))
   (values t 'amqp-method-queue-bind-ok))
 
-(defmethod method-has-content-p ((method amqp-method-queue-bind))
+(defmethod amqp-method-has-content-p ((method amqp-method-queue-bind))
   nil)
 
-(defmethod method-class-id ((method amqp-method-queue-bind))
+(defmethod amqp-method-class-id ((method amqp-method-queue-bind))
   50)
 
-(defmethod method-method-id ((method amqp-method-queue-bind))
+(defmethod amqp-method-method-id ((method amqp-method-queue-bind))
   20)
 
 (defclass amqp-method-queue-bind-ok (amqp-method-base)
@@ -1231,23 +1231,23 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-queue-bind-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-queue-bind-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-queue-bind-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-queue-bind-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-queue-bind-ok))
+(defmethod amqp-method-class-id ((method amqp-method-queue-bind-ok))
   50)
 
-(defmethod method-method-id ((method amqp-method-queue-bind-ok))
+(defmethod amqp-method-method-id ((method amqp-method-queue-bind-ok))
   21)
 
 (defclass amqp-method-queue-purge (amqp-method-base)
 (
-  (ticket :type amqp-short :initarg :ticket :initform 0)
-  (queue :type amqp-shortstr :initarg :queue :initform "")
-  (nowait :type amqp-bit :initarg :nowait :initform :false)
+  (ticket :type amqp-short :initarg :ticket :initform 0 :reader amqp-method-field-ticket)
+  (queue :type amqp-shortstr :initarg :queue :initform "" :reader amqp-method-field-queue)
+  (nowait :type amqp-bit :initarg :nowait :initform nil :reader amqp-method-field-nowait)
 ))
 
 (defun decode-amqp-method-queue-purge (ibuffer)
@@ -1270,26 +1270,26 @@
       (amqp-short-encoder obuffer (slot-value method 'ticket))
       (amqp-shortstr-encoder obuffer (slot-value method 'queue))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'nowait)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'nowait) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-queue-purge))
+(defmethod amqp-method-synchronous-p ((method amqp-method-queue-purge))
   (values t 'amqp-method-queue-purge-ok))
 
-(defmethod method-has-content-p ((method amqp-method-queue-purge))
+(defmethod amqp-method-has-content-p ((method amqp-method-queue-purge))
   nil)
 
-(defmethod method-class-id ((method amqp-method-queue-purge))
+(defmethod amqp-method-class-id ((method amqp-method-queue-purge))
   50)
 
-(defmethod method-method-id ((method amqp-method-queue-purge))
+(defmethod amqp-method-method-id ((method amqp-method-queue-purge))
   30)
 
 (defclass amqp-method-queue-purge-ok (amqp-method-base)
 (
-  (message-count :type amqp-long :initarg :message-count)
+  (message-count :type amqp-long :initarg :message-count :reader amqp-method-field-message-count)
 ))
 
 (defun decode-amqp-method-queue-purge-ok (ibuffer)
@@ -1309,25 +1309,25 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-queue-purge-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-queue-purge-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-queue-purge-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-queue-purge-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-queue-purge-ok))
+(defmethod amqp-method-class-id ((method amqp-method-queue-purge-ok))
   50)
 
-(defmethod method-method-id ((method amqp-method-queue-purge-ok))
+(defmethod amqp-method-method-id ((method amqp-method-queue-purge-ok))
   31)
 
 (defclass amqp-method-queue-delete (amqp-method-base)
 (
-  (ticket :type amqp-short :initarg :ticket :initform 0)
-  (queue :type amqp-shortstr :initarg :queue :initform "")
-  (if-unused :type amqp-bit :initarg :if-unused :initform :false)
-  (if-empty :type amqp-bit :initarg :if-empty :initform :false)
-  (nowait :type amqp-bit :initarg :nowait :initform :false)
+  (ticket :type amqp-short :initarg :ticket :initform 0 :reader amqp-method-field-ticket)
+  (queue :type amqp-shortstr :initarg :queue :initform "" :reader amqp-method-field-queue)
+  (if-unused :type amqp-bit :initarg :if-unused :initform nil :reader amqp-method-field-if-unused)
+  (if-empty :type amqp-bit :initarg :if-empty :initform nil :reader amqp-method-field-if-empty)
+  (nowait :type amqp-bit :initarg :nowait :initform nil :reader amqp-method-field-nowait)
 ))
 
 (defun decode-amqp-method-queue-delete (ibuffer)
@@ -1352,28 +1352,28 @@
       (amqp-short-encoder obuffer (slot-value method 'ticket))
       (amqp-shortstr-encoder obuffer (slot-value method 'queue))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'if-unused)) (setf (ldb (byte 8 0) bit-buffer) 1))
-      (when (eq t (slot-value method 'if-empty)) (setf (ldb (byte 8 1) bit-buffer) 1))
-      (when (eq t (slot-value method 'nowait)) (setf (ldb (byte 8 2) bit-buffer) 1))
+      (when (slot-value method 'if-unused) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'if-empty) (setf (ldb (byte 8 1) bit-buffer) 1))
+      (when (slot-value method 'nowait) (setf (ldb (byte 8 2) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-queue-delete))
+(defmethod amqp-method-synchronous-p ((method amqp-method-queue-delete))
   (values t 'amqp-method-queue-delete-ok))
 
-(defmethod method-has-content-p ((method amqp-method-queue-delete))
+(defmethod amqp-method-has-content-p ((method amqp-method-queue-delete))
   nil)
 
-(defmethod method-class-id ((method amqp-method-queue-delete))
+(defmethod amqp-method-class-id ((method amqp-method-queue-delete))
   50)
 
-(defmethod method-method-id ((method amqp-method-queue-delete))
+(defmethod amqp-method-method-id ((method amqp-method-queue-delete))
   40)
 
 (defclass amqp-method-queue-delete-ok (amqp-method-base)
 (
-  (message-count :type amqp-long :initarg :message-count)
+  (message-count :type amqp-long :initarg :message-count :reader amqp-method-field-message-count)
 ))
 
 (defun decode-amqp-method-queue-delete-ok (ibuffer)
@@ -1393,25 +1393,25 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-queue-delete-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-queue-delete-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-queue-delete-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-queue-delete-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-queue-delete-ok))
+(defmethod amqp-method-class-id ((method amqp-method-queue-delete-ok))
   50)
 
-(defmethod method-method-id ((method amqp-method-queue-delete-ok))
+(defmethod amqp-method-method-id ((method amqp-method-queue-delete-ok))
   41)
 
 (defclass amqp-method-queue-unbind (amqp-method-base)
 (
-  (ticket :type amqp-short :initarg :ticket :initform 0)
-  (queue :type amqp-shortstr :initarg :queue :initform "")
-  (exchange :type amqp-shortstr :initarg :exchange)
-  (routing-key :type amqp-shortstr :initarg :routing-key :initform "")
-  (arguments :type amqp-table :initarg :arguments :initform nil)
+  (ticket :type amqp-short :initarg :ticket :initform 0 :reader amqp-method-field-ticket)
+  (queue :type amqp-shortstr :initarg :queue :initform "" :reader amqp-method-field-queue)
+  (exchange :type amqp-shortstr :initarg :exchange :reader amqp-method-field-exchange)
+  (routing-key :type amqp-shortstr :initarg :routing-key :initform "" :reader amqp-method-field-routing-key)
+  (arguments :type amqp-table :initarg :arguments :initform nil :reader amqp-method-field-arguments)
 ))
 
 (defun decode-amqp-method-queue-unbind (ibuffer)
@@ -1439,16 +1439,16 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-queue-unbind))
+(defmethod amqp-method-synchronous-p ((method amqp-method-queue-unbind))
   (values t 'amqp-method-queue-unbind-ok))
 
-(defmethod method-has-content-p ((method amqp-method-queue-unbind))
+(defmethod amqp-method-has-content-p ((method amqp-method-queue-unbind))
   nil)
 
-(defmethod method-class-id ((method amqp-method-queue-unbind))
+(defmethod amqp-method-class-id ((method amqp-method-queue-unbind))
   50)
 
-(defmethod method-method-id ((method amqp-method-queue-unbind))
+(defmethod amqp-method-method-id ((method amqp-method-queue-unbind))
   50)
 
 (defclass amqp-method-queue-unbind-ok (amqp-method-base)
@@ -1464,23 +1464,23 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-queue-unbind-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-queue-unbind-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-queue-unbind-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-queue-unbind-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-queue-unbind-ok))
+(defmethod amqp-method-class-id ((method amqp-method-queue-unbind-ok))
   50)
 
-(defmethod method-method-id ((method amqp-method-queue-unbind-ok))
+(defmethod amqp-method-method-id ((method amqp-method-queue-unbind-ok))
   51)
 
 (defclass amqp-method-basic-qos (amqp-method-base)
 (
-  (prefetch-size :type amqp-long :initarg :prefetch-size :initform 0)
-  (prefetch-count :type amqp-short :initarg :prefetch-count :initform 0)
-  (global :type amqp-bit :initarg :global :initform :false)
+  (prefetch-size :type amqp-long :initarg :prefetch-size :initform 0 :reader amqp-method-field-prefetch-size)
+  (prefetch-count :type amqp-short :initarg :prefetch-count :initform 0 :reader amqp-method-field-prefetch-count)
+  (global :type amqp-bit :initarg :global :initform nil :reader amqp-method-field-global)
 ))
 
 (defun decode-amqp-method-basic-qos (ibuffer)
@@ -1503,21 +1503,21 @@
       (amqp-long-encoder obuffer (slot-value method 'prefetch-size))
       (amqp-short-encoder obuffer (slot-value method 'prefetch-count))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'global)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'global) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-qos))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-qos))
   (values t 'amqp-method-basic-qos-ok))
 
-(defmethod method-has-content-p ((method amqp-method-basic-qos))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-qos))
   nil)
 
-(defmethod method-class-id ((method amqp-method-basic-qos))
+(defmethod amqp-method-class-id ((method amqp-method-basic-qos))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-qos))
+(defmethod amqp-method-method-id ((method amqp-method-basic-qos))
   10)
 
 (defclass amqp-method-basic-qos-ok (amqp-method-base)
@@ -1533,28 +1533,28 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-qos-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-qos-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-basic-qos-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-qos-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-basic-qos-ok))
+(defmethod amqp-method-class-id ((method amqp-method-basic-qos-ok))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-qos-ok))
+(defmethod amqp-method-method-id ((method amqp-method-basic-qos-ok))
   11)
 
 (defclass amqp-method-basic-consume (amqp-method-base)
 (
-  (ticket :type amqp-short :initarg :ticket :initform 0)
-  (queue :type amqp-shortstr :initarg :queue :initform "")
-  (consumer-tag :type amqp-shortstr :initarg :consumer-tag :initform "")
-  (no-local :type amqp-bit :initarg :no-local :initform :false)
-  (no-ack :type amqp-bit :initarg :no-ack :initform :false)
-  (exclusive :type amqp-bit :initarg :exclusive :initform :false)
-  (nowait :type amqp-bit :initarg :nowait :initform :false)
-  (arguments :type amqp-table :initarg :arguments :initform nil)
+  (ticket :type amqp-short :initarg :ticket :initform 0 :reader amqp-method-field-ticket)
+  (queue :type amqp-shortstr :initarg :queue :initform "" :reader amqp-method-field-queue)
+  (consumer-tag :type amqp-shortstr :initarg :consumer-tag :initform "" :reader amqp-method-field-consumer-tag)
+  (no-local :type amqp-bit :initarg :no-local :initform nil :reader amqp-method-field-no-local)
+  (no-ack :type amqp-bit :initarg :no-ack :initform nil :reader amqp-method-field-no-ack)
+  (exclusive :type amqp-bit :initarg :exclusive :initform nil :reader amqp-method-field-exclusive)
+  (nowait :type amqp-bit :initarg :nowait :initform nil :reader amqp-method-field-nowait)
+  (arguments :type amqp-table :initarg :arguments :initform nil :reader amqp-method-field-arguments)
 ))
 
 (defun decode-amqp-method-basic-consume (ibuffer)
@@ -1583,30 +1583,30 @@
       (amqp-shortstr-encoder obuffer (slot-value method 'queue))
       (amqp-shortstr-encoder obuffer (slot-value method 'consumer-tag))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'no-local)) (setf (ldb (byte 8 0) bit-buffer) 1))
-      (when (eq t (slot-value method 'no-ack)) (setf (ldb (byte 8 1) bit-buffer) 1))
-      (when (eq t (slot-value method 'exclusive)) (setf (ldb (byte 8 2) bit-buffer) 1))
-      (when (eq t (slot-value method 'nowait)) (setf (ldb (byte 8 3) bit-buffer) 1))
+      (when (slot-value method 'no-local) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'no-ack) (setf (ldb (byte 8 1) bit-buffer) 1))
+      (when (slot-value method 'exclusive) (setf (ldb (byte 8 2) bit-buffer) 1))
+      (when (slot-value method 'nowait) (setf (ldb (byte 8 3) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
       (amqp-table-encoder obuffer (slot-value method 'arguments))
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-consume))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-consume))
   (values t 'amqp-method-basic-consume-ok))
 
-(defmethod method-has-content-p ((method amqp-method-basic-consume))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-consume))
   nil)
 
-(defmethod method-class-id ((method amqp-method-basic-consume))
+(defmethod amqp-method-class-id ((method amqp-method-basic-consume))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-consume))
+(defmethod amqp-method-method-id ((method amqp-method-basic-consume))
   20)
 
 (defclass amqp-method-basic-consume-ok (amqp-method-base)
 (
-  (consumer-tag :type amqp-shortstr :initarg :consumer-tag)
+  (consumer-tag :type amqp-shortstr :initarg :consumer-tag :reader amqp-method-field-consumer-tag)
 ))
 
 (defun decode-amqp-method-basic-consume-ok (ibuffer)
@@ -1626,22 +1626,22 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-consume-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-consume-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-basic-consume-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-consume-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-basic-consume-ok))
+(defmethod amqp-method-class-id ((method amqp-method-basic-consume-ok))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-consume-ok))
+(defmethod amqp-method-method-id ((method amqp-method-basic-consume-ok))
   21)
 
 (defclass amqp-method-basic-cancel (amqp-method-base)
 (
-  (consumer-tag :type amqp-shortstr :initarg :consumer-tag)
-  (nowait :type amqp-bit :initarg :nowait :initform :false)
+  (consumer-tag :type amqp-shortstr :initarg :consumer-tag :reader amqp-method-field-consumer-tag)
+  (nowait :type amqp-bit :initarg :nowait :initform nil :reader amqp-method-field-nowait)
 ))
 
 (defun decode-amqp-method-basic-cancel (ibuffer)
@@ -1662,26 +1662,26 @@
              (ignorable bit-buffer))
       (amqp-shortstr-encoder obuffer (slot-value method 'consumer-tag))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'nowait)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'nowait) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-cancel))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-cancel))
   (values t 'amqp-method-basic-cancel-ok))
 
-(defmethod method-has-content-p ((method amqp-method-basic-cancel))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-cancel))
   nil)
 
-(defmethod method-class-id ((method amqp-method-basic-cancel))
+(defmethod amqp-method-class-id ((method amqp-method-basic-cancel))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-cancel))
+(defmethod amqp-method-method-id ((method amqp-method-basic-cancel))
   30)
 
 (defclass amqp-method-basic-cancel-ok (amqp-method-base)
 (
-  (consumer-tag :type amqp-shortstr :initarg :consumer-tag)
+  (consumer-tag :type amqp-shortstr :initarg :consumer-tag :reader amqp-method-field-consumer-tag)
 ))
 
 (defun decode-amqp-method-basic-cancel-ok (ibuffer)
@@ -1701,25 +1701,25 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-cancel-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-cancel-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-basic-cancel-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-cancel-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-basic-cancel-ok))
+(defmethod amqp-method-class-id ((method amqp-method-basic-cancel-ok))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-cancel-ok))
+(defmethod amqp-method-method-id ((method amqp-method-basic-cancel-ok))
   31)
 
 (defclass amqp-method-basic-publish (amqp-method-base)
 (
-  (ticket :type amqp-short :initarg :ticket :initform 0)
-  (exchange :type amqp-shortstr :initarg :exchange :initform "")
-  (routing-key :type amqp-shortstr :initarg :routing-key :initform "")
-  (mandatory :type amqp-bit :initarg :mandatory :initform :false)
-  (immediate :type amqp-bit :initarg :immediate :initform :false)
+  (ticket :type amqp-short :initarg :ticket :initform 0 :reader amqp-method-field-ticket)
+  (exchange :type amqp-shortstr :initarg :exchange :initform "" :reader amqp-method-field-exchange)
+  (routing-key :type amqp-shortstr :initarg :routing-key :initform "" :reader amqp-method-field-routing-key)
+  (mandatory :type amqp-bit :initarg :mandatory :initform nil :reader amqp-method-field-mandatory)
+  (immediate :type amqp-bit :initarg :immediate :initform nil :reader amqp-method-field-immediate)
   (content :initarg :content :reader method-content)
   (content-properties :type amqp-basic-class-properties :initarg :content-properties :initform (make-instance 'amqp-basic-class-properties) :reader method-content-properties)
 ))
@@ -1747,30 +1747,30 @@
       (amqp-shortstr-encoder obuffer (slot-value method 'exchange))
       (amqp-shortstr-encoder obuffer (slot-value method 'routing-key))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'mandatory)) (setf (ldb (byte 8 0) bit-buffer) 1))
-      (when (eq t (slot-value method 'immediate)) (setf (ldb (byte 8 1) bit-buffer) 1))
+      (when (slot-value method 'mandatory) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'immediate) (setf (ldb (byte 8 1) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-publish))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-publish))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-basic-publish))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-publish))
   t)
 
-(defmethod method-class-id ((method amqp-method-basic-publish))
+(defmethod amqp-method-class-id ((method amqp-method-basic-publish))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-publish))
+(defmethod amqp-method-method-id ((method amqp-method-basic-publish))
   40)
 
 (defclass amqp-method-basic-return (amqp-method-base)
 (
-  (reply-code :type amqp-short :initarg :reply-code)
-  (reply-text :type amqp-shortstr :initarg :reply-text :initform "")
-  (exchange :type amqp-shortstr :initarg :exchange)
-  (routing-key :type amqp-shortstr :initarg :routing-key)
+  (reply-code :type amqp-short :initarg :reply-code :reader amqp-method-field-reply-code)
+  (reply-text :type amqp-shortstr :initarg :reply-text :initform "" :reader amqp-method-field-reply-text)
+  (exchange :type amqp-shortstr :initarg :exchange :reader amqp-method-field-exchange)
+  (routing-key :type amqp-shortstr :initarg :routing-key :reader amqp-method-field-routing-key)
   (content :initarg :content :reader method-content)
   (content-properties :type amqp-basic-class-properties :initarg :content-properties :initform (make-instance 'amqp-basic-class-properties) :reader method-content-properties)
 ))
@@ -1798,25 +1798,25 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-return))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-return))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-basic-return))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-return))
   t)
 
-(defmethod method-class-id ((method amqp-method-basic-return))
+(defmethod amqp-method-class-id ((method amqp-method-basic-return))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-return))
+(defmethod amqp-method-method-id ((method amqp-method-basic-return))
   50)
 
 (defclass amqp-method-basic-deliver (amqp-method-base)
 (
-  (consumer-tag :type amqp-shortstr :initarg :consumer-tag)
-  (delivery-tag :type amqp-longlong :initarg :delivery-tag)
-  (redelivered :type amqp-bit :initarg :redelivered :initform :false)
-  (exchange :type amqp-shortstr :initarg :exchange)
-  (routing-key :type amqp-shortstr :initarg :routing-key)
+  (consumer-tag :type amqp-shortstr :initarg :consumer-tag :reader amqp-method-field-consumer-tag)
+  (delivery-tag :type amqp-longlong :initarg :delivery-tag :reader amqp-method-field-delivery-tag)
+  (redelivered :type amqp-bit :initarg :redelivered :initform nil :reader amqp-method-field-redelivered)
+  (exchange :type amqp-shortstr :initarg :exchange :reader amqp-method-field-exchange)
+  (routing-key :type amqp-shortstr :initarg :routing-key :reader amqp-method-field-routing-key)
   (content :initarg :content :reader method-content)
   (content-properties :type amqp-basic-class-properties :initarg :content-properties :initform (make-instance 'amqp-basic-class-properties) :reader method-content-properties)
 ))
@@ -1843,30 +1843,30 @@
       (amqp-shortstr-encoder obuffer (slot-value method 'consumer-tag))
       (amqp-longlong-encoder obuffer (slot-value method 'delivery-tag))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'redelivered)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'redelivered) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
       (amqp-shortstr-encoder obuffer (slot-value method 'exchange))
       (amqp-shortstr-encoder obuffer (slot-value method 'routing-key))
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-deliver))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-deliver))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-basic-deliver))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-deliver))
   t)
 
-(defmethod method-class-id ((method amqp-method-basic-deliver))
+(defmethod amqp-method-class-id ((method amqp-method-basic-deliver))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-deliver))
+(defmethod amqp-method-method-id ((method amqp-method-basic-deliver))
   60)
 
 (defclass amqp-method-basic-get (amqp-method-base)
 (
-  (ticket :type amqp-short :initarg :ticket :initform 0)
-  (queue :type amqp-shortstr :initarg :queue :initform "")
-  (no-ack :type amqp-bit :initarg :no-ack :initform :false)
+  (ticket :type amqp-short :initarg :ticket :initform 0 :reader amqp-method-field-ticket)
+  (queue :type amqp-shortstr :initarg :queue :initform "" :reader amqp-method-field-queue)
+  (no-ack :type amqp-bit :initarg :no-ack :initform nil :reader amqp-method-field-no-ack)
 ))
 
 (defun decode-amqp-method-basic-get (ibuffer)
@@ -1889,30 +1889,30 @@
       (amqp-short-encoder obuffer (slot-value method 'ticket))
       (amqp-shortstr-encoder obuffer (slot-value method 'queue))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'no-ack)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'no-ack) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-get))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-get))
   (values t 'amqp-method-basic-get-ok))
 
-(defmethod method-has-content-p ((method amqp-method-basic-get))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-get))
   nil)
 
-(defmethod method-class-id ((method amqp-method-basic-get))
+(defmethod amqp-method-class-id ((method amqp-method-basic-get))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-get))
+(defmethod amqp-method-method-id ((method amqp-method-basic-get))
   70)
 
 (defclass amqp-method-basic-get-ok (amqp-method-base)
 (
-  (delivery-tag :type amqp-longlong :initarg :delivery-tag)
-  (redelivered :type amqp-bit :initarg :redelivered :initform :false)
-  (exchange :type amqp-shortstr :initarg :exchange)
-  (routing-key :type amqp-shortstr :initarg :routing-key)
-  (message-count :type amqp-long :initarg :message-count)
+  (delivery-tag :type amqp-longlong :initarg :delivery-tag :reader amqp-method-field-delivery-tag)
+  (redelivered :type amqp-bit :initarg :redelivered :initform nil :reader amqp-method-field-redelivered)
+  (exchange :type amqp-shortstr :initarg :exchange :reader amqp-method-field-exchange)
+  (routing-key :type amqp-shortstr :initarg :routing-key :reader amqp-method-field-routing-key)
+  (message-count :type amqp-long :initarg :message-count :reader amqp-method-field-message-count)
   (content :initarg :content :reader method-content)
   (content-properties :type amqp-basic-class-properties :initarg :content-properties :initform (make-instance 'amqp-basic-class-properties) :reader method-content-properties)
 ))
@@ -1938,7 +1938,7 @@
              (ignorable bit-buffer))
       (amqp-longlong-encoder obuffer (slot-value method 'delivery-tag))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'redelivered)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'redelivered) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
       (amqp-shortstr-encoder obuffer (slot-value method 'exchange))
       (amqp-shortstr-encoder obuffer (slot-value method 'routing-key))
@@ -1946,21 +1946,21 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-get-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-get-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-basic-get-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-get-ok))
   t)
 
-(defmethod method-class-id ((method amqp-method-basic-get-ok))
+(defmethod amqp-method-class-id ((method amqp-method-basic-get-ok))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-get-ok))
+(defmethod amqp-method-method-id ((method amqp-method-basic-get-ok))
   71)
 
 (defclass amqp-method-basic-get-empty (amqp-method-base)
 (
-  (cluster-id :type amqp-shortstr :initarg :cluster-id :initform "")
+  (cluster-id :type amqp-shortstr :initarg :cluster-id :initform "" :reader amqp-method-field-cluster-id)
 ))
 
 (defun decode-amqp-method-basic-get-empty (ibuffer)
@@ -1980,22 +1980,22 @@
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-get-empty))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-get-empty))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-basic-get-empty))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-get-empty))
   nil)
 
-(defmethod method-class-id ((method amqp-method-basic-get-empty))
+(defmethod amqp-method-class-id ((method amqp-method-basic-get-empty))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-get-empty))
+(defmethod amqp-method-method-id ((method amqp-method-basic-get-empty))
   72)
 
 (defclass amqp-method-basic-ack (amqp-method-base)
 (
-  (delivery-tag :type amqp-longlong :initarg :delivery-tag :initform 0)
-  (multiple :type amqp-bit :initarg :multiple :initform :false)
+  (delivery-tag :type amqp-longlong :initarg :delivery-tag :initform 0 :reader amqp-method-field-delivery-tag)
+  (multiple :type amqp-bit :initarg :multiple :initform nil :reader amqp-method-field-multiple)
 ))
 
 (defun decode-amqp-method-basic-ack (ibuffer)
@@ -2016,27 +2016,27 @@
              (ignorable bit-buffer))
       (amqp-longlong-encoder obuffer (slot-value method 'delivery-tag))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'multiple)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'multiple) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-ack))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-ack))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-basic-ack))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-ack))
   nil)
 
-(defmethod method-class-id ((method amqp-method-basic-ack))
+(defmethod amqp-method-class-id ((method amqp-method-basic-ack))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-ack))
+(defmethod amqp-method-method-id ((method amqp-method-basic-ack))
   80)
 
 (defclass amqp-method-basic-reject (amqp-method-base)
 (
-  (delivery-tag :type amqp-longlong :initarg :delivery-tag)
-  (requeue :type amqp-bit :initarg :requeue :initform t)
+  (delivery-tag :type amqp-longlong :initarg :delivery-tag :reader amqp-method-field-delivery-tag)
+  (requeue :type amqp-bit :initarg :requeue :initform t :reader amqp-method-field-requeue)
 ))
 
 (defun decode-amqp-method-basic-reject (ibuffer)
@@ -2057,26 +2057,26 @@
              (ignorable bit-buffer))
       (amqp-longlong-encoder obuffer (slot-value method 'delivery-tag))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'requeue)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'requeue) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-reject))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-reject))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-basic-reject))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-reject))
   nil)
 
-(defmethod method-class-id ((method amqp-method-basic-reject))
+(defmethod amqp-method-class-id ((method amqp-method-basic-reject))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-reject))
+(defmethod amqp-method-method-id ((method amqp-method-basic-reject))
   90)
 
 (defclass amqp-method-basic-recover-async (amqp-method-base)
 (
-  (requeue :type amqp-bit :initarg :requeue :initform :false)
+  (requeue :type amqp-bit :initarg :requeue :initform nil :reader amqp-method-field-requeue)
 ))
 
 (defun decode-amqp-method-basic-recover-async (ibuffer)
@@ -2095,26 +2095,26 @@
     (declare (type (unsigned-byte 8) bit-buffer)
              (ignorable bit-buffer))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'requeue)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'requeue) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-recover-async))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-recover-async))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-basic-recover-async))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-recover-async))
   nil)
 
-(defmethod method-class-id ((method amqp-method-basic-recover-async))
+(defmethod amqp-method-class-id ((method amqp-method-basic-recover-async))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-recover-async))
+(defmethod amqp-method-method-id ((method amqp-method-basic-recover-async))
   100)
 
 (defclass amqp-method-basic-recover (amqp-method-base)
 (
-  (requeue :type amqp-bit :initarg :requeue :initform :false)
+  (requeue :type amqp-bit :initarg :requeue :initform nil :reader amqp-method-field-requeue)
 ))
 
 (defun decode-amqp-method-basic-recover (ibuffer)
@@ -2133,21 +2133,21 @@
     (declare (type (unsigned-byte 8) bit-buffer)
              (ignorable bit-buffer))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'requeue)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'requeue) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-recover))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-recover))
   (values t 'amqp-method-basic-recover-ok))
 
-(defmethod method-has-content-p ((method amqp-method-basic-recover))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-recover))
   nil)
 
-(defmethod method-class-id ((method amqp-method-basic-recover))
+(defmethod amqp-method-class-id ((method amqp-method-basic-recover))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-recover))
+(defmethod amqp-method-method-id ((method amqp-method-basic-recover))
   110)
 
 (defclass amqp-method-basic-recover-ok (amqp-method-base)
@@ -2163,23 +2163,23 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-recover-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-recover-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-basic-recover-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-recover-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-basic-recover-ok))
+(defmethod amqp-method-class-id ((method amqp-method-basic-recover-ok))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-recover-ok))
+(defmethod amqp-method-method-id ((method amqp-method-basic-recover-ok))
   111)
 
 (defclass amqp-method-basic-nack (amqp-method-base)
 (
-  (delivery-tag :type amqp-longlong :initarg :delivery-tag :initform 0)
-  (multiple :type amqp-bit :initarg :multiple :initform :false)
-  (requeue :type amqp-bit :initarg :requeue :initform t)
+  (delivery-tag :type amqp-longlong :initarg :delivery-tag :initform 0 :reader amqp-method-field-delivery-tag)
+  (multiple :type amqp-bit :initarg :multiple :initform nil :reader amqp-method-field-multiple)
+  (requeue :type amqp-bit :initarg :requeue :initform t :reader amqp-method-field-requeue)
 ))
 
 (defun decode-amqp-method-basic-nack (ibuffer)
@@ -2201,22 +2201,22 @@
              (ignorable bit-buffer))
       (amqp-longlong-encoder obuffer (slot-value method 'delivery-tag))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'multiple)) (setf (ldb (byte 8 0) bit-buffer) 1))
-      (when (eq t (slot-value method 'requeue)) (setf (ldb (byte 8 1) bit-buffer) 1))
+      (when (slot-value method 'multiple) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'requeue) (setf (ldb (byte 8 1) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-basic-nack))
+(defmethod amqp-method-synchronous-p ((method amqp-method-basic-nack))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-basic-nack))
+(defmethod amqp-method-has-content-p ((method amqp-method-basic-nack))
   nil)
 
-(defmethod method-class-id ((method amqp-method-basic-nack))
+(defmethod amqp-method-class-id ((method amqp-method-basic-nack))
   60)
 
-(defmethod method-method-id ((method amqp-method-basic-nack))
+(defmethod amqp-method-method-id ((method amqp-method-basic-nack))
   120)
 
 (defclass amqp-method-tx-select (amqp-method-base)
@@ -2232,16 +2232,16 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-tx-select))
+(defmethod amqp-method-synchronous-p ((method amqp-method-tx-select))
   (values t 'amqp-method-tx-select-ok))
 
-(defmethod method-has-content-p ((method amqp-method-tx-select))
+(defmethod amqp-method-has-content-p ((method amqp-method-tx-select))
   nil)
 
-(defmethod method-class-id ((method amqp-method-tx-select))
+(defmethod amqp-method-class-id ((method amqp-method-tx-select))
   90)
 
-(defmethod method-method-id ((method amqp-method-tx-select))
+(defmethod amqp-method-method-id ((method amqp-method-tx-select))
   10)
 
 (defclass amqp-method-tx-select-ok (amqp-method-base)
@@ -2257,16 +2257,16 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-tx-select-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-tx-select-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-tx-select-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-tx-select-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-tx-select-ok))
+(defmethod amqp-method-class-id ((method amqp-method-tx-select-ok))
   90)
 
-(defmethod method-method-id ((method amqp-method-tx-select-ok))
+(defmethod amqp-method-method-id ((method amqp-method-tx-select-ok))
   11)
 
 (defclass amqp-method-tx-commit (amqp-method-base)
@@ -2282,16 +2282,16 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-tx-commit))
+(defmethod amqp-method-synchronous-p ((method amqp-method-tx-commit))
   (values t 'amqp-method-tx-commit-ok))
 
-(defmethod method-has-content-p ((method amqp-method-tx-commit))
+(defmethod amqp-method-has-content-p ((method amqp-method-tx-commit))
   nil)
 
-(defmethod method-class-id ((method amqp-method-tx-commit))
+(defmethod amqp-method-class-id ((method amqp-method-tx-commit))
   90)
 
-(defmethod method-method-id ((method amqp-method-tx-commit))
+(defmethod amqp-method-method-id ((method amqp-method-tx-commit))
   20)
 
 (defclass amqp-method-tx-commit-ok (amqp-method-base)
@@ -2307,16 +2307,16 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-tx-commit-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-tx-commit-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-tx-commit-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-tx-commit-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-tx-commit-ok))
+(defmethod amqp-method-class-id ((method amqp-method-tx-commit-ok))
   90)
 
-(defmethod method-method-id ((method amqp-method-tx-commit-ok))
+(defmethod amqp-method-method-id ((method amqp-method-tx-commit-ok))
   21)
 
 (defclass amqp-method-tx-rollback (amqp-method-base)
@@ -2332,16 +2332,16 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-tx-rollback))
+(defmethod amqp-method-synchronous-p ((method amqp-method-tx-rollback))
   (values t 'amqp-method-tx-rollback-ok))
 
-(defmethod method-has-content-p ((method amqp-method-tx-rollback))
+(defmethod amqp-method-has-content-p ((method amqp-method-tx-rollback))
   nil)
 
-(defmethod method-class-id ((method amqp-method-tx-rollback))
+(defmethod amqp-method-class-id ((method amqp-method-tx-rollback))
   90)
 
-(defmethod method-method-id ((method amqp-method-tx-rollback))
+(defmethod amqp-method-method-id ((method amqp-method-tx-rollback))
   30)
 
 (defclass amqp-method-tx-rollback-ok (amqp-method-base)
@@ -2357,21 +2357,21 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-tx-rollback-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-tx-rollback-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-tx-rollback-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-tx-rollback-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-tx-rollback-ok))
+(defmethod amqp-method-class-id ((method amqp-method-tx-rollback-ok))
   90)
 
-(defmethod method-method-id ((method amqp-method-tx-rollback-ok))
+(defmethod amqp-method-method-id ((method amqp-method-tx-rollback-ok))
   31)
 
 (defclass amqp-method-confirm-select (amqp-method-base)
 (
-  (nowait :type amqp-bit :initarg :nowait :initform :false)
+  (nowait :type amqp-bit :initarg :nowait :initform nil :reader amqp-method-field-nowait)
 ))
 
 (defun decode-amqp-method-confirm-select (ibuffer)
@@ -2390,21 +2390,21 @@
     (declare (type (unsigned-byte 8) bit-buffer)
              (ignorable bit-buffer))
       (setf bit-buffer 0)
-      (when (eq t (slot-value method 'nowait)) (setf (ldb (byte 8 0) bit-buffer) 1))
+      (when (slot-value method 'nowait) (setf (ldb (byte 8 0) bit-buffer) 1))
       (amqp-octet-encoder obuffer bit-buffer)
   )
 )
 
-(defmethod synchronous-method-p ((method amqp-method-confirm-select))
+(defmethod amqp-method-synchronous-p ((method amqp-method-confirm-select))
   (values t 'amqp-method-confirm-select-ok))
 
-(defmethod method-has-content-p ((method amqp-method-confirm-select))
+(defmethod amqp-method-has-content-p ((method amqp-method-confirm-select))
   nil)
 
-(defmethod method-class-id ((method amqp-method-confirm-select))
+(defmethod amqp-method-class-id ((method amqp-method-confirm-select))
   85)
 
-(defmethod method-method-id ((method amqp-method-confirm-select))
+(defmethod amqp-method-method-id ((method amqp-method-confirm-select))
   10)
 
 (defclass amqp-method-confirm-select-ok (amqp-method-base)
@@ -2420,16 +2420,16 @@
   (declare (ignore method obuffer))
 )
 
-(defmethod synchronous-method-p ((method amqp-method-confirm-select-ok))
+(defmethod amqp-method-synchronous-p ((method amqp-method-confirm-select-ok))
   nil)
 
-(defmethod method-has-content-p ((method amqp-method-confirm-select-ok))
+(defmethod amqp-method-has-content-p ((method amqp-method-confirm-select-ok))
   nil)
 
-(defmethod method-class-id ((method amqp-method-confirm-select-ok))
+(defmethod amqp-method-class-id ((method amqp-method-confirm-select-ok))
   85)
 
-(defmethod method-method-id ((method amqp-method-confirm-select-ok))
+(defmethod amqp-method-method-id ((method amqp-method-confirm-select-ok))
   11)
 
 
