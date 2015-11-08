@@ -35,7 +35,7 @@
            #:+amqp-internal-error+
 
            ;; conditions
-           #:error-type-from-reply-code
+           #:amqp-error-type-from-reply-code
            #:amqp-unknown-reply-code-error
            #:amqp-protocol-error
            #:amqp-channel-error
