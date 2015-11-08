@@ -95,7 +95,7 @@
   ((method-class :initarg :method-class
                  :reader :amqp-error-method-class)))
 
-(defun error-type-from-reply-code (reply-code)
+(defun amqp-error-type-from-reply-code (reply-code)
   (case reply-code
     (311 #|+amqp-content-too-large+|# 'amqp-error-content-too-large)
     (312 #|+amqp-no-route+|# 'amqp-error-no-route)
