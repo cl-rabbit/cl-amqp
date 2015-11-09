@@ -13,10 +13,10 @@
                :reader amqp-error-connection)
    (channel :initarg :channel
             :reader amqp-error-channel)
-   (class :initarg :class
-          :reader amqp-error-class)
-   (method :initarg :method
-           :reader amqp-error-method)))
+   (class-id :initarg :class-id
+             :reader amqp-error-class)
+   (method-id :initarg :method-id
+              :reader amqp-error-method)))
 
 (define-condition amqp-channel-error (amqp-protocol-error)
   ((channel :initarg :channel
