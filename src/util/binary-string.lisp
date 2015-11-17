@@ -36,21 +36,23 @@ here by ENABLE-BINARY-STRING-SYNTAX.")
 
 (defmacro disable-binary-string-syntax ()
   `(eval-when (:compile-toplevel :load-toplevel :execute)
-    (%disable-binary-string-syntax)))
+     (%disable-binary-string-syntax)))
+
+(defun print-binary-string (stream vector)
+  (when *print-escape*
+    (princ "#b\"" stream))
+  (loop for byte across vector do
+           (if (or (< byte 31)
+                   (> byte 126))
+               (format stream "\\x~(~2,'0x~)" byte)
+               (princ (code-char byte) stream)))
+  (when *print-escape*
+    (princ "\"" stream)))
 
 (defun enable-binary-string-printing ()
   (set-pprint-dispatch
    'nibbles:simple-octet-vector
-   (lambda (stream vector)
-     (when *print-escape*
-       (princ "#b\"" stream))
-     (loop for byte across vector do
-              (if (or (< byte 31)
-                      (> byte 126))
-                  (format stream "\\x~(~2,'0x~)" byte)
-                  (princ (code-char byte) stream)))
-     (when *print-escape*
-       (princ "\"" stream)))))
+   #'print-binary-string))
 
 (defun disable-binary-string-printing ()
   (set-pprint-dispatch 'nibbles:simple-octet-vector nil))
