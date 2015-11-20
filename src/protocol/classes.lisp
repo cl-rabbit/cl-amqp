@@ -1895,7 +1895,7 @@
 )
 
 (defmethod amqp-method-synchronous-p ((method amqp-method-basic-get))
-  (values t 'amqp-method-basic-get-ok))
+  (values t '(amqp-method-basic-get-empty amqp-method-basic-get-ok)))
 
 (defmethod amqp-method-has-content-p ((method amqp-method-basic-get))
   nil)

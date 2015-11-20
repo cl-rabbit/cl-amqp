@@ -119,7 +119,7 @@ SYNC_REQ_RESP = {
     "basic.qos": "qos-ok",
     "basic.consume": "consume-ok",
     "basic.cancel": "cancel-ok",
-    "basic.get": "get-ok",
+    "basic.get": ["get-empty", "get-ok"],
     "basic.recover": "recover-ok",
 
     "tx.select": "select-ok",
@@ -136,7 +136,12 @@ def method_synchronous_reply_method(self):
 AmqpMethod.method_synchronous_reply_method = method_synchronous_reply_method
 
 def method_synchronous_reply_method_lisp_name(self):
-    return 'amqp-method-%s-%s' % (self.klass.name, SYNC_REQ_RESP['{0}.{1}'.format(self.klass.name, self.name)])
+    reply = SYNC_REQ_RESP['{0}.{1}'.format(self.klass.name, self.name)]
+    if isinstance(reply, list):
+        format_str = "("+' '.join(["amqp-method-"+ self.klass.name +"-%s"]*len(reply))+")"
+        return format_str % tuple(reply)
+    else:
+        return 'amqp-method-%s-%s' % (self.klass.name, reply)
 
 AmqpMethod.method_synchronous_reply_method_lisp_name = method_synchronous_reply_method_lisp_name
 
