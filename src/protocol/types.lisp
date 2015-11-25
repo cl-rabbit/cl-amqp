@@ -24,6 +24,10 @@
 ;;   V     V       V            Void
 ;;                 x            Byte array         (D)
 
+
+(defvar *amqp-boolean-false* nil)
+(defvar *amqp-void* :void)
+
 (deftype alist ()
   `(and list (satisfies list-is-alist)))
 
@@ -35,14 +39,14 @@
   `(and symbol (satisfies symbol-is-void)))
 
 (defun symbol-is-void (symbol)
-  (eq :void symbol))
+  (eq *amqp-void* symbol))
 
 (deftype amqp-boolean ()
   `(and symbol (satisfies symbol-is-amqp-boolean)))
 
 (defun symbol-is-amqp-boolean (symbol)
   (or (eq t symbol)
-      (eq :false symbol)))
+      (eq *amqp-boolean-false* symbol)))
 
 (deftype amqp-bit ()
   `amqp-boolean)
@@ -115,9 +119,6 @@
                ,@(loop for (value name) in types-and-decoders
                        collect `(,(char-code value) (,(amqp-type-decoder-name name) buffer)))
                (t (error "Unknown field type ~a" ,type))))))))) ;;TODO: specialize error
-
-(defvar *amqp-boolean-false* nil)
-(defvar *amqp-void* nil)
 
 (defun amqp-decode-field-value-type (buffer)
   (ibuffer-decode-ub8 buffer))
