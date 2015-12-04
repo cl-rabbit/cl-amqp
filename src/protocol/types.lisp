@@ -6,11 +6,11 @@
 ;; ---------------------------------------------------------------------------
 ;;         t       t            Boolean
 ;;         b       b            Signed 8-bit
-;;         B                    Unsigned 8-bit
+;;         B       B            Unsigned 8-bit
 ;;         U       s            Signed 16-bit      (A1)
-;;         u                    Unsigned 16-bit
+;;         u       u            Unsigned 16-bit
 ;;   I     I       I            Signed 32-bit
-;;         i                    Unsigned 32-bit
+;;         i       i            Unsigned 32-bit
 ;;         L       l            Signed 64-bit      (B)
 ;;         l                    Unsigned 64-bit
 ;;         f       f            32-bit float
@@ -63,11 +63,20 @@
 (deftype amqp-octet ()
   `(signed-byte 8))
 
+(deftype amqp-uoctet ()
+  `(unsigned-byte 8))
+
 (deftype amqp-short ()
   `(signed-byte 16))
 
+(deftype amqp-ushort ()
+  `(unsigned-byte 16))
+
 (deftype amqp-long ()
   `(signed-byte 32))
+
+(deftype amqp-ulong ()
+  `(unsigned-byte 23))
 
 (deftype amqp-longlong ()
   `(signed-byte 64))
@@ -133,11 +142,20 @@
 (defun amqp-octet-decoder (buffer)
   (ibuffer-decode-sb8 buffer))
 
+(defun amqp-uoctet-decoder (buffer)
+  (ibuffer-decode-ub8 buffer))
+
 (defun amqp-short-decoder (buffer)
   (ibuffer-decode-sb16 buffer))
 
+(defun amqp-ushort-decoder (buffer)
+  (ibuffer-decode-ub16 buffer))
+
 (defun amqp-long-decoder (buffer)
   (ibuffer-decode-sb32 buffer))
+
+(defun amqp-ulong-decoder (buffer)
+  (ibuffer-decode-ub32 buffer))
 
 (defun amqp-longlong-decoder (buffer)
   (ibuffer-decode-sb64 buffer))
@@ -204,8 +222,11 @@
 (define-amqp-table-field-types
   (#\t "boolean")
   (#\b "octet")
+  (#\B "uoctet")
   (#\s "short")
+  (#\u "ushort")
   (#\I "long")
+  (#\i "ulong")
   (#\l "longlong")
   (#\f "single")
   (#\d "double")
@@ -234,6 +255,13 @@
   (amqp-encode-field-value-type buffer +amqp-type-octet+)
   (amqp-octet-encoder buffer value))
 
+(defun amqp-uoctet-encoder (buffer value)
+  (obuffer-encode-ub8 buffer value))
+
+(defun amqp-uoctet-table-field-encoder (buffer value)
+  (amqp-encode-field-value-type buffer +amqp-type-uoctet+)
+  (amqp-uoctet-encoder buffer value))
+
 (defun amqp-short-encoder (buffer value)
   (obuffer-encode-sb16 buffer value))
 
@@ -241,12 +269,26 @@
   (amqp-encode-field-value-type buffer +amqp-type-short+)
   (amqp-short-encoder buffer value))
 
+(defun amqp-ushort-encoder (buffer value)
+  (obuffer-encode-ub16 buffer value))
+
+(defun amqp-ushort-table-field-encoder (buffer value)
+  (amqp-encode-field-value-type buffer +amqp-type-ushort+)
+  (amqp-ushort-encoder buffer value))
+
 (defun amqp-long-encoder (buffer value)
   (obuffer-encode-sb32 buffer value))
 
 (defun amqp-long-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-long+)
   (amqp-long-encoder buffer value))
+
+(defun amqp-ulong-encoder (buffer value)
+  (obuffer-encode-ub32 buffer value))
+
+(defun amqp-ulong-table-field-encoder (buffer value)
+  (amqp-encode-field-value-type buffer +amqp-type-ulong+)
+  (amqp-ulong-encoder buffer value))
 
 (defun amqp-longlong-encoder (buffer value)
   (obuffer-encode-sb64 buffer value))
@@ -344,8 +386,11 @@
 (defun amqp-encode-table-field-value (buffer value)
   (typecase value
     (amqp-octet (amqp-octet-table-field-encoder buffer value))
+    (amqp-uoctet (amqp-uoctet-table-field-encoder buffer value))
     (amqp-short (amqp-short-table-field-encoder buffer value))
+    (amqp-ushort (amqp-ushort-table-field-encoder buffer value))
     (amqp-long (amqp-long-table-field-encoder buffer value))
+    (amqp-ulong (amqp-ulong-table-field-encoder buffer value))
     (amqp-longlong (amqp-longlong-table-field-encoder buffer value))
     (amqp-single (amqp-single-table-field-encoder buffer value))
     (amqp-double (amqp-double-table-field-encoder buffer value))

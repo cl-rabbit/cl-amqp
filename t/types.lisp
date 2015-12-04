@@ -11,7 +11,7 @@
 
 (subtest "AMQP Table encode/decode test"
   (let ((amqp-table-bytes (concatenate '(simple-array  (unsigned-byte 8) 1)
-                                       #b"\x00\x00\x01\x1a"
+                                       #b"\x00\x00\x012"
                                        #b"\x05arrayA\x00\x00\x00\x0fI\x00\x00\x00\x01I\x00\x00\x00\x02I\x00\x00\x00\x03"
                                        #b"\x07boolvalt\x01"
                                        #b"\x0dboolval_falset\x00"
@@ -24,8 +24,11 @@
                                        #b"\x04nullV"
                                        #b"\x06strvalS\x00\x00\x00\x04Test"
                                        #b"\x06singlef\x40\x48\xf5\xc3"
-                                       #b"\x03sb8b\x44"
-                                       #b"\x04sb16s\x4\x44"
+                                       #b"\x03sb8b\xbc"
+                                       #b"\x03ub8B\x9a"
+                                       #b"\x04sb16s\xfb\xbc"
+                                       #b"\x04ub16u\xea`"
+                                       #b"\x04ub32i\xff\xff\xfe\xd8"
                                        #b"\x06doubled\x40\xd\x55\x55\x55\x55\x4f\x78"
                                        #b"\x0ctimestampvalT\x00\x00\x00\x00Ec)\x92"
                                        #b"\x07unicodeS\x00\x00\x00\x08utf8=\xe2\x9c\x93"
@@ -42,8 +45,11 @@
                  ("null" . :void)
                  ("strval" . "Test")
                  ("single" . 3.14)
-                 ("sb8" . #x44)
-                 ("sb16" . #x444)
+                 ("sb8" . -68)
+                 ("ub8" . 154)
+                 ("sb16" . -1092)
+                 ("ub16" . 60000)
+                 ("ub32" . 4294967000)
                  ("double" . 3.666666666666d0)
                  ("timestampval" . @2006-11-21T16:30:10)
                  ("unicode" . "utf8=✓")
