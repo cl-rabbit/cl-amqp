@@ -36,5 +36,6 @@
                    (:file "conditions")
                    (:file "classes")
                    (:file "types")
-                   (:file "frame"))))))
+                   (:file "frame")))
+                 (:file "method"))))
   :in-order-to ((test-op (test-op cl-amqp.test))))
