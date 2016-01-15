@@ -64,7 +64,6 @@
            #:amqp-error-not-implemented
            #:amqp-error-internal-error
 
-
            ;; frames
            #:make-frame-parser
            #:make-frame-payload-parser
@@ -72,6 +71,7 @@
            #:frame-payload-parser-finish
            #:method-frame
            #:header-frame
+           #:body-frame
            #:heartbeat-frame
            #:frame-channel
            #:frame-payload-size
@@ -223,6 +223,7 @@
                                          ;; it prefixed with package name already
            #:method-decode
            #:method-class-from-signature
+           #:method-to-frames
 
            ;; properties
            #:amqp-property-content-type
