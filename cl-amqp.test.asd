@@ -25,6 +25,7 @@
                  (:test-file "util/binary-string")
                  (:test-file "conditions")
                  (:test-file "frame")
+                 (:test-file "method")
                  (:test-file "types"))))
   :defsystem-depends-on (:prove-asdf)
   :perform (test-op :after (op c)
