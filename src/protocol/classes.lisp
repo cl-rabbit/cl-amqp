@@ -1720,7 +1720,7 @@
   (routing-key :type amqp-shortstr :initarg :routing-key :initform "" :reader amqp-method-field-routing-key)
   (mandatory :type amqp-bit :initarg :mandatory :initform nil :reader amqp-method-field-mandatory)
   (immediate :type amqp-bit :initarg :immediate :initform nil :reader amqp-method-field-immediate)
-  (content :initarg :content :reader amqp-method-content)
+  (content :initarg :content :initform nil :reader amqp-method-content)
   (content-properties :type amqp-basic-class-properties :initarg :content-properties :initform (make-instance 'amqp-basic-class-properties) :reader amqp-method-content-properties)
 ))
 
@@ -1771,7 +1771,7 @@
   (reply-text :type amqp-shortstr :initarg :reply-text :initform "" :reader amqp-method-field-reply-text)
   (exchange :type amqp-shortstr :initarg :exchange :reader amqp-method-field-exchange)
   (routing-key :type amqp-shortstr :initarg :routing-key :reader amqp-method-field-routing-key)
-  (content :initarg :content :reader amqp-method-content)
+  (content :initarg :content :initform nil :reader amqp-method-content)
   (content-properties :type amqp-basic-class-properties :initarg :content-properties :initform (make-instance 'amqp-basic-class-properties) :reader amqp-method-content-properties)
 ))
 
@@ -1817,7 +1817,7 @@
   (redelivered :type amqp-bit :initarg :redelivered :initform nil :reader amqp-method-field-redelivered)
   (exchange :type amqp-shortstr :initarg :exchange :reader amqp-method-field-exchange)
   (routing-key :type amqp-shortstr :initarg :routing-key :reader amqp-method-field-routing-key)
-  (content :initarg :content :reader amqp-method-content)
+  (content :initarg :content :initform nil :reader amqp-method-content)
   (content-properties :type amqp-basic-class-properties :initarg :content-properties :initform (make-instance 'amqp-basic-class-properties) :reader amqp-method-content-properties)
 ))
 
@@ -1913,7 +1913,7 @@
   (exchange :type amqp-shortstr :initarg :exchange :reader amqp-method-field-exchange)
   (routing-key :type amqp-shortstr :initarg :routing-key :reader amqp-method-field-routing-key)
   (message-count :type amqp-long :initarg :message-count :reader amqp-method-field-message-count)
-  (content :initarg :content :reader amqp-method-content)
+  (content :initarg :content :initform nil :reader amqp-method-content)
   (content-properties :type amqp-basic-class-properties :initarg :content-properties :initform (make-instance 'amqp-basic-class-properties) :reader amqp-method-content-properties)
 ))
 
