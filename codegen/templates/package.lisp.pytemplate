@@ -73,6 +73,10 @@
            #:method-class-from-signature
            #:method-to-frames
 
+           #:method-assembler
+           #:consume-frame
+           #:consume-method
+
            ## since there is only one properties class
            ## no need to remove duplicates
            ;; properties

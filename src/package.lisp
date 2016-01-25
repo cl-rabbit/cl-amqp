@@ -225,6 +225,10 @@
            #:method-class-from-signature
            #:method-to-frames
 
+           #:method-assembler
+           #:consume-frame
+           #:consume-method
+
            ;; properties
            #:amqp-property-content-type
            #:amqp-property-content-encoding
