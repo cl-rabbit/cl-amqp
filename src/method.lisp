@@ -24,3 +24,49 @@
               (append (list method-frame content-header-frame) (content-to-body-frames (amqp-method-content method) channel (- max-frame-size 9)))
               (list method-frame content-header-frame)))
         (list method-frame))))
+
+
+(defclass method-assembler ()
+  ((channel :initarg :channel :reader method-assembler-channel)
+   (max-body-size :initarg :max-body-size :reader method-assembler-max-body-size :initform #.(* 4 1024 1024))
+   (state :initform :start :accessor method-assembler-state)
+   (current-method :accessor method-assembler-method)
+   (body-bound :initform 0 :accessor method-assembler-body-bound)))
+
+(defgeneric consume-method (mc method)
+  (:method (mc method)
+    (error "Method CONSUME-METHOD not implemented for method consumer ~a" mc)))
+
+(defmethod reset-method-assembler-state ((ma method-assembler))
+  (setf (method-assembler-state ma) :start
+        (method-assembler-method ma) nil
+        (method-assembler-body-bound ma) 0))
+
+(defmethod consume-frame ((ma method-assembler) frame)
+  (flet ((consume-method (ma method)
+           (reset-method-assembler-state ma)
+           (consume-method ma method)))
+    (case (method-assembler-state ma)
+      (:start ;; frame should be method-frame
+       (assert (= (frame-type frame) +amqp-frame-method+))
+       (if (amqp-method-has-content-p (frame-payload frame))
+           (setf (method-assembler-method ma) (frame-payload frame)
+                 (method-assembler-state ma) :header)
+           (consume-method ma (frame-payload frame))))
+      (:header ;; frame should be header-frame
+       (assert (= (frame-type frame) +amqp-frame-header+))
+       (setf (slot-value (method-assembler-method ma) 'content-properties) (frame-payload frame))
+       (if (= (slot-value frame 'body-size) 0)
+           (consume-method ma (method-assembler-method ma))
+           (progn
+             (assert (< (slot-value frame 'body-size) (method-assembler-max-body-size ma)) nil "Method body is bigger than allowed") ;; TODO: specialize error
+             (setf (slot-value (method-assembler-method ma) 'content) (nibbles:make-octet-vector (slot-value frame 'body-size))
+                   (method-assembler-state ma) :body))))
+      (:body ;; frame should be body-frame
+       (assert (= (frame-type frame) +amqp-frame-body+))
+       (replace (the (simple-array (unsigned-byte 8)) (amqp-method-content (method-assembler-method ma)))
+                (the (simple-array (unsigned-byte 8)) (frame-payload frame))
+                :start1 (the fixnum (method-assembler-body-bound ma)))
+       (incf (method-assembler-body-bound ma) (frame-payload-size frame))
+       (when (= (method-assembler-body-bound ma) (length (amqp-method-content (method-assembler-method ma))))
+         (consume-method ma (method-assembler-method ma)))))))
