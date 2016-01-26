@@ -35,7 +35,7 @@
 
 (defgeneric consume-method (mc method)
   (:method (mc method)
-    (error "Method CONSUME-METHOD not implemented for method consumer ~a" mc)))
+    method))
 
 (defmethod reset-method-assembler-state ((ma method-assembler))
   (setf (method-assembler-state ma) :start
@@ -50,8 +50,9 @@
       (:start ;; frame should be method-frame
        (assert (= (frame-type frame) +amqp-frame-method+))
        (if (amqp-method-has-content-p (frame-payload frame))
-           (setf (method-assembler-method ma) (frame-payload frame)
-                 (method-assembler-state ma) :header)
+           (progn (setf (method-assembler-method ma) (frame-payload frame)
+                        (method-assembler-state ma) :header)
+                  nil)
            (consume-method ma (frame-payload frame))))
       (:header ;; frame should be header-frame
        (assert (= (frame-type frame) +amqp-frame-header+))
@@ -61,7 +62,8 @@
            (progn
              (assert (< (slot-value frame 'body-size) (method-assembler-max-body-size ma)) nil "Method body is bigger than allowed") ;; TODO: specialize error
              (setf (slot-value (method-assembler-method ma) 'content) (nibbles:make-octet-vector (slot-value frame 'body-size))
-                   (method-assembler-state ma) :body))))
+                   (method-assembler-state ma) :body)
+             nil)))
       (:body ;; frame should be body-frame
        (assert (= (frame-type frame) +amqp-frame-body+))
        (replace (the (simple-array (unsigned-byte 8)) (amqp-method-content (method-assembler-method ma)))
