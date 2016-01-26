@@ -67,6 +67,11 @@
     (obuffer-add-bytes obuffer payload-bytes))
   obuffer)
 
+(defmethod frame-payload-encoder ((frame body-frame) obuffer)
+  (obuffer-encode-ub32 obuffer (length (frame-payload frame)))
+  (obuffer-add-bytes obuffer (frame-payload frame))
+  obuffer)
+
 (define-condition malformed-frame-error (amqp-base-error)
   ())
 
@@ -209,9 +214,12 @@
                         (go :end))
                       (error 'malformed-frame-error))
                 :end)
-               index)))
+               (values index (= (frame-parser-state parser) +parsing-start+)))))
     (loop for i from start to (1- end) do
-             (setf i (the fixnum (consume data i))))))
+             (multiple-value-bind (index parsed) (consume data i)
+               (if parsed
+                   (return (values (1+ index) parsed))
+                   (setf i (the fixnum index)))))))
 
 (defclass method-frame-payload-parser ()
   (;; parser state
@@ -261,7 +269,7 @@
                  (declare (type (unsigned-byte 8) byte))
                  (tagbody
                     (case state
-                      (:state (go :parsing-method-signature-first-octet))
+                      (:start (go :parsing-method-signature-first-octet))
                       (:parsing-method-signature-second-octet (go :parsing-method-signature-second-octet))
                       (:parsing-method-signature-third-octet (go :parsing-method-signature-third-octet))
                       (:parsing-method-signature-forth-octet (go :parsing-method-signature-forth-octet))
@@ -297,7 +305,9 @@
                     (go :consuming-method-arguments-start)
                   :consuming-method-arguments-start
                     (if (= size consumed)
-                        (go :method-frame-payload-parsed)
+                        (progn
+                          (setf state :method-frame-payload-parsed)
+                          (go :method-frame-payload-parsed))
                         (go :end))
                   :consuming-method-arguments
                     (let ((to-copy (if (< (- end start) (- size consumed))
@@ -370,7 +380,7 @@
                  (declare (type (unsigned-byte 8) byte))
                  (tagbody
                     (case state
-                      (:state (go :parsing-class-id-first-octet))
+                      (:start (go :parsing-class-id-first-octet))
                       (:parsing-class-id-second-octet (go :parsing-class-id-second-octet))
                       (:parsing-weight-first-octet (go :parsing-weight-first-octet))
                       (:parsing-weight-second-octet (go :parsing-weight-second-octet))
@@ -475,6 +485,38 @@
 
     (setf (frame-payload frame) (amqp-class-properties-decoder payload-class (new-ibuffer buffer :start 12)))))
 
+(defclass body-frame-payload-parser ()
+  (;; parser state
+   (state :initform :start)
+   (consumed :initform 0)
+   (buffer :initarg :buffer)
+   (frame :initarg :frame)
+   (size :initarg :size)
+   ;; events
+   (on-content :initarg :on-content)))
+
+(defun body-frame-payload-parser (frame &key on-content &aux (size (frame-payload-size frame)))
+  (make-instance 'body-frame-payload-parser :frame frame
+                                            :size size
+                                            :buffer (nibbles:make-octet-vector size)
+                                            :on-content on-content))
+
+(defmethod frame-payload-parser-consume ((payload-parser body-frame-payload-parser) octets &key (start 0) (end (length octets)))
+  (with-slots (state
+               consumed
+               buffer
+               frame
+               size
+               on-content) payload-parser
+    (replace buffer octets :start1 consumed :start2 start :end2 end)
+    (incf consumed (- end start))))
+
+(defmethod frame-payload-parser-finish ((payload-parser body-frame-payload-parser))
+  (with-slots (buffer
+               frame) payload-parser
+    (setf (frame-payload frame) buffer)))
+
+
 
 (defun make-frame-payload-parser (frame &rest args &key &allow-other-keys)
   (let ((parser-ctor
@@ -482,6 +524,6 @@
             (1 #|+amqp-frame-method+|# 'method-frame-payload-parser)
             (2 #|+amqp-frame-header+|# 'header-frame-payload-parser)
             (3 #|+amqp-frame-body+|# 'body-frame-payload-parser)
-            (4 #|+amqp-frame-heartbeat+|# 'heartbeat-frame-payload-parser)
+            (8 #|+amqp-frame-heartbeat+|# 'heartbeat-frame-payload-parser)
             (t (error 'amqp-unknown-frame-type-error :frame-type (frame-type frame))))))
     (apply parser-ctor frame args)))
