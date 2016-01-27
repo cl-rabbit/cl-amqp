@@ -466,6 +466,61 @@
             :test (lambda (x y)
                     (mw-equiv:object= x y t))))))
 
+  (subtest "Splitted Header frame test"
+    (let* ((frame-bytes (list
+                         #b"\x02\x00\x01\x00\x00\x00\x0e\x00<\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0c\x00"
+                         #b"\x00\xce"))
+           (cframe-bytes (concatenate '(simple-array  (unsigned-byte 8) 1)
+                                      #b"\x02\x00\x01\x00\x00\x00\x0e\x00<\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0c\x00"
+                                      #b"\x00\xce"))
+           (basic-properties (make-instance 'amqp:amqp-basic-class-properties))
+           (frame (make-instance 'amqp:header-frame :channel 1 :body-size 12 :payload basic-properties))
+           (payload-parser)
+           (dframe)
+           (parser (amqp:make-frame-parser
+                    :on-frame-type (lambda (parser frame-type)
+                                     (declare (ignore parser))
+                                     (is frame-type amqp:+amqp-frame-header+ "Frame type is expected to be Header Frame")
+                                     (setf dframe (make-instance (amqp:frame-class-from-frame-type frame-type))))
+                    :on-frame-channel (lambda (parser frame-channel)
+                                        (declare (ignore parser))
+                                        (setf (amqp:frame-channel dframe) frame-channel))
+                    :on-frame-payload-size (lambda (parser payload-size)
+                                             (declare (ignore parser))
+                                             ;; validate frame size
+                                             (setf (amqp:frame-payload-size dframe) payload-size)
+                                             (setf payload-parser
+                                                   (amqp:make-frame-payload-parser dframe
+                                                                                   :on-class-id (lambda (class-id)
+                                                                                                  (is class-id 60 "Class is Basic Class"))
+                                                                                   :on-content-body-size (lambda (body-size)
+                                                                                                           (is body-size 12 "Body size is 100")))))
+                    :on-frame-payload (lambda (parser data start end)
+                                        (declare (ignore parser))
+                                        (amqp:frame-payload-parser-consume payload-parser data :start start :end end))
+                    :on-frame-end (lambda (parser)
+                                    (declare (ignore parser))
+                                    (amqp:frame-payload-parser-finish payload-parser)))))
+
+
+      ;; encoding test
+      (let ((obuffer (amqp:new-obuffer)))
+        (amqp:frame-encoder frame obuffer)
+        (is (amqp:obuffer-get-bytes obuffer)
+            cframe-bytes
+            :test (lambda (x y)
+                    (mw-equiv:object= x y t))))
+
+      ;; decoding test
+      (amqp:frame-parser-consume parser (first frame-bytes))
+      (amqp:frame-parser-consume parser (second frame-bytes))
+      (let ((obuffer (amqp:new-obuffer)))
+        (amqp:frame-encoder dframe obuffer)
+        (is (amqp:obuffer-get-bytes obuffer)
+            cframe-bytes
+            :test (lambda (x y)
+                    (mw-equiv:object= x y t))))))
+
   (subtest "Heartbeat frame encoding/decoding"
     (let* ((heartbeat-frame (make-instance 'amqp:heartbeat-frame))
            (frame-bytes #b"\x08\x00\x00\x00\x00\x00\x00\xce")

@@ -203,6 +203,8 @@
                               (if (= payload-size payload-bytes-readed)
                                   (progn (setf (frame-parser-state parser) +parsing-frame-end-octet+)
                                          (decf index)))
+                              (if (= index end)
+                                  (decf index))
                               (return))))))
                   (go :end)
                 :parsing-frame-end-octet
@@ -214,12 +216,12 @@
                         (go :end))
                       (error 'malformed-frame-error))
                 :end)
-               (values index (= (frame-parser-state parser) +parsing-start+)))))
-    (loop for i from start to (1- end) do
-             (multiple-value-bind (index parsed) (consume data i)
-               (if parsed
-                   (return (values (1+ index) parsed))
-                   (if (= index end)
+               index)))
+    (loop for i from start below end do
+             (let ((index (consume data i)))
+               (if (= (frame-parser-state parser) +parsing-start+)
+                   (return (values (1+ index) t))
+                   (if (= index (1- end))
                        (return (values end nil))
                        (if (= i (1- end))
                            (return (values end nil))
@@ -461,10 +463,10 @@
                         (go :header-frame-payload-parsed)
                         (go :end))
                   :consuming-class-properties
-                    (let ((to-copy (if (< (- end start) (- size consumed))
-                                       (- end start)
-                                       (- size consumed))))
-                      (replace buffer octets :start1 consumed :start2 index)
+                    (let ((to-copy (min (- end start)
+                                        (- size consumed)
+                                        (- (length octets) index))))
+                      (replace buffer octets :start1 consumed :end1 (+ consumed to-copy) :start2 index :end2 (+ index to-copy))
                       (incf consumed to-copy)
                       (incf index to-copy)
                       (when (= consumed size)
