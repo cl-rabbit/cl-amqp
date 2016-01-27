@@ -200,9 +200,9 @@
                             (progn
                               (if on-frame-payload
                                   (funcall on-frame-payload parser bytes index-start index))
-                              (when (= payload-size payload-bytes-readed)
-                                (setf (frame-parser-state parser) +parsing-frame-end-octet+)
-                                (decf index))
+                              (if (= payload-size payload-bytes-readed)
+                                  (progn (setf (frame-parser-state parser) +parsing-frame-end-octet+)
+                                         (decf index)))
                               (return))))))
                   (go :end)
                 :parsing-frame-end-octet
@@ -219,7 +219,11 @@
              (multiple-value-bind (index parsed) (consume data i)
                (if parsed
                    (return (values (1+ index) parsed))
-                   (setf i (the fixnum index)))))))
+                   (if (= index end)
+                       (return (values end nil))
+                       (if (= i (1- end))
+                           (return (values end nil))
+                           (setf i (the fixnum index)))))))))
 
 (defclass method-frame-payload-parser ()
   (;; parser state
@@ -310,10 +314,10 @@
                           (go :method-frame-payload-parsed))
                         (go :end))
                   :consuming-method-arguments
-                    (let ((to-copy (if (< (- end start) (- size consumed))
-                                       (- end start)
-                                       (- size consumed))))
-                      (replace buffer octets :start1 consumed :start2 index)
+                    (let ((to-copy (min (- end start)
+                                        (- size consumed)
+                                        (- (length octets) index))))
+                      (replace buffer octets :start1 consumed :end1 (+ consumed to-copy) :start2 index :end2 (+ index to-copy))
                       (incf consumed to-copy)
                       (incf index to-copy)
                       (when (= consumed size)
