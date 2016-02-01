@@ -27,8 +27,7 @@
 
 
 (defclass method-assembler ()
-  ((channel :initarg :channel :reader method-assembler-channel)
-   (max-body-size :initarg :max-body-size :reader method-assembler-max-body-size :initform #.(* 4 1024 1024))
+  ((max-body-size :initarg :max-body-size :reader method-assembler-max-body-size :initform #.(* 4 1024 1024))
    (state :initform :start :accessor method-assembler-state)
    (current-method :accessor method-assembler-method)
    (body-bound :initform 0 :accessor method-assembler-body-bound)))
