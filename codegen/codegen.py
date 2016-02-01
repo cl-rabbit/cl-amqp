@@ -145,6 +145,16 @@ def method_synchronous_reply_method_lisp_name(self):
 
 AmqpMethod.method_synchronous_reply_method_lisp_name = method_synchronous_reply_method_lisp_name
 
+def method_synchronous_reply(self):
+    return SYNC_REQ_RESP['{0}.{1}'.format(self.klass.name, self.name)]
+    # if isinstance(reply, list):
+    #     format_str = "("+' '.join(["amqp-method-"+ self.klass.name +"-%s"]*len(reply))+")"
+    #     return format_str % tuple(reply)
+    # else:
+    #     return 'amqp-method-%s-%s' % (self.klass.name, reply)
+
+AmqpMethod.method_synchronous_reply = method_synchronous_reply
+
 accepted_by_update = json.loads(file("codegen/amqp_0.9.1_changes.json").read())
 
 def accepted_by(self, *receivers):

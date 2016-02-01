@@ -54,7 +54,17 @@
 
 (defmethod amqp-method-synchronous-p ((method ${m.method_lisp_class_name()}))
 % if m.isSynchronous:
-  (values t '${m.method_synchronous_reply_method_lisp_name()}))
+  (values t (lambda (method)
+  % if isinstance(m.method_synchronous_reply(), list):
+              (typecase method
+             % for reply in m.method_synchronous_reply():
+                (${'amqp-method-%s-%s' % (m.klass.name, reply)} t)
+             % endfor
+              )
+  % else:
+              (typep method '${'amqp-method-%s-%s' % (m.klass.name, m.method_synchronous_reply())})
+  % endif
+)))
 % else:
   nil)
 % endif
