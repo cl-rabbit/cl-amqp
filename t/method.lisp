@@ -2,7 +2,7 @@
 
 (enable-binary-string-syntax)
 
-(plan 1)
+(plan 2)
 
 (defclass test-method-assembler (method-assembler)
   ((consume-method-lambda :initarg :cm-lambda :reader consume-method-lambda)))
@@ -137,5 +137,25 @@
         (consume-frame assembler mframe)
         (is-error (consume-frame assembler hframe) 'error)
         (is cb-fired nil "callback NOT fired")))))
+
+(subtest "Method sync replies"
+  (subtest "Async method"
+    (let ((method (make-instance 'amqp-method-basic-publish)))
+      (is (amqp-method-synchronous-p method) nil "Basic publish isn't sync method")))
+
+  (subtest "Sync method with single reply"
+    (let ((method (make-instance 'amqp-method-connection-start)))
+      (multiple-value-bind (sync reply-matcher) (amqp-method-synchronous-p method)
+        (is sync t "Connection.start is sync")
+        (is (funcall reply-matcher (make-instance 'amqp-method-connection-start-ok)) t "Connection.StartOk is reply for Connection.Start")
+        (is (funcall reply-matcher (make-instance 'amqp-method-channel-open-ok)) nil "Channel.OpenOk isn't reply for Connection.Start"))))
+
+  (subtest "Sync method with multiple replies"
+    (let ((method (make-instance 'amqp-method-basic-get)))
+      (multiple-value-bind (sync reply-matcher) (amqp-method-synchronous-p method)
+        (is sync t "Basic.Get is sync")
+        (is (funcall reply-matcher (make-instance 'amqp-method-basic-get-ok)) t "Basic.GetOk is reply for Basic.Get")
+        (is (funcall reply-matcher (make-instance 'amqp-method-basic-get-empty)) t "Basic.GetEmpty is reply for Basic.Get")
+        (is (funcall reply-matcher (make-instance 'amqp-method-channel-open-ok)) nil "Channel.OpenOk isn't reply for Basic.Get")))))
 
 (finalize)
