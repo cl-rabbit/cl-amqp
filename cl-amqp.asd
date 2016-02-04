@@ -6,7 +6,7 @@
 (in-package :cl-amqp.system)
 
 (defsystem :cl-amqp
-  :version "0.4"
+  :version "0.4.1"
   :description "AMQP 0.9.1 with RabbitMQ extensions in Common Lisp"  
   :maintainer "Ilya Khaprov <ilya.khaprov@publitechs.com>"
   :author "Ilya Khaprov <ilya.khaprov@publitechs.com> and CONTRIBUTORS"
