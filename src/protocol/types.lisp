@@ -340,7 +340,7 @@
     (obuffer-add-bytes buffer array-bytes)))
 
 (defun amqp-timestamp-encoder (buffer value)
-  (obuffer-encode-sb64 buffer value))
+  (obuffer-encode-sb64 buffer (local-time:timestamp-to-unix value)))
 
 (defun amqp-timestamp-table-field-encoder (buffer value)
   (amqp-encode-field-value-type buffer +amqp-type-timestamp+)
@@ -398,7 +398,7 @@
     (amqp-longstr (amqp-longstr-table-field-encoder buffer value))
     (amqp-barray (amqp-barray-table-field-encoder buffer value))
     (amqp-array (amqp-array-table-field-encoder buffer value))
-    (amqp-timestamp (amqp-timestamp-table-field-encoder buffer (local-time:timestamp-to-unix value)))
+    (amqp-timestamp (amqp-timestamp-table-field-encoder buffer value))
     (amqp-table (amqp-table-table-field-encoder buffer value))
     (amqp-void (amqp-void-table-field-encoder buffer value))
     (amqp-boolean (amqp-boolean-table-field-encoder buffer (eq t value)))

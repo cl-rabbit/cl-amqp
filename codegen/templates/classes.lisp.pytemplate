@@ -182,7 +182,7 @@ ${line}
                (when (zerop (logand partial-flags 1))
                  (return))
                (incf flagword-index))
-            (collectors:with-appender-output (add-initarg)
+            (collectors:with-collector-output (add-initarg)
              % for prop in klass.fields:
               % if spec.resolveDomain(prop.domain) == 'bit':
                (add-initarg :${prop.name} (not (zerop (logand flags +flag-${prop.name}+))))

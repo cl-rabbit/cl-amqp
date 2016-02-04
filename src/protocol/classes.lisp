@@ -3008,7 +3008,7 @@
                (when (zerop (logand partial-flags 1))
                  (return))
                (incf flagword-index))
-            (collectors:with-appender-output (add-initarg)
+            (collectors:with-collector-output (add-initarg)
              (unless (zerop (logand flags +flag-content-type+))
                (add-initarg :content-type (amqp-shortstr-decoder ibuffer)))
              (unless (zerop (logand flags +flag-content-encoding+))
