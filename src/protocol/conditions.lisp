@@ -16,7 +16,13 @@
    (class-id :initarg :class-id
              :reader amqp-error-class)
    (method-id :initarg :method-id
-              :reader amqp-error-method)))
+              :reader amqp-error-method)) 
+  (:report (lambda (condition stream)   
+             (format stream "~A[~A, ~A] in response to ~A" (class-name (class-of condition))
+                     (amqp-error-reply-code condition)
+                     (amqp-error-reply-text condition)
+                     (method-class-from-signature (logior (ash (amqp-error-class condition) 16)
+                                                          (amqp-error-method condition)))))))
 
 (define-condition amqp-channel-error (amqp-protocol-error)
   ((channel :initarg :channel
